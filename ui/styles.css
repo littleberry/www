@@ -1,0 +1,364 @@
+/*
+	Theme: Blueprint
+	Author: Patricia Kruep
+	
+	Stylesheet: Master
+	Depends on: None
+	External resources: Google Web Fonts: Merriweather Sans 400, Merriweather Sans 400 Italic, Merriweather Sans 700, Merriweather Sans 700 Italics
+	
+	Version 1.0
+	Last updated: 2013-09-11
+	
+	Notes:
+		Uses SMACSS methodology for file structure
+		
+		Colors:
+			#0A0C21 (Midnight)
+			#152959 (Twilight)
+			#193E73 (Dusk)
+			#A9BFF5 (Sky)
+			#FAF9FF (Cloud)
+*/
+
+/* !BASE 
+**************************************************/
+* {
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+	margin: 0;
+}
+article, aside, dialog, figure, footer, header, hgroup, nav, section {
+	display:block; zoom:1;
+}
+/* Base styles */
+html {
+	height: 100%; /* presumably to get the footer to sit at the bottom of the window/page */
+}
+body {
+	height: 100%;
+	font-family: 'Merriweather Sans', 'Helvetica', 'Arial', sans-serif;
+	font-weight: 400;
+	font-size: 1em;
+	color: #0A0C21;
+	padding: 0;
+	margin: 0;
+	background-color: #FAF9FF;
+}
+
+a:link,
+a:visited {
+	color: #193E73;
+}
+a:hover,
+a:active {
+	color: #A9BFF5;
+}
+
+/* !LAYOUT 
+**************************************************/
+/* Global page layout */
+
+#site-header {
+	position: relative;
+	width: 100%;
+	margin: 0em;
+	padding: 0em;
+	overflow: auto;
+}
+#site-nav {
+	position: relative;
+	width: auto;
+	float: left;
+	overflow: auto;
+}
+#section-nav {
+	position: relative;
+	width: 100%;
+	overflow: auto;
+	margin: 0em;
+	padding: 0em;
+}
+#page-content {
+	position: relative;
+	width: 85%;
+	overflow: auto;
+	margin: 1.5em auto;
+	padding: 0;
+}
+
+.l-col-100 {
+	position: relative;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+.l-col-75 {
+	position: relative;
+	width: 75%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+.l-col-50 {
+	position: relative;
+	width: 50%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+.l-col-25 {
+	position: relative;
+	width: 25%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+.l-col-80 {
+	position: relative;
+	width: 80%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+.l-col-60 {
+	position: relative;
+	width: 60%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+.l-col-40 {
+	position: relative;
+	width: 40%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+.l-col-20 {
+	position: relative;
+	width: 20%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+.l-col-33 {
+	position: relative;
+	width: 33%;
+	margin: 0;
+	padding: 0;
+	/* clear: both; */
+	overflow: auto;
+}
+.l-col-66 {
+	position: relative;
+	width: 66%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+}
+
+
+
+/* !Modules 
+**************************************************/
+/* !Header modules */
+.site-header {
+	position: relative;
+	width: 100%;
+	background-color: #152959;
+}
+
+.site-title {
+	color: #FAF9FF;
+	font-size: 2em;
+	font-weight: 700;
+	font-variant: small-caps;
+	padding: .25em 1.5em .25em 1.5em;
+	float: left;
+}
+
+.site-nav {
+	position: relative;
+	color: #FAF9FF;
+	margin: 1em;
+	padding: 0em 1em;
+	border-left: 1px solid #193E73;
+	border-right: 1px solid #193E73;
+}
+
+.site-menu {
+	position: relative;
+	list-style: none;
+	margin: 0em;
+	padding: 0em;
+}
+
+.site-menu-item {
+	position: relative;
+	float: left;
+	margin: .5em;
+	padding: 0;
+}
+
+.site-menu-link:link,
+.site-menu-link:visited {
+	color: #FAF9FF;
+	text-decoration: none;
+}
+.site-menu-link:hover,
+.site-menu-link:active {
+	color: #A9BFF5;
+	text-decoration: underline;
+}
+
+.section-nav {
+	position: relative;
+	color: #FAF9FF;
+	background-color: #193E73;
+	margin: 1em;
+	padding: 0em 1em;
+	border-left: 1px solid #193E73;
+	border-right: 1px solid #193E73;
+}
+.section-nav-title {
+	position: relative;
+	color: #FAF9FF;
+	font-size: 1.5em;
+	font-weight: 400;
+	font-variant: small-caps;
+	padding: .25em .5em .25em 2em;
+	float: left;
+}
+.section-menu {
+	position: relative;
+	list-style: none;
+	margin: 0em;
+	padding: .25em 1em .25em 1em;
+}
+
+.section-menu-item {
+	position: relative;
+	float: left;
+	margin: .5em;
+	padding: 0;
+}
+
+.section-menu-link:link,
+.section-menu-link:visited {
+	color: #FAF9FF;
+	text-decoration: none;
+}
+.section-menu-link:hover,
+.section-menu-link:active {
+	color: #A9BFF5;
+	text-decoration: underline;
+}
+
+
+/* !Content modules */
+.page-header {
+	position: relative;
+	width: 100%;
+	margin: 1em 0;
+	overflow: auto;
+}
+.page-title {
+	position: relative;
+	width: 75%;
+	float: left;
+}
+.page-controls-nav {
+	position: relative;
+	width: 25%;
+	float: left;
+}
+.content {
+	position: relative;
+	width: 100%;
+	margin: 1em 0;
+	overflow: auto;
+	clear: left;
+}
+
+/* !Content Manage Client modules */
+.client-page-controls {
+	position: relative;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.page-controls-item {
+	position: relative;
+	margin: 0em .5em;
+	padding: .25em;
+	font-size: .8em;
+	float: left;
+}
+.add-client-button {
+	position: relative;
+	text-align: center;
+	font-weight: 700;
+	width: 8em;
+	padding: .25em;
+	color: #FAF9FF;
+	background-color: #A9BFF5;
+	border: 1px dotted #193E73;
+}
+.add-client-link:link,
+.add-client-link:visited {
+	text-decoration: none;
+	color: #FAF9FF;
+}
+.add-client-link:hover,
+.add-client-link:visited {
+	color: #193E73;
+}
+.client-list {
+	position: relative;
+	list-style: none;
+	margin: 0em;
+	padding: 0em;
+}
+.client-list-item {
+	position: relative;
+	float: left;
+	margin: 0em;
+	padding: .5em;
+	/* border: 1px solid #D4E8F5; */
+}
+.client-logo {
+	
+}
+.client-logo-thumbnail {
+	position: relative;
+	width: 120px;
+	height: 100%;
+	float: left;
+	padding: 0 1em 0 0;
+	border: none;
+}
+.client-info-list {
+	position: relative;
+	list-style: none;
+	margin: 0em;
+	padding: 0em;
+}
+.client-info-name {}
+.client-info-name-link {}
+.client-info-contact {}
+.client-info-contact-link {}
+.client-info-active-projects {}
+client-info-active-projects-link {}
+
+/* !Footer modules */
