@@ -1,6 +1,6 @@
 <?php
 
-//display page header, including CSS (UGH!)
+//old
 function displayPageHeader($pageTitle) {
 ?>
 <!doctype html public "-//w3c//dtd html 1.0 strict//en" "http://www.w3.org/TR/xhtml1-strict.dtd">

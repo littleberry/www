@@ -1,5 +1,6 @@
 <?php
 //this is the php file with all of the configuration information for the application.
+//this is a local config file, do not change on dev server.
 
 //dsn used to connect to database
 define ("DB_DSN", "mysql:dbname=time_tracker");

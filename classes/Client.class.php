@@ -1,17 +1,19 @@
 <?php
 
 
-//include the DataObject code with the class to get the connectivity
+//connectivity
 require_once("DataObject.class.php");
 
 class Client extends DataObject {
-	//set up the array keys and initilize each key. Enables the class constructor to validate fields when a each object is created.
 	protected $data = array(
 		"client_id"=>"",
 		"client_name"=>"",
 		"client_address"=>"",
 		"client_currency_index"=>"",
-		//address fields
+		"client_logo_link"=>"",
+		"client_email"=>"",
+		"client_phone"=>"",
+		//address fields, need to use for detailed addy.
 		"client_address_number"=>"",
 		"client_street_name"=>"",
 		"client_state"=>"",
@@ -20,15 +22,14 @@ class Client extends DataObject {
 		"client_city"=>""
 	);
 	
-	//display all clients
+	//display all information about a client returned as an array
 	public static function getClients() {
 		$conn=parent::connect();
-		$sql="SELECT client_name FROM " . TBL_CLIENT;
-		
+		$sql="SELECT * FROM " . TBL_CLIENT;
 		try {
 			$st = $conn->prepare($sql);
 			$st->execute();
-			$clients=array();
+			$client=array();
 			foreach ($st->fetchAll() as $row) {
 				$clients[] = new Client($row);
 			}
@@ -40,25 +41,39 @@ class Client extends DataObject {
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
-		
 	
-	
-	//return the data for a specific client based on the client_id.
-	public static function getClient($clientId) {
+	//display all client names
+	/*public static function getClientNameAndLogo($clientId) {
 		$conn=parent::connect();
-		//use a placeholder for the ID
-		$sql = "SELECT * FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
+		$sql="SELECT client_name, client_logo_link FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
 		
 		try {
-			//get the PDO object
 			$st = $conn->prepare($sql);
-			//bind the value thats being inserted and set its datatype
 			$st->bindValue(":client_id", $clientId, PDO::PARAM_INT);
 			$st->execute();
-			//this is a small return, so fetch() works fine.
 			$row=$st->fetch();
 			parent::disconnect($conn);
-			//send the client object back to the calling function.
+			if ($row) return new Client($row);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	*/
+	
+	
+	//return all data for a specific client based on the client_id.
+	public static function getClient($clientId) {
+		$conn=parent::connect();
+		//OLD SQL, use a left join here, rather than just deliver an error for missing data.
+		//$sql = "SELECT " . TBL_CLIENT . ".*," . TBL_CLIENT_ADDRESS . ".* FROM " . TBL_CLIENT . "," . TBL_CLIENT_ADDRESS . " WHERE " . TBL_CLIENT . ".client_id = :client_id and ". TBL_CLIENT . ".client_id=" . TBL_CLIENT_ADDRESS . ".client_id";
+		$sql = "SELECT " . TBL_CLIENT . ".*," . TBL_CLIENT_ADDRESS . ".* FROM " . TBL_CLIENT . " as client LEFT JOIN " . TBL_CLIENT_ADDRESS . " as client_address on client.client_id = client_address.client_id WHERE client.client_id = :client_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $clientId, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
 			if ($row) return new Client($row);
 		} catch(PDOException $e) {
 			parent::disconnect($conn);
@@ -66,7 +81,25 @@ class Client extends DataObject {
 		}
 	}
 	
-	//return the client_id based on the client_name
+	
+	//return the clients name based on the client_id.
+	//I'll keep this here as a utility function.
+	public function getClientNameById($client_id) {
+		$conn=parent::connect();
+		$sql = "SELECT client_name FROM " . TBL_CLIENT . " WHERE client_id = '" . $client_id . "'";			
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed getting the client name, sql is $sql " . $e->getMessage());
+		}
+	}
+	
 	public function getClientId($client_name) {
 		$conn=parent::connect();
 		$sql = "SELECT client_id FROM " . TBL_CLIENT . " WHERE client_name = '" . $client_name . "'";			
@@ -76,7 +109,7 @@ class Client extends DataObject {
 			$st->execute();
 			$row=$st->fetch();
 			parent::disconnect($conn);
-			if ($row) return new Client($row);
+			if ($row) return $row;
 		} catch (PDOException $e) {
 			parent::disconnect($conn);
 			die("Query failed getting the client id, sql is $sql " . $e->getMessage());
@@ -84,7 +117,7 @@ class Client extends DataObject {
 	}
 	
 	//get the available currencies out of the currency table
-	//9/4: Client only needs US here
+	//9/4: Client only needs US here, so this only returns USD at this point, but this is built to handle others.
 	public function getCurrency() {
 		$conn=parent::connect();
 		$sql = "SELECT * FROM " . TBL_CURRENCY;
@@ -98,6 +131,25 @@ class Client extends DataObject {
 				$currency[] = $row;
 			}
 			return $currency;
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage());
+		}
+	}
+	
+	//get the currency for a specific currency index
+	public function getCurrencyByIndex($client_currency_index) {
+		$conn=parent::connect($client_currency_index);
+		$sql = "SELECT client_preferred_currency FROM " . TBL_CURRENCY . " WHERE client_currency_index = :client_currency_index";
+		
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_currency_index", $client_currency_index, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			//just return the value for the currency.
+			if ($row) return $row[0];
 		} catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("Query failed on you: " . $e->getMessage());
