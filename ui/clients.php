@@ -41,7 +41,11 @@
 		<h1 class="page-title">Clients</h1>
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
+<<<<<<< HEAD
 				<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.php">+ Add Client</a></li>
+=======
+				<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
+>>>>>>> 0cca4a4e50cf8adc95a446f113fcc1a862b3daa7
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
 			</ul>
 		</nav>

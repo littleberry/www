@@ -73,7 +73,11 @@
 				<h1 class="client-details-title"><?php echo $client_details->getValue("client_name")?></h1>
 			</header>
 			<ul class="details-list client-details-list">
+<<<<<<< HEAD
 				<li class="client-details-item phoneNum"><?php echo $client_details->getValue("client_address")?></li>
+=======
+				<li class="client-details-item phoneNum"><?php echo $client_details->getValue("client_address_number")?></li>
+>>>>>>> 0cca4a4e50cf8adc95a446f113fcc1a862b3daa7
 				<li class="client-details-item email"><?php echo $client_details->getValue("client_email")?></li>
 				<li class="client-details-item fax"><?php echo $client_details->getValue("client_phone")?></li>
 				<li class="client-details-item address">

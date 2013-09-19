@@ -14,8 +14,13 @@ class Client extends DataObject {
 		"client_email"=>"",
 		"client_phone"=>"",
 		//address fields, need to use for detailed addy.
+<<<<<<< HEAD
 		//"client_address_number"=>"",
 		//"client_street_name"=>"",
+=======
+		"client_address_number"=>"",
+		"client_street_name"=>"",
+>>>>>>> 0cca4a4e50cf8adc95a446f113fcc1a862b3daa7
 		"client_state"=>"",
 		"client_zip"=>"",
 		//"client_apartment"=>"",
