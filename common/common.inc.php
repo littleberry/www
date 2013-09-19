@@ -1,10 +1,6 @@
 <?php
 
-<<<<<<< HEAD
 /*
-=======
-//old
->>>>>>> 0cca4a4e50cf8adc95a446f113fcc1a862b3daa7
 function displayPageHeader($pageTitle) {
 ?>
 <!doctype html public "-//w3c//dtd html 1.0 strict//en" "http://www.w3.org/TR/xhtml1-strict.dtd">
