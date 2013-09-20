@@ -64,7 +64,7 @@
 	?>
 	<section class="content">
     <!--added because we need the information to be submitted in a form-->
-      <form action="client-add.php" method="post" style="margin-bottom:50px;">
+      <form action="client-add.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
       <input type="hidden" name="action" value="client-add"/>
     <!--end add-->
 		<figure class="client-logo l-col-20">
@@ -205,9 +205,17 @@
  <?php } 
  
  function processClient() {
+ 	//these are just the required fields in this form
 	$requiredFields = array("client_name","client_address","client_state","client_phone","client_city","client_zip","client_email");
 	$missingFields = array();
 	$errorMessages = array();
+	
+	//this is for the photo upload
+	if (isset($_FILES["client-logo-file"])) {
+		//echo "got the file " . $_FILES["client-logo-file"]["name"];
+		//I have like 5 minutes here.
+		move_uploaded_file($_FILES["client-logo-file"]["tmp_name"], "images/" . basename($_FILES["client-logo-file"]["name"]));
+	}
 	
 	//create the object here and pass in the appropriate fields to the constructor. These values are now part of the client object.
 	$client = new Client( array(
