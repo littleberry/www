@@ -28,7 +28,7 @@
 		</ul>
 	</nav>
 	<nav id="section-nav" class="section-nav manage">
-		<h1 class="section-nav-title">Manage: </h1>
+		<h1 class="section-nav-title">Manage: I am putting this out there, please remove.</h1>
 		<ul class="section-menu">
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Projects</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
