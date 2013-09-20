@@ -20,6 +20,7 @@
     	echo "The detailed data for this client is not available. YET! :)";
 		exit;
 	}
+	//this is just a comment.
 ?>
 <!DOCTYPE html>
 <html lang="en">
