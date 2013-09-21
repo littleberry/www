@@ -9,7 +9,7 @@
 	} elseif (isset ($_POST["client_id"])) {
 		$client_id = $_POST["client_id"]; 
 	} else {
-		echo "no client identifier provided, cannot find details for emtpy client.";
+		echo "no client identifier provided, cannot find details for empty client.";
 		exit;
 	}
 	//retrieve the active contact list for this client
