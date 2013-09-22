@@ -302,9 +302,6 @@
 	}
 } 
 
-//function displayClients() {
-//	header("Location: clients.php");
-//}
 ?>
  
  
@@ -372,3 +369,4 @@
 <script src="client-controls.js" type="text/javascript"></script>
 </body>
 </html>
+	
