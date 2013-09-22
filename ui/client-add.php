@@ -2,7 +2,10 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
+	require_once("../common/errorMessages.php");
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,15 +49,19 @@
 			</ul>
 		</nav>
 	</header>
-    <?php if (isset($_POST["action"]) and $_POST["action"] == "client-add") {
+	
+<!--OVERALL CONTROL--->
+<?php if (isset($_POST["action"]) and $_POST["action"] == "client-add") {
 					processClient();
 				} else {
 					displayClientInsertForm(array(), array(), new Client(array()));
 				} 
-	?>
+?>
     
-	<?php function displayClientInsertForm($errorMessages, $missingFields, $client) { 
-	//print_r($client);
+    
+<!--DISPLAY CLIENT INSERT WEB FORM--->
+<?php function displayClientInsertForm($errorMessages, $missingFields, $client) { 
+	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
@@ -84,7 +91,7 @@
 				</header>
 				<ul class="details-list client-details-list">
 		   			<li class="client-details-item name">
-						<label for="clientname" <?php validateField("client_name", $missingFields)?> class="client-details-label">Client's name:</label>
+						<label for="client-name" <?php validateField("client_name", $missingFields)?> class="client-details-label">Client's name:</label>
 						<input id="client-name" name="client-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $client->getValueEncoded("client_name")?>" /><br />
 						<label for="contact-info-sync" class="client-details-label">Client and contact the same:</label>
 						<input id="contact-info-sync" name="contact-info-sync" class="contact-info-sync-input" type="checkbox" tabindex="11" value="info-sync" />
@@ -202,53 +209,94 @@
 			</fieldset>
 		</section>
         </form>
- <?php } 
+ <?php } ?>
  
- function processClient() {
- 	//these are just the required fields in this form
+ 
+<!--PROCESS THE CLIENT THAT WAS SUBMITTED--->
+<?php function processClient() {
+ 	//these are the required fields in this form
 	$requiredFields = array("client_name","client_address","client_state","client_phone","client_city","client_zip","client_email");
 	$missingFields = array();
 	$errorMessages = array();
 	
-	//this is for the photo upload
-	if (isset($_FILES["client-logo-file"])) {
-		//echo "got the file " . $_FILES["client-logo-file"]["name"];
-		//I have like 5 minutes here.
-		move_uploaded_file($_FILES["client-logo-file"]["tmp_name"], "images/" . basename($_FILES["client-logo-file"]["name"]));
+		//this is for the photo upload
+	if (isset($_FILES["client-logo-file"]) and $_FILES["client_logo-file"]["error"] == UPLOAD_ERR_OK) {
+		if ( $_FILES["client-logo-file"]["type"] != "image/jpeg") {
+			//I'm hardcoding the client_currency_index, because it's in the wrong place. This should be with the rest of the validation.
+			$errorMessages[] = "<li>" . getErrorMessage("1","client_logo_link", "invalid_file") . "</li>";
+		} elseif ( !move_uploaded_file($_FILES["client-logo-file"]["tmp_name"], "images/" . basename($_FILES["client-logo-file"]["name"]))) {
+			$errorMessages[] = "<li>" . getErrorMessage("1","client_logo_link", "upload_problem") . "</li>";
+		} else {
+			$_POST["client_logo_link"] = $_FILES["client-logo-file"]["name"];
+		}
 	}
+
 	
 	//create the object here and pass in the appropriate fields to the constructor. These values are now part of the client object.
 	$client = new Client( array(
 		//CHECK REG SUBS!!
+		"client_logo_link" => isset($_POST["client_logo_link"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["client_logo_link"]) : "",
 		"client_name" => isset($_POST["client-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-name"]) : "",
-		"client_phone" => isset($_POST["client-phone"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-phone"]) : "",
-		"client_email" => isset($_POST["client-email"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-email"]) : "",
+		"client_phone" => isset($_POST["client-phone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-phone"]) : "",
+		"client_email" => isset($_POST["client-email"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["client-email"]) : "",
 		"client_address" => isset($_POST["client-streetAddress"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-streetAddress"]) : "",
 		"client_state" => isset($_POST["client-state"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-state"]) : "",
-		"client_zip" => isset($_POST["client-zip"])? preg_replace("/[^0-9]/", "", $_POST["client-zip"]) : "",
+		"client_zip" => isset($_POST["client-zip"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-zip"]) : "",
 		"client_city" => isset($_POST["client-city"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-city"]) : "",
 		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
-		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-fax"]) : "",
+		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
 	
-	
+//error messages and validation script
 	foreach($requiredFields as $requiredField) {
 		if ( !$client->getValue($requiredField)) {
 			$missingFields[] = $requiredField;
 		}
 	}
 	
+	
 	if ($missingFields) {
-		$errorMessages[] = '<p class="client-details-label required">There were some missing fields in the form you submitted. Please complete the fields highlighted below and click Send Details to resend the form.</p>';
+		$i = 0;
+		$errorType = "required";
+		foreach ($missingFields as $missingField) {
+			$errorMessages[] = "<li>" . getErrorMessage($client->getValue("client_currency_index"),$missingField, $errorType) . "</li>";
+			$i++;
+		}
+	} else {
+		$email = $client->getValue("client_email");
+		$phone = $client->getValue("client_phone");
+		$zip = $client->getValue("client_zip");
+		
+		// validate the email address
+		if(!preg_match("/^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,3})$/i", $email)) {
+			$errorMessages[] = "<li>" . getErrorMessage($client->getValue("client_currency_index"),"client_email", "invalid_input") . "</li>";
+		}
+		
+		// validate the phone number
+		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $phone)) {
+			$errorMessages[] = "<li>" . getErrorMessage($client->getValue("client_currency_index"),"client_phone", "invalid_input") . "</li>";
+		}
+		
+		//validate the zip code
+		if (!preg_match ("/^[0-9]{5}$/", $zip)) {
+			$errorMessages[] = "<li>" . getErrorMessage($client->getValue("client_currency_index"),"client_zip", "invalid_input") . "</li>";
+		}	
 	}
 		
 	if ($errorMessages) {
 		displayClientInsertForm($errorMessages, $missingFields, $client);
 	} else {
 		$client_email=$_POST["client-email"];
-		$client->insertClient($client_email);
-		echo"You have successfully added client " . $client_email . ". You may add an additional client now. ";		
-		echo"<a href=\"clients.php\">View the full client list</a>";
+		$client_name=$client->getValue("client_name");
+		$client_id = $client->getClientId($client_name);
+		//don't allow duplicate entries in the database.
+		if ($client_id[0]) {
+			echo "Client " . $client_id[0] . " is already in the database. Please try again.";
+		} else {
+			$client->insertClient($client_email);
+			echo "You have successfully added client " . $client_email . ". You may add an additional client now. ";		
+			echo"<a href=\"clients.php\">View the full client list</a>";
+		}
 		//headers already sent, call the page back with blank attributes.
 		displayClientInsertForm(array(), array(), new Client(array()));
 	}
