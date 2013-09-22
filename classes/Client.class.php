@@ -197,6 +197,7 @@ class Client extends DataObject {
 				parent::disconnect($conn);
 				die("Query failed on insert, sql is $sql " . $e->getMessage());
 			}	
+			
 			//get the client ID out of the client table based on the email address we just inserted. It must use the same key (auto increment) created when the record
 			//was inserted into the client table.
 			$conn=parent::connect();
