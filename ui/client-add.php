@@ -19,7 +19,7 @@
 <body>
 <header id="site-header" class="site-header">
 	<h1 class="site-title">Time Tracker</h1>
-	<nav id="site-nav" class="site-nav">
+	<nav id="site-nav" class="site-nav">223
 		<ul id="site-menu" class="site-menu">
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Timesheets</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Reports</a></li>
@@ -220,7 +220,7 @@
 	$errorMessages = array();
 	
 		//this is for the photo upload
-	if (isset($_FILES["client-logo-file"]) and $_FILES["client_logo-file"]["error"] == UPLOAD_ERR_OK) {
+	if (isset($_FILES["client-logo-file"]) and $_FILES["client-logo-file"]["error"] == UPLOAD_ERR_OK) {
 		if ( $_FILES["client-logo-file"]["type"] != "image/jpeg") {
 			//I'm hardcoding the client_currency_index, because it's in the wrong place. This should be with the rest of the validation.
 			$errorMessages[] = "<li>" . getErrorMessage("1","client_logo_link", "invalid_file") . "</li>";
