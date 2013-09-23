@@ -5,11 +5,10 @@
 	require_once("../common/errorMessages.php");
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Add Clients For Test</title>
+	<title>Add Client</title>
 	<meta charset="utf-8" />
 	<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700,700italic' rel='stylesheet' type='text/css' />
 	<link href="styles.css" rel="stylesheet" type="text/css" />
@@ -19,7 +18,7 @@
 <body>
 <header id="site-header" class="site-header">
 	<h1 class="site-title">Time Tracker</h1>
-	<nav id="site-nav" class="site-nav">223
+	<nav id="site-nav" class="site-nav">
 		<ul id="site-menu" class="site-menu">
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Timesheets</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Reports</a></li>
@@ -37,7 +36,7 @@
 	</nav>
 </header>
 <section id="page-content" class="page-content">
-<header class="page-header">
+	<header class="page-header">
 		<h1 class="page-title">Add New Client</h1>
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
@@ -49,16 +48,14 @@
 			</ul>
 		</nav>
 	</header>
-	
+
 <!--OVERALL CONTROL--->
-<?php if (isset($_POST["action"]) and $_POST["action"] == "client-add") {
+<?php 			if (isset($_POST["action"]) and $_POST["action"] == "client-add") {
 					processClient();
 				} else {
 					displayClientInsertForm(array(), array(), new Client(array()));
 				} 
 ?>
-    
-    
 <!--DISPLAY CLIENT INSERT WEB FORM--->
 <?php function displayClientInsertForm($errorMessages, $missingFields, $client) { 
 	
@@ -191,27 +188,95 @@
 						<?php foreach ($currency as $currencies) { ?>
    							<option value="<?php echo $currencies["client_currency_index"] ?>"<?php setSelected($client, "client_currency_index", $currencies["client_currency_index"]) ?>><?php echo $currencies["client_preferred_currency"]?></option>
     					<?php } ?>
-                        </select>
-                        
-<!--					 <select id="client-currency" name="client-currency" class="client-currency-select" tabindex="10">
-							<option value="">Select currency</option>
-							<option selected="selected" value="USD">United States Dollar</option>
-						</select>--><br />
+                        </select><br />
 					</li>
+					<!--
+<li class="client-details-item submit-client">
+						<label for="client-add-btn" class="client-details-label">All done?</label>
+						<input id="client-add-btn" name="client-add-btn" class="client-add-btn" type="button" value="+Add Client" tabindex="11" /> or
+						<a class="" href="#" tabindex="11">Cancel</a>
+					</li>
+-->
+				</ul>
+			</fieldset>
+		<!--
+</section>
+		<section id="contact-detail" class="contact-detail">
+			<header class="details-header contact-details-header">
+				<h1 class="client-details-title">Contacts</h1>
+			</header>
+-->
+			<fieldset class="contact-details-entry">
+				<legend class="contact-details-title">Enter contact details:</legend>
+				<h4 class="required">= Required</h4>
+				<ul class="details-list client-details-list">
+					<li class="client-details-item name">
+						<label for="contact-name" class="client-details-label required">Your contact's name:</label>
+						<input id="contact-name" name="contact-name" class="contact-contact-info-input" type="text" tabindex="12" value="" /><br />
+						<label for="contact-primary" class="client-details-label">This the primary contact: </label>
+						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" tabindex="13" value="primary" />
+					</li>
+					<li class="client-details-item phoneNum">
+						<label for="contact-officePhone" class="client-details-label">Office phone:</label>
+						<input id="contact-officePhone" name="contact-officePhone" class="contact-contact-info-input" type="text" tabindex="14" value="" /><br />
+						<label for="contact-mobilePhone" class="client-details-label">Mobile phone:</label>
+						<input id="contact-mobilePhone" name="contact-mobilePhone" class="contact-info-input" type="text" tabindex="15" value="" />
+					</li>
+					<li class="client-details-item email">
+						<label for="contact-email" class="client-details-label">Email:</label>
+						<input id="contact-email" name="contact-email" class="contact-contact-info-input" type="text" tabindex="16" value="" />
+					</li>
+					<li class="client-details-item fax">
+						<label for="contact-fax" class="client-details-label">Fax:</label>
+						<input id="contact-fax" name="contact-fax" class="contact-contact-info-input" type="text" tabindex="17" value="" />
+					</li>
+					
+					<li class="client-details-item submit-additional">
+						<label for="add-additional-link" class="client-details-label">Need to add more contacts?</label>
+						<a id="add-additional-link" href="#" class="" tabindex="20">Add another contact</a>
+					</li>
+					
+					<!--
+<li class="contact-details-item submit-contact">
+						<label for="contact-add-btn" class="contact-details-label">All done?</label>
+						<input id="contact-add-btn" name="contact-add-btn" class="contact-add-btn" type="button" value="+Add Contact" tabindex="18" /> or <a id="cancel-add-contact-link" class="cancel-action-link" href="#" tabindex="19">Cancel</a>
+					</li>
+-->
+				</ul>
+			</fieldset>
+			<fieldset class="client-details-entry">
+				<ul class="details-list client-details-submit">
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label">All done?</label>
-                        <!--modified field to be of type submit instead of button-->
-                        <input id="client-add-btn" name="client-add-btn" class="client-add-btn" type="submit" value="+Add Client" /> or
-						<!--end change-->
-                        <a class="" href="#">Cancel</a>
+						<!--modified field to be of type submit instead of button-->
+                        <input id="client-add-btn" name="client-add-btn" class="client-add-btn" type="submit" value="+Add Client" tabindex="11"/> 
+						<!--input id="client-add-btn" name="client-add-btn" class="client-add-btn" type="button" value="+Add Client" tabindex="11" /-->
+						<!--end change--> 
+						<a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 			</fieldset>
 		</section>
-        </form>
- <?php } ?>
- 
- 
+		<!--
+<section class="client-projects">
+			<header class="details-header client-projects-header">
+				<h1 class="client-details-title">Projects</h1>
+			</header>
+			<h1 class="client-projects-title active">Active Projects</h1>
+			<ul class="details-list client-projects-list active">
+				<li class="client-projects-list-item">Atomic Cupcakes</li>
+			</ul>
+			<h1 class="client-projects-title archive">Archived Projects</h1>
+			<ul class="details-list client-projects-list archive">
+				<li class="client-projects-list-item">Atomic Cupcakes 'Coming Soon' Campaign</li>
+			</ul>
+		</section>
+-->
+	</section>
+</section>
+</form>
+<?php } ?>
+
 <!--PROCESS THE CLIENT THAT WAS SUBMITTED--->
 <?php function processClient() {
  	//these are the required fields in this form
@@ -303,70 +368,9 @@
 } 
 
 ?>
- 
- 
- 
-		<section class="contact-detail">
-			<header class="details-header contact-details-header">
-				<h1 class="client-details-title">Contacts</h1>
-			</header>
-			<fieldset class="contact-details-entry">
-				<legend class="contact-details-title">Enter contact details:</legend>
-				<h4 class="required">= Required</h4>
-				<ul class="details-list contact-details-list">
-					<li class="contact-details-item name">
-						<label for="contact-name" class="contact-details-label required">Your contact's name:</label>
-						<input id="contact-name" name="contact-name" class="contact-name-input" type="text" tabindex="9" value="" /><br />
-						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
-						<input id="contact-primary" name="contact-primary" class="contact-primary-input" type="checkbox" tabindex="10" value="primary" />
-					</li>
-					<li class="contact-details-item phoneNum">
-						<label for="contact-info-sync" class="contact-details-label">Client and contact the same:</label>
-						<input id="contact-info-sync" name="contact-info-sync" class="contact-info-sync-input" type="checkbox" tabindex="11" value="info-sync" /><br />
-						<label for="contact-officePhone" class="contact-details-label">Office phone:</label>
-						<input id="contact-officePhone" name="contact-officePhone" class="contact-officePhone-input" type="text" tabindex="12" value="" /><br />
-						<label for="contact-mobilePhone" class="contact-details-label">Mobile phone:</label>
-						<input id="contact-mobilePhone" name="contact-mobilePhone" class="contact-mobilePhone-input" type="text" tabindex="13" value="" />
-					</li>
-					<li class="contact-details-item email">
-						<label for="contact-email" class="contact-details-label">Email:</label>
-						<input id="contact-email" name="contact-email" class="contact-email-input" type="text" tabindex="14" value="" />
-					</li>
-					<li class="contact-details-item fax">
-						<label for="contact-fax" class="contact-details-label">Fax:</label>
-						<input id="contact-fax" name="contact-fax" class="contact-fax-input" type="text" tabindex="15" value="" />
-					</li>
-					<li class="contact-details-item submit-contact">
-						<label for="contact-add-btn" class="contact-details-label">All done?</label>
-						<input id="contact-add-btn" name="contact-add-btn" class="contact-add-btn" type="button" value="+Add Contact" /> or
-						<a class="" href="#">Cancel</a>
-					</li>
-					<li class="contact-details-item submit-additional">
-						<label for="contact-add-btn" class="contact-details-label">Need to add more contacts?</label>
-						<a href="#" class="">Add another contact</a>
-					</li>
-				</ul>
-			</fieldset>
-		</section>
-		<section class="client-projects">
-			<header class="details-header client-projects-header">
-				<h1 class="client-details-title">Projects</h1>
-			</header>
-			<h1 class="client-projects-title active">Active Projects</h1>
-			<ul class="details-list client-projects-list active">
-				<li class="client-projects-list-item">Atomic Cupcakes</li>
-			</ul>
-			<h1 class="client-projects-title archive">Archived Projects</h1>
-			<ul class="details-list client-projects-list archive">
-				<li class="client-projects-list-item">Atomic Cupcakes 'Coming Soon' Campaign</li>
-			</ul>
-		</section>
-	</section>
-</section>
 <footer id="site-footer" class="site-footer">
 
 </footer>
 <script src="client-controls.js" type="text/javascript"></script>
 </body>
 </html>
-	
