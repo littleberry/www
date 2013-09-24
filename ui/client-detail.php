@@ -9,7 +9,7 @@
 	} elseif (isset ($_POST["client_id"])) {
 		$client_id = $_POST["client_id"]; 
 	} else {
-		echo "no client identifier provided, cannot find details for emtpy client.";
+		echo "no client identifier provided, cannot find details for empty client.";
 		exit;
 	}
 	//retrieve the active contact list for this client
@@ -67,7 +67,7 @@
 	</header>
 	<section class="content">
 		<figure class="client-logo l-col-20">
-			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
+			<img class="client-logo-img small" src="<?php echo $client_details->getValue("client_logo_link")?>" title="Client/Company name logo" alt="Client/Company name logo" />
 		</figure>
 		<section class="client-detail l-col-80">
 			<header class="client-details-header">

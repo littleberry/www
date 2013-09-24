@@ -173,13 +173,15 @@ class Client extends DataObject {
 				client_email,
 				client_phone,
 				client_fax,
-				client_currency_index
+				client_currency_index,
+				client_logo_link
 				) VALUES (
 				:client_name,
 				:client_email,
 				:client_phone,
 				:client_fax,
-				:client_currency_index
+				:client_currency_index,
+				:client_logo_link
 				)";
 			try {
 				$st = $conn->prepare($sql);
@@ -188,12 +190,14 @@ class Client extends DataObject {
 				$st->bindValue(":client_phone", $this->data["client_phone"], PDO::PARAM_INT);
 				$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
 				$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
+				$st->bindValue(":client_logo_link", "images/" . $this->data["client_logo_link"], PDO::PARAM_STR);
 				$st->execute();
 				parent::disconnect($conn);
 			} catch (PDOException $e) {
 				parent::disconnect($conn);
 				die("Query failed on insert, sql is $sql " . $e->getMessage());
 			}	
+			
 			//get the client ID out of the client table based on the email address we just inserted. It must use the same key (auto increment) created when the record
 			//was inserted into the client table.
 			$conn=parent::connect();

@@ -2,7 +2,7 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
-	//retrieve the active client array into a list
+	//retrieve the active clients array into a list
 	//so we can get the items out easily in the for loop
 	list($clients) = Client::getClients();
 	?>
@@ -17,6 +17,7 @@
 </head>
 
 <body>
+<?php echo("here is a test");?>
 <header id="site-header" class="site-header">
 	<h1 class="site-title">Time Tracker</h1>
 	<nav id="site-nav" class="site-nav">
@@ -28,7 +29,7 @@
 		</ul>
 	</nav>
 	<nav id="section-nav" class="section-nav manage">
-		<h1 class="section-nav-title">Manage: I am putting this out there, please remove.</h1>
+		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Projects</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
