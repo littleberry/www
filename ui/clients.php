@@ -17,7 +17,6 @@
 </head>
 
 <body>
-<?php echo("here is a test");?>
 <header id="site-header" class="site-header">
 	<h1 class="site-title">Time Tracker</h1>
 	<nav id="site-nav" class="site-nav">
@@ -56,13 +55,13 @@
 				//retrieve the primary contact for the UI
 				$primary_contact = Contact::getPrimaryContact($client_id[0]);
 				//if the client has no contacts, spit that info out to the UI.
-				if (!isset($primary_contact)) $primary_contact = new Contact(array("contact_first_name"=>"No contacts found"));
+				if (!isset($primary_contact)) $primary_contact = new Contact(array("contact_name"=>"No contacts found"));
 	?>
 			<li class="client-list-item l-col-33">
 				<img class="client-logo-thumbnail thumbnail" src="<?php echo $client->getValueEncoded("client_logo_link")?>" title="Client Logo" alt="Client Logo" />
 				<ul class="client-info-list">
 					<li class="client-info-name"><a class="client-info-name-link" href="<?php echo "client-detail.php?client_id=" . $client_id[0]?>" title="View client details"><?php echo $client->getValueEncoded("client_name")?></a></li>
-					<li class="client-info-contact">Contact: <a class="client-info-contact-link" href="#" title="View contact details"><?php echo $primary_contact->getValue("contact_first_name") ?></a></li>
+					<li class="client-info-contact">Contact: <a class="client-info-contact-link" href="#" title="View contact details"><?php echo $primary_contact->getValue("contact_name") ?></a></li>
 					<li class="client-info-active-projects">X Active <a class="client-info-active-projects-link" href="#" title="View active projects">Projects</a></li>
 				</ul>		
 			</li>
