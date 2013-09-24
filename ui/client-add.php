@@ -8,7 +8,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Add Client</title>
+	<title>Add Client with GIT!</title>
 	<meta charset="utf-8" />
 	<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700,700italic' rel='stylesheet' type='text/css' />
 	<link href="styles.css" rel="stylesheet" type="text/css" />
@@ -16,6 +16,7 @@
 </head>
 
 <body>
+<!--this is just a comment.-->
 <header id="site-header" class="site-header">
 	<h1 class="site-title">Time Tracker</h1>
 	<nav id="site-nav" class="site-nav">
@@ -44,7 +45,7 @@
 <li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
 -->
-				<li class="page-controls-item"><a class="view-all-link" href="clients.html">View All</a></li>
+				<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -53,11 +54,15 @@
 <?php 			if (isset($_POST["action"]) and $_POST["action"] == "client-add") {
 					processClient();
 				} else {
-					displayClientInsertForm(array(), array(), new Client(array()));
+					displayClientInsertForm(array(), array(), new Client(array()), new Contact(array()));
 				} 
 ?>
 <!--DISPLAY CLIENT INSERT WEB FORM--->
+<<<<<<< HEAD
 <?php function displayClientInsertForm($errorMessages, $missingFields, $client) { 
+=======
+<?php function displayClientInsertForm($errorMessages, $missingFields, $client, $contact) { 
+>>>>>>> upstream/master
 	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
@@ -65,7 +70,8 @@
 			echo $errorMessage;
 		}
 	}
-	?>
+	
+?>
 	<section class="content">
     <!--added because we need the information to be submitted in a form-->
       <form action="client-add.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
@@ -195,6 +201,7 @@
 						<label for="client-add-btn" class="client-details-label">All done?</label>
 						<input id="client-add-btn" name="client-add-btn" class="client-add-btn" type="button" value="+Add Client" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
+<<<<<<< HEAD
 					</li>
 -->
 				</ul>
@@ -216,6 +223,29 @@
 						<label for="contact-primary" class="client-details-label">This the primary contact: </label>
 						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" tabindex="13" value="primary" />
 					</li>
+=======
+					</li>
+-->
+				</ul>
+			</fieldset>
+		<!--
+</section>
+		<section id="contact-detail" class="contact-detail">
+			<header class="details-header contact-details-header">
+				<h1 class="client-details-title">Contacts</h1>
+			</header>
+-->
+			<fieldset class="contact-details-entry">
+				<legend class="contact-details-title">Enter contact details:</legend>
+				<h4 class="required">= Required</h4>
+				<ul class="details-list client-details-list">
+					<li class="client-details-item name">
+						<label for="contact-name" <?php validateField("contact_name", $missingFields)?> class="client-details-label">Your contact's name:</label>
+						<input id="contact-name" name="contact-name" class="contact-contact-info-input" type="text" tabindex="12" value="<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
+						<label for="contact-primary" class="client-details-label">This the primary contact: </label>
+						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" tabindex="13" value="1" />
+					</li>
+>>>>>>> upstream/master
 					<li class="client-details-item phoneNum">
 						<label for="contact-officePhone" class="client-details-label">Office phone:</label>
 						<input id="contact-officePhone" name="contact-officePhone" class="contact-contact-info-input" type="text" tabindex="14" value="" /><br />
@@ -277,6 +307,7 @@
 </form>
 <?php } ?>
 
+<<<<<<< HEAD
 <!--PROCESS THE CLIENT THAT WAS SUBMITTED--->
 <?php function processClient() {
  	//these are the required fields in this form
@@ -287,6 +318,19 @@
 		//this is for the photo upload
 	if (isset($_FILES["client-logo-file"]) and $_FILES["client-logo-file"]["error"] == UPLOAD_ERR_OK) {
 		if ( $_FILES["client-logo-file"]["type"] != "image/jpeg") {
+=======
+<!--PROCESS THE CLIENT & THE CONTACT THAT WERE SUBMITTED--->
+<?php function processClient() {
+ 	//these are the required client fields in this form
+	$requiredFields = array("client_name","client_address","client_state","client_phone","client_city","client_zip","client_email","client_name", "contact_name");
+	$missingFields = array();
+	$errorMessages = array();
+	
+		//this is for the photo upload, and it is in the wrong place.
+	if (isset($_FILES["client-logo-file"]) and $_FILES["client-logo-file"]["error"] == UPLOAD_ERR_OK) {
+		if ( $_FILES["client-logo-file"]["type"] != "image/jpeg") {
+			
+>>>>>>> upstream/master
 			//I'm hardcoding the client_currency_index, because it's in the wrong place. This should be with the rest of the validation.
 			$errorMessages[] = "<li>" . getErrorMessage("1","client_logo_link", "invalid_file") . "</li>";
 		} elseif ( !move_uploaded_file($_FILES["client-logo-file"]["tmp_name"], "images/" . basename($_FILES["client-logo-file"]["name"]))) {
@@ -297,7 +341,7 @@
 	}
 
 	
-	//create the object here and pass in the appropriate fields to the constructor. These values are now part of the client object.
+	//create the client object ($client)
 	$client = new Client( array(
 		//CHECK REG SUBS!!
 		"client_logo_link" => isset($_POST["client_logo_link"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["client_logo_link"]) : "",
@@ -310,13 +354,36 @@
 		"client_city" => isset($_POST["client-city"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-city"]) : "",
 		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
 		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
+<<<<<<< HEAD
 	));
 	
+=======
+	));
+	
+	//create the contact object ($contact)
+	$contact = new Contact( array(
+		//CHECK REG SUBS!!
+		"contact_name" => isset($_POST["contact-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name"]) : "",
+		"contact_primary" => isset($_POST["contact-primary"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary"]) : "",
+		"contact_office_number" => isset($_POST["contact-officePhone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-officePhone"]) : "",
+		"contact_mobile_number" => isset($_POST["contact-mobilePhone"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone"]) : "",
+		"contact_email" => isset($_POST["contact-email"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-streetAddress"]) : "",
+		"contact_fax_number" => isset($_POST["contact-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax"]) : "",
+	));
+	
+	
+>>>>>>> upstream/master
 //error messages and validation script
 	foreach($requiredFields as $requiredField) {
-		if ( !$client->getValue($requiredField)) {
-			$missingFields[] = $requiredField;
-		}
+		if (preg_match("/client/", $requiredField)) {
+			if ( !$client->getValue($requiredField)) {
+				$missingFields[] = $requiredField;
+			}
+		} elseif (preg_match("/contact/", $requiredField)) {
+			if (!$contact->getValue($requiredField)) {
+				$missingFields[] = $requiredField;
+			}
+		}	
 	}
 	
 	
@@ -349,21 +416,31 @@
 	}
 		
 	if ($errorMessages) {
-		displayClientInsertForm($errorMessages, $missingFields, $client);
+		displayClientInsertForm($errorMessages, $missingFields, $client, $contact);
 	} else {
 		$client_email=$_POST["client-email"];
 		$client_name=$client->getValue("client_name");
 		$client_id = $client->getClientId($client_name);
+<<<<<<< HEAD
 		//don't allow duplicate entries in the database.
+=======
+		//don't allow duplicate entries in the database for the client.
+>>>>>>> upstream/master
 		if ($client_id[0]) {
 			echo "Client " . $client_id[0] . " is already in the database. Please try again.";
 		} else {
 			$client->insertClient($client_email);
+<<<<<<< HEAD
 			echo "You have successfully added client " . $client_email . ". You may add an additional client now. ";		
+=======
+			$client_id = $client->getClientId($client_name);
+			$contact->insertContact($client_id[0]);
+			echo "You have successfully added client " . $client_email . "with client id " . $client_id[0] . ". You may add an additional client now. ";		
+>>>>>>> upstream/master
 			echo"<a href=\"clients.php\">View the full client list</a>";
 		}
 		//headers already sent, call the page back with blank attributes.
-		displayClientInsertForm(array(), array(), new Client(array()));
+		displayClientInsertForm(array(), array(), new Client(array()), new Contact(array()));
 	}
 } 
 

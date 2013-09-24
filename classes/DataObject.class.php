@@ -24,7 +24,7 @@ abstract class DataObject  {
 		if (array_key_exists($field, $this->data)) {
 			return $this->data[$field];
 		}else{
-			die("field not found, field name is " . $field);
+			die("field not found, field name is " . $field . " IN DATAOBJECT");
 		}
 	}
 	
