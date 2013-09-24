@@ -20,25 +20,13 @@ $(document).ready( function() {
 		}
 	});
 	
-
-	$( '#add-additional-link' ).click( function( evt ) {
-		var addNewContactLink = $( this ).parent().detach();
-		var newContactDetailsForm = $( '.contact-details-entry' ).last().clone( true );
-		
-		newContactDetailsForm.find( '[type="checkbox"]' ).prop( 'checked', false );
-		newContactDetailsForm.children('.contact-details-list').append( addNewContactLink );
-		newContactDetailsForm.appendTo('#contact-detail').slideDown( 'slow' );
-		//$( '#contact-details' ).append('<p>');
-		//$('.page-title').clone().appendTo('.page-header');
-		
-		evt.preventDefault();
-	});
 	
-	$( '#cancel-add-contact-link' ).click( function( evt ) {
+	var $cancelContactLabel = $( '<label for="cancel-contact-link" class="client-details-label">Need to remove contact?</label>' );
+	var $cancelContactLink = $( '<a id="cancel-contact-link" class="cancel-action-link" href="#" tabindex="19">Cancel</a>' ).click( function( evt ) {
 		console.log('cancel');
 		//$( '.contact-details-list' ).find( '[type="checkbox"]' ).prop( 'checked', false );
 		//$ ( this ).prop( 'checked', true )
-		if ( $( this ).parent() )
+		//if ( $( this ).parent() )
 		if ( $( this ).parent().next().has( '#add-additional-link' ) ) {
 			var addNewContactLink = $( this ).parent().next( ).detach();
 			$( this ).parents( '.contact-details-entry' ).remove();
@@ -47,5 +35,19 @@ $(document).ready( function() {
 		
 		evt.preventDefault();
 	});
+	
+
+	$( '#add-additional-link' ).click( function( evt ) {
+		var $newContactDetailsForm = $( '.contact-details-entry' ).last().clone( true );
+		$( this ).prev().replaceWith( $cancelContactLabel );
+		$( this ).replaceWith( $cancelContactLink );
+		
+		$newContactDetailsForm.find( '[type="checkbox"]' ).prop( 'checked', false );
+		$( '.contact-details-entry' ).last().after( $newContactDetailsForm ).slideDown( 'slow' );
+				
+		evt.preventDefault();
+	});
+	
+	
 	
 });
