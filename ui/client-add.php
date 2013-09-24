@@ -44,7 +44,7 @@
 <li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
 -->
-				<li class="page-controls-item"><a class="view-all-link" href="clients.html">View All</a></li>
+				<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
 			</ul>
 		</nav>
 	</header>
