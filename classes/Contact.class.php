@@ -6,17 +6,14 @@ require_once("DataObject.class.php");
 class Contact extends DataObject {
 	protected $data = array(
 		"contact_id"=>"",
-		"contact_first_name"=>"",
-		"contact_last_name"=>"",
-		"contact_title"=>"",
-		//address fields
+		"contact_name"=>"",
 		"contact_email"=>"",
 		"contact_office_number"=>"",
 		"contact_mobile_number"=>"",
 		"contact_fax_number"=>"",
 		"contact_id"=>"",
 		"client_id"=>"",
-		"primary_contact"=>""
+		"contact_primary"=>""
 	);
 	
 	//display all contact data for the client
@@ -57,6 +54,48 @@ class Contact extends DataObject {
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+	
+	//function inserts new client into db. If ADDRESS_CONFIG value is 0, insert the address as a large varchar field, not as individual fields in the database.
+	//it also gets the key for the record being inserted and inserts
+	//a row in the address table if the information was sent.
+	
+	public function insertContact($client_id) {
+		$conn=parent::connect();
+		$sql = "INSERT INTO " . TBL_CONTACT . " (
+			contact_name,
+			contact_primary,
+			contact_email,
+			contact_office_number,
+			contact_mobile_number,
+			contact_fax_number,
+			client_id
+			) VALUES (
+			:contact_name,
+			:contact_primary,
+			:contact_email,
+			:contact_office_number,
+			:contact_mobile_number,
+			:contact_fax_number,
+			:client_id
+			)";
+		
+		try {
+				$st = $conn->prepare($sql);
+				$st->bindValue(":contact_name", $this->data["contact_name"], PDO::PARAM_STR);
+				$st->bindValue(":contact_primary", $this->data["contact_primary"], PDO::PARAM_STR);
+				$st->bindValue(":contact_email", $this->data["contact_email"], PDO::PARAM_STR);
+				$st->bindValue(":contact_office_number", $this->data["contact_office_number"], PDO::PARAM_INT);
+				$st->bindValue(":contact_mobile_number", $this->data["contact_mobile_number"], PDO::PARAM_STR);
+				$st->bindValue(":contact_fax_number", $this->data["contact_fax_number"], PDO::PARAM_STR);
+				$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+				$st->execute();
+				parent::disconnect($conn);
+			} catch (PDOException $e) {
+				parent::disconnect($conn);
+				die("Query failed on insert of contact, sql is $sql " . $e->getMessage());
+			}	
+			
+		}
 		
 	
 /* 9/15	
@@ -119,52 +158,7 @@ class Contact extends DataObject {
 			die("Query failed on you: " . $e->getMessage());
 		}
 	}
-	
-	//function inserts new client into db. If ADDRESS_CONFIG value is 0, insert the address as a large varchar field, not as individual fields in the database.
-	//it also gets the key for the record being inserted and inserts
-	//a row in the address table if the information was sent.
-	
-	public function insertContact($client_id) {
-		$conn=parent::connect();
-		$sql = "INSERT INTO " . TBL_CONTACT . " (
-			contact_first_name,
-			contact_last_name,
-			contact_title,
-			contact_email,
-			contact_office_number,
-			contact_mobile_number,
-			contact_fax_number,
-			client_id
-			) VALUES (
-			:contact_first_name,
-			:contact_last_name,
-			:contact_title,
-			:contact_email,
-			:contact_office_number,
-			:contact_mobile_number,
-			:contact_fax_number,
-			:client_id
-			)";
 		
-		try {
-				$st = $conn->prepare($sql);
-				$st->bindValue(":contact_first_name", $this->data["contact_first_name"], PDO::PARAM_STR);
-				$st->bindValue(":contact_last_name", $this->data["contact_last_name"], PDO::PARAM_STR);
-				$st->bindValue(":contact_title", $this->data["contact_title"], PDO::PARAM_STR);
-				$st->bindValue(":contact_email", $this->data["contact_email"], PDO::PARAM_STR);
-				$st->bindValue(":contact_office_number", $this->data["contact_office_number"], PDO::PARAM_INT);
-				$st->bindValue(":contact_mobile_number", $this->data["contact_mobile_number"], PDO::PARAM_STR);
-				$st->bindValue(":contact_fax_number", $this->data["contact_fax_number"], PDO::PARAM_STR);
-				$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
-				$st->execute();
-				parent::disconnect($conn);
-			} catch (PDOException $e) {
-				parent::disconnect($conn);
-				die("Query failed on insert of contact, sql is $sql " . $e->getMessage());
-			}	
-			
-		}
-	
 	//update the client record based on the client_id
 	//if we want to break out the address, write the config to do the update later
 	//so that we can update those fields as well.
