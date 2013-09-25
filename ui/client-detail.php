@@ -20,7 +20,6 @@
     	echo "The detailed data for this client is not available. YET! :)";
 		exit;
 	}
-	//this is just a comment. Lets see if this works.
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -74,10 +73,10 @@
 				<h1 class="client-details-title"><?php echo $client_details->getValue("client_name")?></h1>
 			</header>
 			<ul class="details-list client-details-list">
-				<li class="client-details-item phoneNum"><?php echo $client_details->getValue("client_address")?></li>
-				<li class="client-details-item phoneNum"><?php echo $client_details->getValue("client_address_number")?></li>
+				<li class="client-details-item address"><?php echo $client_details->getValue("client_address")?></li>
+				<li class="client-details-item phoneNum"><?php echo $client_details->getValue("client_phone")?></li>
 				<li class="client-details-item email"><?php echo $client_details->getValue("client_email")?></li>
-				<li class="client-details-item fax"><?php echo $client_details->getValue("client_phone")?></li>
+				<li class="client-details-item fax"><?php echo $client_details->getValue("client_fax")?></li>
 				<li class="client-details-item address">
 					<?php echo $client_details->getValue("client_address")?>
 				</li>
@@ -90,7 +89,7 @@
 			</header>
            <?php foreach ($contacts as $contact) { ?>
 			<ul class="details-list contact-details-list">
-				<li class="contact-details-item name"><?php echo $contact->getValue("contact_first_name")?></li>
+				<li class="contact-details-item name"><?php echo $contact->getValue("contact_name")?></li>
 				<li class="contact-details-item phoneNum"><?php echo $contact->getValue("contact_office_number")?></li>
 				<li class="contact-details-item email"><?php echo $contact->getValue("contact_email")?></li>
 				<li class="contact-details-item fax"><?php echo $contact->getValue("contact_fax_number")?></li>
