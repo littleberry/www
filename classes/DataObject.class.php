@@ -28,6 +28,15 @@ abstract class DataObject  {
 		}
 	}
 	
+	//this is the setter for the values in the array.
+	public function setValue($field, $value) {
+		if (array_key_exists($field, $this->data)) {
+			$this->data[$field] = $value;
+		}else{
+			die("something went wrong setting " . $field . " to " . $value .  "IN DATAOBJECT");
+		}
+	}
+	
 	//function to encode values. This helps with security and in generating xhml. THIS IS A CONVENIENCE FUNCTION.
 	public function getValueEncoded($field) {
 		return htmlspecialchars($this->getValue($field));
