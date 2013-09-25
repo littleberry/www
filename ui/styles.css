@@ -119,7 +119,7 @@ input[type=button] {
 	font-size: .825em;
 	width: 8em;
 	padding: .25em;
-	color: #FAF9FF;
+	/* color: #FAF9FF; */
 	background-color: #A9BFF5;
 	border: 1px dotted #193E73;
 }
