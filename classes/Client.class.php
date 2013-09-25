@@ -6,18 +6,21 @@ require_once("DataObject.class.php");
 
 class Client extends DataObject {
 	protected $data = array(
+		//these fields are in the client table.
 		"client_id"=>"",
 		"client_name"=>"",
-		"client_address"=>"",
 		"client_currency_index"=>"",
 		"client_logo_link"=>"",
 		"client_email"=>"",
 		"client_phone"=>"",
+		"client_address"=>"",
+		"client_archived"=>"",
+		//these fields are in the client_address table.
 		//address fields, need to use for detailed addy.
 		//"client_address_number"=>"",
 		//"client_street_name"=>"",
-		"client_address_number"=>"",
-		"client_street_name"=>"",
+		//"client_address_number"=>"",
+		//"client_street_name"=>"",
 		"client_state"=>"",
 		"client_zip"=>"",
 		//"client_apartment"=>"",
@@ -25,7 +28,7 @@ class Client extends DataObject {
 		"client_city"=>""
 	);
 	
-	//display all information about a client returned as an array
+	//display all information about a client returned as an array. This function returns all clients, archived and not.
 	public static function getClients() {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_CLIENT;
@@ -44,27 +47,7 @@ class Client extends DataObject {
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
-	
-	//display all client names
-	/*public static function getClientNameAndLogo($clientId) {
-		$conn=parent::connect();
-		$sql="SELECT client_name, client_logo_link FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
 		
-		try {
-			$st = $conn->prepare($sql);
-			$st->bindValue(":client_id", $clientId, PDO::PARAM_INT);
-			$st->execute();
-			$row=$st->fetch();
-			parent::disconnect($conn);
-			if ($row) return new Client($row);
-		}catch(PDOException $e) {
-			parent::disconnect($conn);
-			die("query failed here: " . $e->getMessage() . "query is " . $sql);
-		}
-	}
-	*/
-	
-	
 	//return all data for a specific client based on the client_id.
 	public static function getClient($clientId) {
 		$conn=parent::connect();
@@ -86,7 +69,7 @@ class Client extends DataObject {
 	
 	
 	//return the clients name based on the client_id.
-	//I'll keep this here as a utility function.
+	//I'll keep this here as a utility function in case we need it.
 	public function getClientNameById($client_id) {
 		$conn=parent::connect();
 		$sql = "SELECT client_name FROM " . TBL_CLIENT . " WHERE client_id = '" . $client_id . "'";			
@@ -164,7 +147,7 @@ class Client extends DataObject {
 	//a row in the address table if the information was sent.
 	
 	public function insertClient($client_email) {
-		//FORGET THE CONFIG!
+		//FORGET THE CONFIG, delete this comment and the else.
 		//if (ADDRESS_CONFIG == 1) {	
 		//insert the client into the client table. Insert the address components into the client_address table..
 			$conn=parent::connect();
@@ -299,7 +282,64 @@ class Client extends DataObject {
 		}
 	}
 	
+	//update the archive flag in the client table.
+	public function setArchiveFlag($flag, $client_id) {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_CLIENT . " SET
+			client_archived = :client_archived
+			WHERE client_id = :client_id";
+	try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+			$st->bindValue(":client_archived", $flag, PDO::PARAM_INT);
+			$st->execute();	
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on update: " . $e->getMessage());
+		}
+
+	}
+	
+	//get the archive flag out of the client table.
+	public function getArchiveFlag($client_id) {
+		$conn=parent::connect($client_id);
+		$sql = "SELECT client_archived FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
+		
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row[0];
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage());
+		}
+	}
+	
 /*	// OLD function stubs below this line.
+	//display all client names
+	/*public static function getClientNameAndLogo($clientId) {
+		$conn=parent::connect();
+		$sql="SELECT client_name, client_logo_link FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
+		
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $clientId, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return new Client($row);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	
+	
+
 	public static function getByUserName($userName) {
 		$conn=parent::connect();
 		$sql = "SELECT * FROM " . TBL_MEMBERS . " WHERE username = :username";
