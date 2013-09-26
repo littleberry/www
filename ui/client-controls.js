@@ -23,18 +23,24 @@ $(document).ready( function() {
 	
 	var contactCtr = 0;
 	var incrementIDs = function( i, attr ) {
-		var indexPat = /(-[0-9]+)$/;
+		/*
+var indexPat = /(-[0-9]+)$/;
 		if ( indexPat.test( attr ) ) {
-			//console.log(attr.search(indexPat));
+			console.log("match: " + attr.match(indexPat));
 			attr.replace( indexPat, "" );
 			//console.log(attr);
+		}
+*/
+		console.log(!isNaN(parseInt( attr.charAt( attr.length - 1 ) )));
+		if ( !isNaN(parseInt( attr.charAt( attr.length - 1 ) ) ) ) {
+			attr = attr.substring( 0, attr.lastIndexOf( '-' ) );
 		}
 		return attr += "-" + contactCtr;
 	};
 	
 	var $contactInputs = $( '#contact-details' );
 	$contactInputs.attr( 'id', incrementIDs )
-			.find( 'input' )
+			.find( 'input, a' )
 			.each( function( index ) {
 				//console.log($( this ).attr('id'));
 				$( this ).attr( 'id', incrementIDs );
@@ -47,6 +53,16 @@ $(document).ready( function() {
 			});
 
 	var $cancelContact = $( '.cancel-additional' )
+		.click( function( evt ) {
+			if ( $( this ).parents( '.contact-details-entry' ).siblings( '.contact-details-entry' ).not( '#contact-save' ).length < 2 ) {
+				$( '.cancel-additional' )
+					.addClass( 'disabled' )
+					.parents( '.contact-details-entry' )
+					.find( 'input[type=checkbox]' )
+					.prop( 'checked', true );
+			}
+			$( this ).parents( '.contact-details-entry' ).remove();
+		})
 		.addClass( 'disabled' );
 
 	$( '#add-additional-link' ).click( function( evt ) {
@@ -87,31 +103,4 @@ $(document).ready( function() {
 		
 		evt.preventDefault();
 	});
-	
-	
-
-		/*
-.click( function( evt ) {
-			console.log('cancel');
-			$( '.contact-details-list' ).find( '[type="checkbox"]' ).prop( 'checked', false );
-			$ ( this ).prop( 'checked', true )
-			if ( $( this ).parent() ) {			
-				if ( $( this ).parent().next().has( '#add-additional-link' ) ) {
-				var addNewContactLink = $( this ).parent().next( ).detach();
-				$( this ).parents( '.contact-details-entry' ).remove();
-				$( '#contact-detail' ).last().find( '.contact-details-list' ).append( addNewContactLink );
-			}
-
-*/
-			
-/*			evt.preventDefault();
-		})
-		
-*/
-	
-
-
-	
-	
-	
 });
