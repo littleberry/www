@@ -21,54 +21,54 @@ $(document).ready( function() {
 		}
 	});
 	
-	var $contactCtr = 0;
+	var contactCtr = 0;
 	var incrementIDs = function( i, attr ) {
-		return attr += "-" + $contactCtr;
+		var indexPat = /(-[0-9]+)$/;
+		if ( indexPat.test( attr ) ) {
+			//console.log(attr.search(indexPat));
+			attr.replace( indexPat, "" );
+			//console.log(attr);
+		}
+		return attr += "-" + contactCtr;
 	};
 	
-	var $contactInputs = $( '#contact-details .contact-details-label, #contact-details .contact-detals-input' ).not( ':last' );
-	$contactInputs.each( function( index ) {
-		if ( $( this ).is( 'input' ) ) {
-			$( this ).attr( 'id', incrementIDs );
-		} else if ( $( this ).is( 'label' ) ) {
-			$( this ).attr( 'for', incrementIDs );
-			console.log($(this).attr("for"));
-		}
-	});
-	
-	
-	/*
-var $cancelContact = $( '<li class="client-details-item cancel-additional"></li>' );
-	var $cancelContactLabel = $( '<label for="cancel-contact-link" class="client-details-label">Need to remove contact?</label>' )
-		.appendTo( $cancelContact );
-	var $cancelContactLink = $( '<a id="cancel-contact-link" class="cancel-action-link" href="#" tabindex="19">Cancel</a>' )
-		.click( function( evt ) {
-			console.log('cancel');
-			//$( '.contact-details-list' ).find( '[type="checkbox"]' ).prop( 'checked', false );
-			//$ ( this ).prop( 'checked', true )
-			//if ( $( this ).parent() )
-			/*
-	if ( $( this ).parent().next().has( '#add-additional-link' ) ) {
-				var addNewContactLink = $( this ).parent().next( ).detach();
-				$( this ).parents( '.contact-details-entry' ).remove();
-				$( '#contact-detail' ).last().find( '.contact-details-list' ).append( addNewContactLink );
-			}
-	*/
-			
-/*			evt.preventDefault();
-		})
-		.appendTo( $cancelContact );
-*/
-	
+	var $contactInputs = $( '#contact-details' );
+	$contactInputs.attr( 'id', incrementIDs )
+			.find( 'input' )
+			.each( function( index ) {
+				//console.log($( this ).attr('id'));
+				$( this ).attr( 'id', incrementIDs );
+			})
+			.end()
+			.find( 'label' )
+			.each( function( index ) {
+				$( this ).attr( 'for', incrementIDs );
+				//console.log($(this).attr('for'));
+			});
+
+	var $cancelContact = $( '.cancel-additional' )
+		.addClass( 'disabled' );
 
 	$( '#add-additional-link' ).click( function( evt ) {
-		var $newContactDetailsForm = $( '.contact-details-entry' )
-			.last()
+		contactCtr = $( '.contact-details-entry' ).not( '#contact-save' ).length;
+		$cancelContact.removeClass( 'disabled' );
+		var $newContactDetailsForm = $( this )
+			.parents( '.contact-details-entry' )
+			.prev()
 			.clone( true );
-
-		$( this )
-			.parent()
-			.replaceWith( $cancelContact );
+		
+		$newContactDetailsForm
+			.attr( 'id', incrementIDs )
+			.find( 'input, a' )
+			.each( function( index ) {
+				$( this ).attr( 'id', incrementIDs );
+			})
+			.end()
+			.find( 'label' )
+			.each( function( index ) {
+				$( this ).attr( 'for', incrementIDs );
+				//console.log($(this).attr('for'));
+			});
 		
 		$newContactDetailsForm
 			.find( '[type="checkbox"]' )
@@ -79,10 +79,37 @@ var $cancelContact = $( '<li class="client-details-item cancel-additional"></li>
 		
 		$( '.contact-details-entry' )
 			.last()
-			.after( $newContactDetailsForm );
+			.before( $newContactDetailsForm );
+		
+		
+		
+		$( '#contact-save-btn' ).val( '+ Save Contacts' );
 		
 		evt.preventDefault();
 	});
+	
+	
+
+		/*
+.click( function( evt ) {
+			console.log('cancel');
+			$( '.contact-details-list' ).find( '[type="checkbox"]' ).prop( 'checked', false );
+			$ ( this ).prop( 'checked', true )
+			if ( $( this ).parent() ) {			
+				if ( $( this ).parent().next().has( '#add-additional-link' ) ) {
+				var addNewContactLink = $( this ).parent().next( ).detach();
+				$( this ).parents( '.contact-details-entry' ).remove();
+				$( '#contact-detail' ).last().find( '.contact-details-list' ).append( addNewContactLink );
+			}
+
+*/
+			
+/*			evt.preventDefault();
+		})
+		
+*/
+	
+
 
 	
 	
