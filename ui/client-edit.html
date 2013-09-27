@@ -40,7 +40,7 @@
 		<h1 class="page-title">Edit Client Details</h1>
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
-				<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
+				<li class="page-controls-item link-btn"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="clients.html">View All</a></li>
 			</ul>
@@ -166,9 +166,17 @@
 							<option selected="selected" value="USD">United States Dollar</option>
 						</select><br />
 					</li>
+					<li class="client-details-item client-archive">
+						<label for="client-archive" class="client-details-label">Archive client?</label>
+						<input id="client-archive" name="client-archive" class="client-archive-input" type="checkbox" tabindex="10" value="1" />
+					</li>
+					<li class="client-details-item delete-client">
+						<label for="client-delete-btn" class="client-details-label">Delete Client?</label>
+						<input id="client-delete-btn" name="client-delete-btn" class="client-delete-btn" type="button" value="- Delete Client" tabindex="11" />
+					</li>
 					<li class="client-details-item submit-client">
 						<label for="client-save-btn" class="client-details-label">All done?</label>
-						<input id="client-save-btn" name="client-save-btn" class="client-save-btn" type="button" value="+Save Changes" tabindex="11" /> or
+						<input id="client-save-btn" name="client-save-btn" class="client-save-btn" type="button" value="+ Save Changes" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
@@ -178,51 +186,49 @@
 			<header class="details-header contact-details-header">
 				<h1 class="client-details-title">Contacts</h1>
 			</header>
-			<fieldset class="contact-details-entry">
+			<fieldset id="contact-details" class="contact-details-entry">
 				<!-- <legend class="contact-details-title">Edit contact details:</legend> -->
 				<header class="contact-details-header">
-					<h1 class="contact-details-title">Edit client details:</h1>
+					<h1 class="contact-details-title">Edit contact details:</h1>
 					<h4 class="required">= Required</h4>
 				</header>
 				<!-- <h4 class="required">= Required</h4> -->
 				<ul class="details-list client-details-list">
 					<li class="client-details-item name">
-						<label for="contact-name" class="client-details-label required">Your contact's name:</label>
-						<input id="contact-name" name="contact-name" class="contact-contact-info-input" type="text" tabindex="12" value="" /><br />
-						<label for="contact-primary" class="client-details-label">This the primary contact: </label>
-						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" tabindex="13" value="1" />
+						<label for="contact-name" class="contact-details-label required">Your contact's name:</label>
+						<input id="contact-name" name="contact-name" class="contact-info-input" type="text" value="" /><br />
+						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
+						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" value="1" />
 					</li>
 					<li class="client-details-item phoneNum">
-						<label for="contact-officePhone" class="client-details-label">Office phone:</label>
-						<input id="contact-officePhone" name="contact-officePhone" class="contact-contact-info-input" type="text" tabindex="14" value="" /><br />
-						<label for="contact-mobilePhone" class="client-details-label">Mobile phone:</label>
-						<input id="contact-mobilePhone" name="contact-mobilePhone" class="contact-info-input" type="text" tabindex="15" value="" />
+						<label for="contact-officePhone" class="contact-details-label">Office phone:</label>
+						<input id="contact-officePhone" name="contact-officePhone" class="contact-info-input" type="text" value="" /><br />
+						<label for="contact-mobilePhone" class="contact-details-label">Mobile phone:</label>
+						<input id="contact-mobilePhone" name="contact-mobilePhone" class="contact-info-input" type="text" value="" />
 					</li>
 					<li class="client-details-item email">
-						<label for="contact-email" class="client-details-label">Email:</label>
-						<input id="contact-email" name="contact-email" class="contact-contact-info-input" type="text" tabindex="16" value="" />
+						<label for="contact-email" class="contact-details-label">Email:</label>
+						<input id="contact-email" name="contact-email" class="contact-info-input" type="text" value="" />
 					</li>
 					<li class="client-details-item fax">
-						<label for="contact-fax" class="client-details-label">Fax:</label>
-						<input id="contact-fax" name="contact-fax" class="contact-contact-info-input" type="text" tabindex="17" value="" />
+						<label for="contact-fax" class="contact-details-label">Fax:</label>
+						<input id="contact-fax" name="contact-fax" class="contact-info-input" type="text" value="" />
 					</li>
-					
-					<li class="client-details-item add-additional">
-						<label for="add-additional-link" class="client-details-label">Need to add more contacts?</label>
-						<a id="add-additional-link" href="#" class="" tabindex="20">Add another contact</a>
-					</li>
-					
-					<li class="contact-details-item submit-contact">
-						<label for="contact-save-btn" class="contact-details-label">All done?</label>
-						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="button" value="+Save Contact" tabindex="18" /> or <a id="cancel-add-contact-link" class="cancel-action-link" href="#" tabindex="19">Cancel</a>
+					<li class="client-details-item cancel-additional">
+						<label for="cancel-contact-link" class="contact-details-label">Need to remove contact?</label>
+						<a id="cancel-contact-link" class="cancel-action-link" href="#" tabindex="19">Remove contact</a>
 					</li>
 				</ul>
 			</fieldset>
-			<fieldset class="client-details-entry">
-				<ul class="details-list client-details-submit">
-					<li class="client-details-item submit-client">
-						<label for="client-add-btn" class="client-details-label">All done?</label>
-						<input id="client-add-btn" name="client-add-btn" class="client-add-btn" type="button" value="+Add Client" tabindex="11" /> or
+			<fieldset id="contact-save" class="contact-details-entry">
+				<ul class="details-list contact-details-submit">
+					<li class="client-details-item add-additional">
+						<label for="add-additional-link" class="contact-details-label">Need to add more contacts?</label>
+						<a id="add-additional-link" href="#" class="">Add another contact</a>
+					</li>
+					<li class="client-details-item submit-contact">
+						<label for="contact-save-btn" class="contact-details-label">All done?</label>
+						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="button" value="+ Save Contact" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
