@@ -53,9 +53,9 @@
 		4. If required fields are missing in the form, re-display the form with error messages.
 		5. If there are no missing required fields, call Client::updateClient AND Contact:updateContact--->	
 <?php 			
-				if (isset($_POST["action"]) and $_POST["action"] == "submit") {
+				if (isset($_POST["action"]) and $_POST["action"] == "edit_client") {
 					echo "user came in from form.";
-					//editClientAndContacts();
+					editClientAndContacts();
 				} else {
 					echo "showing the form, this is the first time the user has come in.";
 					displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
@@ -76,13 +76,14 @@
 	}
 	if (isset($_GET["client_id"])) {
 		$client=Client::getClient($_GET["client_id"]);
-		$contact=Contact::getContacts($_GET["client_id"]);
+		list($contact)=Contact::getContacts($_GET["client_id"]);
 	}
 ?>
 
 	<section class="content">
 	<!--BEGIN FORM-->
 	<form action="client-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+	<input type="hidden" name="action" value="edit_client">
 		<figure class="client-logo l-col-20">
 			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
 			<fieldset class="client-logo-upload">
@@ -244,6 +245,10 @@
 				<ul class="details-list client-details-list">
 					<li class="client-details-item name">
 						<label for="contact-name" <?php validateField("contact_name", $missingFields)?> class="contact-details-label required">Your contact's name:</label>
+						<!--there are multiple contacts. loop through them.--->
+						<!--this is SO going to break the UI!-->
+						<? foreach ($contact as $contact) {
+						?>
 						<input id="contact-name" name="contact-name" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
 						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
 						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" value="1" />
@@ -276,8 +281,9 @@
 					</li>
 					<li class="client-details-item submit-contact">
 						<label for="contact-save-btn" class="contact-details-label">All done?</label>
-						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="button" value="+ Save Contact" tabindex="11" /> or
+						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="submit" value="+ Save Contact" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
+						<?php } ?>
 					</li>
 				</ul>
 			</fieldset>
@@ -354,7 +360,7 @@
 		"contact_primary" => isset($_POST["contact-primary"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary"]) : "",
 		"contact_office_number" => isset($_POST["contact-officePhone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-officePhone"]) : "",
 		"contact_mobile_number" => isset($_POST["contact-mobilePhone"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone"]) : "",
-		"contact_email" => isset($_POST["contact-email"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-email"]) : "",
+		"contact_email" => isset($_POST["contact-email"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-email"]) : "",
 		"contact_fax_number" => isset($_POST["contact-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax"]) : "",
 	));
 
@@ -390,7 +396,7 @@
 		$contactEmail = $contact->getValue("contact_email");
 		$contactOfficePhone = $contact->getValue("contact_office_number");
 		$contactMobilePhone = $contact->getValue("contact_mobile_number");
-		$contactFax = $contact->getValue("contact_fax");
+		$contactFax = $contact->getValue("contact_fax_number");
 		
 		
 		// validate the email addresses
@@ -412,7 +418,7 @@
 			$errorMessages[] = "<li>" . getErrorMessage(1,"contact_mobile_number", "invalid_input") . "</li>";
 		}
 		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $contactFax)) {
-			$errorMessages[] = "<li>" . getErrorMessage(1,"contact_fax", "invalid_input") . "</li>";
+			$errorMessages[] = "<li>" . getErrorMessage(1,"contact_fax_number", "invalid_input") . "</li>";
 		}
 		
 		//validate the zip code
@@ -422,7 +428,7 @@
 	}
 		
 	if ($errorMessages) {
-		displayClientAndContactEditForm($errorMessages, $missingFields, $client, $contact);
+		displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact);
 	} else {
 		//there were no errors in the form. Update the client, but get out the id first because
 		//of the (&^(%(&(&*% autoincrement field.
