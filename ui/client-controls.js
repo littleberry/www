@@ -23,15 +23,7 @@ $(document).ready( function() {
 	
 	var contactCtr = 0;
 	var incrementIDs = function( i, attr ) {
-		/*
-var indexPat = /(-[0-9]+)$/;
-		if ( indexPat.test( attr ) ) {
-			console.log("match: " + attr.match(indexPat));
-			attr.replace( indexPat, "" );
-			//console.log(attr);
-		}
-*/
-		console.log(!isNaN(parseInt( attr.charAt( attr.length - 1 ) )));
+		//console.log(!isNaN(parseInt( attr.charAt( attr.length - 1 ) )));
 		if ( !isNaN(parseInt( attr.charAt( attr.length - 1 ) ) ) ) {
 			attr = attr.substring( 0, attr.lastIndexOf( '-' ) );
 		}
@@ -42,14 +34,12 @@ var indexPat = /(-[0-9]+)$/;
 	$contactInputs.attr( 'id', incrementIDs )
 			.find( 'input, a' )
 			.each( function( index ) {
-				//console.log($( this ).attr('id'));
 				$( this ).attr( 'id', incrementIDs );
 			})
 			.end()
 			.find( 'label' )
 			.each( function( index ) {
 				$( this ).attr( 'for', incrementIDs );
-				//console.log($(this).attr('for'));
 			});
 
 	var $cancelContact = $( '.cancel-additional' )
@@ -61,6 +51,35 @@ var indexPat = /(-[0-9]+)$/;
 					.find( 'input[type=checkbox]' )
 					.prop( 'checked', true );
 			}
+			$( this ).parents( '.contact-details-entry' ).nextAll().not( '#contact-save' )
+				.attr( 'id', function (i, attr) {
+					idNum = parseInt( attr.slice( attr.lastIndexOf( '-' ) + 1 ) ) - 1;
+					attr = attr.substring( 0, attr.lastIndexOf( '-' ) );
+					attr += "-" + idNum;
+					//console.log(attr);
+					return attr;
+				})
+				.find( 'input, a' )
+				.each( function( index ) {
+					$( this ).attr( 'id', function (i, attr) {
+						idNum = parseInt( attr.slice( attr.lastIndexOf( '-' ) + 1 ) ) - 1;
+						attr = attr.substring( 0, attr.lastIndexOf( '-' ) );
+						attr += "-" + idNum;
+						//console.log(attr);
+						return attr;
+					})
+				})
+				.end()
+				.find( 'label' )
+				.each( function( index ) {
+					$( this ).attr( 'for', function (i, attr) {
+						idNum = parseInt( attr.slice( attr.lastIndexOf( '-' ) + 1 ) ) - 1;
+						attr = attr.substring( 0, attr.lastIndexOf( '-' ) );
+						attr += "-" + idNum;
+						//console.log(attr);
+						return attr;
+					})
+				})
 			$( this ).parents( '.contact-details-entry' ).remove();
 		})
 		.addClass( 'disabled' );
