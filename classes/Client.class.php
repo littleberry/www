@@ -261,22 +261,28 @@ class Client extends DataObject {
 	public function updateClient($client_id) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_CLIENT . " SET
-			client_name = :client_name,
-			client_address = :client_address,
-			client_currency_index = :client_currency_index
-			WHERE client_id = :client_id";
-	try {
-			$st = $conn->prepare($sql);
-			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
-			$st->bindValue(":client_name", $this->data["client_name"], PDO::PARAM_STR);
-			$st->bindValue(":client_address", $this->data["client_address"], PDO::PARAM_STR);
-			$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
-			$st->execute();	
-			parent::disconnect($conn);
-		} catch (PDOException $e) {
-			parent::disconnect($conn);
-			die("Query failed on update: " . $e->getMessage());
-		}
+				client_name = :client_name,
+				client_email = :client_email,
+				client_phone = :client_phone,
+				client_fax = :client_fax,
+				client_currency_index = :client_currency_index,
+				client_logo_link = :client_logo_link
+				WHERE client_id = :client_id";
+			try {
+				$st = $conn->prepare($sql);
+				$st->bindValue(":client_name", $this->data["client_name"], PDO::PARAM_STR);
+				$st->bindValue(":client_email", $this->data["client_email"], PDO::PARAM_STR);
+				$st->bindValue(":client_phone", $this->data["client_phone"], PDO::PARAM_INT);
+				$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
+				$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
+				$st->bindValue(":client_logo_link", $this->data["client_logo_link"], PDO::PARAM_INT);
+				$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+				$st->execute();	
+				parent::disconnect($conn);
+			} catch (PDOException $e) {
+				parent::disconnect($conn);
+				die("Query failed on update: " . $e->getMessage());
+			}
 	}
 	
 	//update the archive flag in the client table.
