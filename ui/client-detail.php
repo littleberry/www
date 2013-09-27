@@ -60,7 +60,10 @@
 <li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
 -->
-				<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
+				<!-- I am just putting this here because I need to send the client id into the client-edit php file.-->
+				<li class="page-controls-item"><a class="view-all-link" href="client-edit.php?client_id=<?php echo $client_id?>">Edit This Client</a></li>
+<!--end-->
+<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
 			</ul>
 		</nav>
 	</header>
