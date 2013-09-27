@@ -40,47 +40,49 @@
 		<h1 class="page-title">Edit Client Details</h1>
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
-				<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
+				<li class="page-controls-item link-btn"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="clients.html">View All</a></li>
 			</ul>
 		</nav>
 	</header>
-	<!--OVERALL CONTROL--->
-	
+	<!--OVERALL CONTROL
+		1. first time user comes in, call the displayClientAndContactsEditForm function.
+		2. Set the client and contact objects to the value pulled from the database.
+		3. User clicks on a button to submit the form, call the editClientAndContacts function.
+		4. If required fields are missing in the form, re-display the form with error messages.
+		5. If there are no missing required fields, call Client::updateClient AND Contact:updateContact--->	
 <?php 			
-				if (isset($_POST["client-save-btn"]) and $_POST["client-save-btn"] == "+Save Changes") {
-					editClient();
-				} elseif (isset($_POST["contact-save-btn"]) and $_POST["contact-save-btn"] == "+Save Contact") {
-					editContact();
+				if (isset($_POST["action"]) and $_POST["action"] == "submit") {
+					echo "user came in from form.";
+					//editClientAndContacts();
 				} else {
-					//user is here for the first time.
-					//echo "here is the display form:";
-					displayClientEditForm(array(), array(), new Client(array()));
-					displayContactEditForm(array(), array(), new Contact(array()));
+					echo "showing the form, this is the first time the user has come in.";
+					displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
 				}
 ?>
-<!--DISPLAY CLIENT EDIT WEB FORM--->
-<?php function displayClientEditForm($errorMessages, $missingFields, $client) { 
+
+	<!--DISPLAY CLIENT AND CONTACT EDIT WEB FORM (displayClientAndContactEditForm)
+	***note...I think we can remove the PHP validation to update the style in validateField*****
+	1. This is the form displayed to the user, the first time the user comes in it gets the client_id out of the $_GET variable (please encode!!)
+	2. If first time, pull the client and contact objects from the database.
+	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.
+	-->
+<?php function displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact) { 
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
 			echo $errorMessage;
 		}
 	}
-	//if the user has already filled out the form and submitted, use the post values. Otherwise, retrieve the information from the object stored in the database.
-	//if (!isset($_POST[])) {
-		//get the client id out of the $_GET var.
-		if (isset($_GET["client_id"])) {
-			$client=Client::getClient($_GET["client_id"]);
-		}
-	//}
-		
-	
+	if (isset($_GET["client_id"])) {
+		$client=Client::getClient($_GET["client_id"]);
+		$contact=Contact::getContacts($_GET["client_id"]);
+	}
 ?>
 
 	<section class="content">
+	<!--BEGIN FORM-->
 	<form action="client-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
-      <input type="hidden" name="action" value="client-edit"/>
 		<figure class="client-logo l-col-20">
 			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
 			<fieldset class="client-logo-upload">
@@ -101,18 +103,16 @@
 				</header>
 				<ul class="details-list client-details-list">
 					<li class="client-details-item name">
-						<!---USE A HIDDEN FORM TO KEEP THE ID!!--->
-						<input type="hidden" name="client-id" value="<?php echo $client->getValue("client_id")?>">
-						<label for="client-name" <?php validateField("client_name", $missingFields)?> class="client-details-label">Client's name:</label>
-						<input id="client-name" name="client-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $client->getValueEncoded("client_name")?>" /><br />
-						
+						<label for="client-name" <?php validateField("client_name", $missingFields)?> class="client-details-label required">Client's name:</label>
+						<input id="client-name" name="client-name" class="client-contact-info-input" type="text" tabindex="1" value="<?php echo $client->getValueEncoded("client_name")?>" />
 					</li>
 					<li class="client-details-item phoneNum">
 						<label for="client-phone" <?php validateField("client_phone", $missingFields)?> class="client-details-label">Phone number:</label>
-						<input id="client-phone" name="client-phone" class="client-phone-input" type="text" tabindex="2" value="<?php echo $client->getValueEncoded("client_phone")?>" />					</li>
+						<input id="client-phone" name="client-phone" class="client-contact-info-input" type="text" tabindex="2" value="<?php echo $client->getValueEncoded("client_phone")?>" />
+					</li>
 					<li class="client-details-item email">
 						<label for="client-email" <?php validateField("client_email", $missingFields)?> class="client-details-label">Email address:</label>
-						<input id="client-email" name="client-email" class="client-email-input" type="text" tabindex="3" value="<?php echo $client->getValueEncoded("client_email")?>" />
+						<input id="client-email" name="client-email" class="client-contact-info-input" type="text" tabindex="3" value="<?php echo $client->getValueEncoded("client_email")?>" />
 					</li>
 					<li class="client-details-item fax">
 						<label for="client-fax" <?php validateField("client_fax", $missingFields)?> class="client-details-label">Fax number:</label>
@@ -125,8 +125,9 @@
 					<li class="client-details-item address">
 						<label for="client-streetAddress" <?php validateField("client_address", $missingFields)?> class="client-details-label">Street Address:</label>
 						<textarea id="client-streetAddress" name="client-streetAddress" class="client-streetAddress-input" tabindex="5"><?php echo $client->getValueEncoded("client_address")?></textarea><br />
-						<label for="client-city" <?php validateField("client_city", $missingFields)?> class="client-details-label">City:</label>
+						<label for="client-city" <?php validateField("client_city", $missingFields)?> class="client-details-label">City</label>
 						<input id="client-city" name="client-city" class="client-city-input" type="text" tabindex="6" value="<?php echo $client->getValueEncoded("client_city")?>" /><br />
+						<!--handle state differently, as it is a select field.-->
 						<label for="client-state" <?php validateField("client_state", $missingFields)?> class="client-details-label">State:</label>
 						<select id="client-state" name="client-state" class="client-state-select" tabindex="7">
 							<option selected="selected" value="default">Select state</option>
@@ -196,107 +197,95 @@
 						</select>
 					</li>
 					<?php 
-						//get the currencies out to populate the drop down.
+						//get the currencies from the table to populate the drop down.
 						$currency = Client::getCurrency();
 					?>
 					<li class="client-details-item currency">
 						<label for="client-currency" class="client-details-label">Preferred currency:</label>
-                        <select name="client_currency_index" id="client_currency_index" size="1">    
+						<select name="client_currency_index" id="client_currency_index" size="1">    
 						<?php foreach ($currency as $currencies) { ?>
    							<option value="<?php echo $currencies["client_currency_index"] ?>"<?php setSelected($client, "client_currency_index", $currencies["client_currency_index"]) ?>><?php echo $currencies["client_preferred_currency"]?></option>
     					<?php } ?>
-                        </select><br />
-					</li>
-<!--		Just commented this out, because we're getting the currencies out of the currency table, no big deal.
-			<li class="client-details-item currency">
-						<label for="client-currency" class="client-details-label">Preferred currency:</label>
-						 <select id="client-currency" name="client-currency" class="client-currency-select" tabindex="10">
+<!--only commented this out because currencies are from the DB.--->
+						<!-- <select id="client-currency" name="client-currency" class="client-currency-select" tabindex="10">
 							<option value="">Select currency</option>
-							<option selected="selected" value="USD">United States Dollar</option>
+							<option selected="selected" value="USD">United States Dollar</option> -->
 						</select><br />
-					</li>-->
+					</li>
+					<!--leave these alone for now. Keep this UI as a single form, but these values have no errors associated with them
+					so they can be straight updates.-->
+					<li class="client-details-item client-archive">
+						<label for="client-archive" class="client-details-label">Archive client?</label>
+						<input id="client-archive" name="client-archive" class="client-archive-input" type="checkbox" tabindex="10" value="1" />
+					</li>
+					<li class="client-details-item delete-client">
+						<label for="client-delete-btn" class="client-details-label">Delete Client?</label>
+						<input id="client-delete-btn" name="client-delete-btn" class="client-delete-btn" type="button" value="- Delete Client" tabindex="11" />
+					</li>
 					<li class="client-details-item submit-client">
 						<label for="client-save-btn" class="client-details-label">All done?</label>
-						<input id="client-save-btn" name="client-save-btn" class="client-save-btn" type="submit" value="+Save Changes" tabindex="11" /> or
+						<input id="client-save-btn" name="client-save-btn" class="client-save-btn" type="submit" value="+ Save Changes" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 			</fieldset>
 		</section>
-	</form>
-<?php } ?>
-
-
-<!--DISPLAY CONTACT EDIT WEB FORM--->
-<?php function displayContactEditForm($errorMessages, $missingFields, $contact) { 
-	
-	//if there are errors in the form display the message
-	if ($errorMessages) {
-		foreach($errorMessages as $errorMessage) {
-			echo $errorMessage;
-		}
-	}
-	?>
-
-	<form action="client-edit.php" method="post" enctype="multipart/form-data">
 		<section id="contact-detail" class="contact-detail">
 			<header class="details-header contact-details-header">
 				<h1 class="client-details-title">Contacts</h1>
 			</header>
-			<fieldset class="contact-details-entry">
+			<fieldset id="contact-details" class="contact-details-entry">
 				<!-- <legend class="contact-details-title">Edit contact details:</legend> -->
 				<header class="contact-details-header">
-					<h1 class="contact-details-title">Edit client details:</h1>
+					<h1 class="contact-details-title">Edit contact details:</h1>
 					<h4 class="required">= Required</h4>
 				</header>
 				<!-- <h4 class="required">= Required</h4> -->
 				<ul class="details-list client-details-list">
 					<li class="client-details-item name">
-						<label for="contact-name" <?php validateField("contact_name", $missingFields)?>	class="client-details-label required">Your contact's name:</label>
-						<input id="contact-name" name="contact-name" class="contact-contact-info-input" type="text" tabindex="12" value="<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
-						<label for="contact-primary" class="client-details-label">This the primary contact: </label>
-						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" tabindex="13" value="1" />
+						<label for="contact-name" <?php validateField("contact_name", $missingFields)?> class="contact-details-label required">Your contact's name:</label>
+						<input id="contact-name" name="contact-name" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
+						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
+						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" value="1" />
 					</li>
 					<li class="client-details-item phoneNum">
-						<label for="contact-officePhone" class="client-details-label">Office phone:</label>
-						<input id="contact-officePhone" name="contact-officePhone" class="contact-contact-info-input" type="text" tabindex="14" value="" /><br />
-						<label for="contact-mobilePhone" class="client-details-label">Mobile phone:</label>
-						<input id="contact-mobilePhone" name="contact-mobilePhone" class="contact-info-input" type="text" tabindex="15" value="" />
+						<label for="contact-officePhone" class="contact-details-label">Office phone:</label>
+						<input id="contact-officePhone" name="contact-officePhone" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_office_number")?>" /><br />
+						<label for="contact-mobilePhone" class="contact-details-label">Mobile phone:</label>
+						<input id="contact-mobilePhone" name="contact-mobilePhone" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_mobile_number")?>" />
 					</li>
 					<li class="client-details-item email">
-						<label for="contact-email" class="client-details-label">Email:</label>
-						<input id="contact-email" name="contact-email" class="contact-contact-info-input" type="text" tabindex="16" value="" />
+						<label for="contact-email" class="contact-details-label">Email:</label>
+						<input id="contact-email" name="contact-email" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_email")?>" />
 					</li>
 					<li class="client-details-item fax">
-						<label for="contact-fax" class="client-details-label">Fax:</label>
-						<input id="contact-fax" name="contact-fax" class="contact-contact-info-input" type="text" tabindex="17" value="" />
+						<label for="contact-fax" class="contact-details-label">Fax:</label>
+						<input id="contact-fax" name="contact-fax" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_fax_number")?>" />
 					</li>
-					
-					<li class="client-details-item add-additional">
-						<label for="add-additional-link" class="client-details-label">Need to add more contacts?</label>
-						<a id="add-additional-link" href="#" class="" tabindex="20">Add another contact</a>
-					</li>
-					
-					<li class="contact-details-item submit-contact">
-						<label for="contact-save-btn" class="contact-details-label">All done?</label>
-						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="submit" value="+Save Contact" tabindex="18" /> or <a id="cancel-add-contact-link" class="cancel-action-link" href="#" tabindex="19">Cancel</a>
+					<li class="client-details-item cancel-additional">
+						<label for="cancel-contact-link" class="contact-details-label">Need to remove contact?</label>
+						<a id="cancel-contact-link" class="cancel-action-link" href="#" tabindex="19">Remove contact</a>
 					</li>
 				</ul>
 			</fieldset>
-			<fieldset class="client-details-entry">
-				<ul class="details-list client-details-submit">
-					<li class="client-details-item submit-client">
-						<label for="client-add-btn" class="client-details-label">All done?</label>
-						<input id="client-add-btn" name="client-add-btn" class="client-add-btn" type="submit" value="+Add Client" tabindex="11" /> or
+			<fieldset id="contact-save" class="contact-details-entry">
+				<ul class="details-list contact-details-submit">
+					<li class="client-details-item add-additional">
+						<label for="add-additional-link" class="contact-details-label">Need to add more contacts?</label>
+						<a id="add-additional-link" href="#" class="">Add another contact</a>
+					</li>
+					<li class="client-details-item submit-contact">
+						<label for="contact-save-btn" class="contact-details-label">All done?</label>
+						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="button" value="+ Save Contact" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 			</fieldset>
 		</section>
-	</form>
+<!--END FORM-->
+</form>
 <?php } ?>
-
-<!--these guys don't warrant a form... yet!-->
+		
 		<section class="client-projects">
 			<header class="details-header client-projects-header">
 				<h1 class="client-details-title">Projects</h1>
@@ -313,10 +302,19 @@
 	</section>
 </section>
 
-<!--PROCESS THE CLIENT THAT WAS SUBMITTED--->
-<?php function editClient() {
-	//these are the required client fields in this form
-	$requiredFields = array("client_name","client_address","client_state","client_phone","client_city","client_zip","client_email");
+<!--CLIENT AND CONTACT PROCESSING FUNCTIONS (editClientAndContacts();)
+	1. Set up the required fields in each of the forms.
+	2. Create the objects based on the values that were submitted the last time the user submitted the form.
+	3. Set up the required fields in the $requiredFields array.
+	4. Compare the existence of the fields in the objects (based on the $_POST values) with the fields in the $requiredFields array. If
+	any are missing, put the fields into the $missingFields[] array.
+	5. If the $missingFields array exists, loop through them and call the error message. If there are NO missing fields, still call the error message for the NON missing field errors (email, phone, etc).
+	6. If there are error messages, call displayClientAndContactsEditForm with the error messages, the missing fields, and all the data for the object and the whole thing starts over again.
+	7. If there are no errors, update the database with the new client and contact information.
+	8. If all went well, display the client details page.
+	-->
+<?php function editClientAndContacts() {
+	$requiredFields = array("client_name","contact_name");
 	$missingFields = array();
 	$errorMessages = array();
 	
@@ -334,7 +332,7 @@
 	}
 
 	
-	//create the client object ($client)
+	//CREATE THE CLIENT OBJECT ($CLIENT)
 	$client = new Client( array(
 		//CHECK REG SUBS!!
 		"client_logo_link" => isset($_POST["client_logo_link"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["client_logo_link"]) : "",
@@ -348,14 +346,33 @@
 		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
 		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
+	
+	//CREATE THE CONTACT OBJECT ($CONTACT)
+	$contact = new Contact( array(
+		//CHECK REG SUBS!!
+		"contact_name" => isset($_POST["contact-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name"]) : "",
+		"contact_primary" => isset($_POST["contact-primary"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary"]) : "",
+		"contact_office_number" => isset($_POST["contact-officePhone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-officePhone"]) : "",
+		"contact_mobile_number" => isset($_POST["contact-mobilePhone"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone"]) : "",
+		"contact_email" => isset($_POST["contact-email"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-email"]) : "",
+		"contact_fax_number" => isset($_POST["contact-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax"]) : "",
+	));
+
 
 	
-//error messages and validation script
+//error messages and validation script.
+//these errors may happen in the client OR the contact object, so we have to
+//call each separately.
 	foreach($requiredFields as $requiredField) {
-		if ( !$client->getValue($requiredField)) {
-			$missingFields[] = $requiredField;
-		}
-		
+		if (preg_match("/client/", $requiredField)) {
+			if ( !$client->getValue($requiredField)) {
+				$missingFields[] = $requiredField;
+			}
+		} elseif (preg_match("/contact/", $requiredField)) {
+			if (!$contact->getValue($requiredField)) {
+				$missingFields[] = $requiredField;
+			}
+		}			
 	}
 	
 	
@@ -367,121 +384,63 @@
 			$i++;
 		}
 	} else {
-		$email = $client->getValue("client_email");
-		$phone = $client->getValue("client_phone");
-		$zip = $client->getValue("client_zip");
+		$clientEmail = $client->getValue("client_email");
+		$clientPhone = $client->getValue("client_phone");
+		$clientZip = $client->getValue("client_zip");
+		$contactEmail = $contact->getValue("contact_email");
+		$contactOfficePhone = $contact->getValue("contact_office_number");
+		$contactMobilePhone = $contact->getValue("contact_mobile_number");
+		$contactFax = $contact->getValue("contact_fax");
 		
-		// validate the email address
-		if(!preg_match("/^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,3})$/i", $email)) {
-			$errorMessages[] = "<li>" . getErrorMessage($client->getValue("client_currency_index"),"client_email", "invalid_input") . "</li>";
+		
+		// validate the email addresses
+		if(!preg_match("/^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,3})$/i", $clientEmail)) {
+			$errorMessages[] = "<li>" . getErrorMessage(1,"client_email", "invalid_input") . "</li>";
+		}
+		if(!preg_match("/^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,3})$/i", $contactEmail)) {
+			$errorMessages[] = "<li>" . getErrorMessage(1,"contact_email", "invalid_input") . "</li>";
 		}
 		
-		// validate the phone number
-		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $phone)) {
-			$errorMessages[] = "<li>" . getErrorMessage($client->getValue("client_currency_index"),"client_phone", "invalid_input") . "</li>";
+		// validate the phone numbers
+		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $clientPhone)) {
+			$errorMessages[] = "<li>" . getErrorMessage(1,"client_phone", "invalid_input") . "</li>";
+		}
+		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $contactOfficePhone)) {
+			$errorMessages[] = "<li>" . getErrorMessage(1,"contact_office_number", "invalid_input") . "</li>";
+		}
+		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $contactMobilePhone)) {
+			$errorMessages[] = "<li>" . getErrorMessage(1,"contact_mobile_number", "invalid_input") . "</li>";
+		}
+		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $contactFax)) {
+			$errorMessages[] = "<li>" . getErrorMessage(1,"contact_fax", "invalid_input") . "</li>";
 		}
 		
 		//validate the zip code
-		if (!preg_match ("/^[0-9]{5}$/", $zip)) {
-			$errorMessages[] = "<li>" . getErrorMessage($client->getValue("client_currency_index"),"client_zip", "invalid_input") . "</li>";
+		if (!preg_match ("/^[0-9]{5}$/", $clientZip)) {
+			$errorMessages[] = "<li>" . getErrorMessage(1,"client_zip", "invalid_input") . "</li>";
 		}	
 	}
 		
 	if ($errorMessages) {
-		displayClientEditForm($errorMessages, $missingFields, $client);
-		displayContactEditForm(array(), array(), new Contact(array()));
+		displayClientAndContactEditForm($errorMessages, $missingFields, $client, $contact);
 	} else {
-		//there were no errors in the form. Update the client.
-		//$client_email=$_POST["client-email"];
-		//$client_name=$client->getValue("client_name");
-		//$client_id = $client->getClientId($client_name);
-		//don't allow duplicate entries in the database for the client.
-		//if ($client_id[0]) {
-		//	echo "Client " . $client_id[0] . " is already in the database. Please try again.";
-		//} else {
-			//$client->editClient($client_email);
-			//print_r($_POST);
-			//$client_name=$client->getValue("client_name");
-			//echo "here: " . $client_name;
-			//$client_id = $client->getClientId($client_name);
-			//$client_id = $client->getValue["client_id"];
-			$client_id = $_POST["client-id"];
-			$client->updateClient($client_id);
-			//$contact->insertContact($client_id[0]);
-			//echo "You have successfully added client " . $client_email . "with client id " . $client_id[0] . ". You may add an additional client now. ";		
-			//echo"<a href=\"clients.php\">View the full client list</a>";
-		//}
+		//there were no errors in the form. Update the client, but get out the id first because
+		//of the (&^(%(&(&*% autoincrement field.
+		$client_name=$client->getValue("client_name");
+		$client_id = $client->getClientId($client_name);
+		$client->updateClient($client_id);
+		//$contact->updateContact($client_id);
+		
 		//headers already sent, call the page back with blank attributes.
 		//just do this for now, it should really go to the clients page.
-		displayClientEditForm(array(), array(), new Client(array()));
-		displayContactEditForm(array(), array(), new Contact(array()));	
+		displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
 	}
 }
 
 ?>
 
-<!--PROCESS THE CONTACT THAT WAS SUBMITTED--->
-<?php function editContact() {
-	error_log("got here");
-	//these are the required client fields in this form
-	$requiredFields = array("contact_name");
-	$missingFields = array();
-	$errorMessages = array();
-
-	
-	//create the contact object ($contact)
-	$contact = new Contact( array(
-		//CHECK REG SUBS!!
-		"contact_name" => isset($_POST["contact-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name"]) : "",
-		"contact_primary" => isset($_POST["contact-primary"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary"]) : "",
-		"contact_office_number" => isset($_POST["contact-officePhone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-officePhone"]) : "",
-		"contact_mobile_number" => isset($_POST["contact-mobilePhone"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone"]) : "",
-		"contact_email" => isset($_POST["contact-email"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-email"]) : "",
-		"contact_fax_number" => isset($_POST["contact-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax"]) : "",
-	));
-
-	
-//error messages and validation script
-	foreach($requiredFields as $requiredField) {
-		if ( !$contact->getValue($requiredField)) {
-			$missingFields[] = $requiredField;
-		}
-		
-	}
 	
 	
-	if ($missingFields) {
-		$i = 0;
-		$errorType = "required";
-		foreach ($missingFields as $missingField) {
-			$errorMessages[] = "<li>" . getErrorMessage(1,$missingField, $errorType) . "</li>";
-			$i++;
-		}
-	} else {
-		error_log("no weird errors here.");	
-	}
-		
-	if ($errorMessages) {
-		displayClientEditForm(array(), array(), new Client(array()));
-		displayContactEditForm($errorMessages, $missingFields, $contact);
-	} else {
-		//there were no errors in the form. Update the client.
-			//$client->editClient($client_email);
-			//$client_id = $client->getClientId($client_name);
-			echo "you are getting ready to call the update of the contact.";
-			//$client->editClient($client_id[0]);
-			//$contact->insertContact($client_id[0]);
-			//echo "You have successfully added client " . $client_email . "with client id " . $client_id[0] . ". You may add an additional client now. ";		
-			//echo"<a href=\"clients.php\">View the full client list</a>";
-		//headers already sent, call the page back with blank attributes.
-		//just do this for now, it should really go to the clients page.
-		displayClientEditForm(array(), array(), new Client(array()));
-		displayContactEditForm(array(), array(), new Contact(array()));	
-	}
-}
-
-?>
-
 
 <footer id="site-footer" class="site-footer">
 
