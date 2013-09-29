@@ -74,6 +74,9 @@
 	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.
 	-->
 <?php function displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact) {
+echo "<br><br>object after it has been passed back to the function.";
+	print_r($contact);
+	echo count($contact);
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
 			echo $errorMessage;
@@ -266,27 +269,27 @@
 						if ($result_count == 1) {
 							$contact = array($contact);
 						}
-						foreach ($contact as $contact) {
+						foreach ($contact as $contacts) {
 							?>
 						<li class="client-details-item name">
-						<label for="contact-name" <?php validateField("contact_name", $missingFields)?> class="contact-details-label required">Your contact's name:</label>
-						<input id="contact-name" name="contact-name-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
+						<label for="contact-name" class="contact-details-label required">Your contact's name:</label>
+						<input id="contact-name" name="contact-name-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_name")?>" /><br />
 						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
 						<input id="contact-primary" name="contact-primary-<?php echo $i ?>" class="contact-info-input" type="checkbox" checked="checked" value="1" />
 					</li>
 					<li class="client-details-item phoneNum">
 						<label for="contact-officePhone" class="contact-details-label">Office phone:</label>
-						<input id="contact-officePhone" name="contact-officePhone-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_office_number")?>" /><br />
+						<input id="contact-officePhone" name="contact-officePhone-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_office_number")?>" /><br />
 						<label for="contact-mobilePhone" class="contact-details-label">Mobile phone:</label>
-						<input id="contact-mobilePhone" name="contact-mobilePhone-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_mobile_number")?>" />
+						<input id="contact-mobilePhone" name="contact-mobilePhone-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_mobile_number")?>" />
 					</li>
 					<li class="client-details-item email">
 						<label for="contact-email" class="contact-details-label">Email:</label>
-						<input id="contact-email" name="contact-email-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_email")?>" />
+						<input id="contact-email" name="contact-email-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_email")?>" />
 					</li>
 					<li class="client-details-item fax">
 						<label for="contact-fax" class="contact-details-label">Fax:</label>
-						<input id="contact-fax" name="contact-fax-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_fax_number")?>" />
+						<input id="contact-fax" name="contact-fax-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_fax_number")?>" />
 					</li>
 					<li class="client-details-item cancel-additional">
 						<label for="cancel-contact-link" class="contact-details-label">Need to remove contact?</label>
@@ -364,6 +367,7 @@
 	//CREATE THE CLIENT OBJECT ($CLIENT)
 	$client = new Client( array(
 		//CHECK REG SUBS!!
+		"client_id" => isset($_POST["client_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["client_id"]) : "",
 		"client_logo_link" => isset($_POST["client_logo_link"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["client_logo_link"]) : "",
 		"client_name" => isset($_POST["client-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-name"]) : "",
 		"client_phone" => isset($_POST["client-phone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-phone"]) : "",
@@ -384,13 +388,16 @@
 		//CHECK REG SUBS!!
 		"contact_name" => isset($_POST["contact-name-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name-$i"]) : "",
 		"contact_primary" => isset($_POST["contact-primary-$i"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary-$i"]) : "",
-		"contact_office_number" => isset($_POST["contact_office_number_$i"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact_office_number"]) : "",
-		"contact_mobile_number" => isset($_POST["contact_mobile_number_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact_mobile_number"]) : "",
-		"contact_email" => isset($_POST["contact_email_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact_email_$i"]) : "",
-		"contact_fax_number" => isset($_POST["contact_fax_number_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact_fax_number_$i"]) : "",
+		"contact_office_number" => isset($_POST["contact-officePhone-$i"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-officePhone-$i"]) : "",
+		"contact_mobile_number" => isset($_POST["contact-mobilePhone-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone-$i"]) : "",
+		"contact_email" => isset($_POST["contact-email-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-email-$i"]) : "",
+		"contact_fax_number" => isset($_POST["contact-fax-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax-$i"]) : "",
 	));
 	}
-
+	echo "object after it has been created";
+	print_r($contact);
+	echo count($contact);
+	
 	
 //error messages and validation script.
 //these errors may happen in the client OR the contact object, so we have to
@@ -401,20 +408,26 @@
 				$missingFields[] = $requiredField;
 			}
 		} elseif (preg_match("/contact/", $requiredField)) {
-			foreach ($contact as $contact) {
-			if (!$contact->getValue($requiredField)) {
-				$missingFields[] = $requiredField;
-			}
+			echo "<br><br>here is the object after the preg_match";
+			print_r($contact);
+			foreach ($contact as $contacts) {
+				echo "<br><br>here is the object after the foreach";
+				print_r($contact);
+				if (!$contacts->getValue($requiredField)) {
+					$missingFields[] = $requiredField;
+				}
 			}
 		}			
 	}
+	echo "<br><br>Here is the contact after we check the fields..";
+	print_r($contact);
 	
 	
 	if ($missingFields) {
 		$i = 0;
 		$errorType = "required";
 		foreach ($missingFields as $missingField) {
-			$errorMessages[] = "<li>" . getErrorMessage($client->getValue("client_currency_index"),$missingField, $errorType) . "</li>";
+			$errorMessages[] = "<li>" . getErrorMessage(1,$missingField, $errorType) . "</li>";
 			$i++;
 		}
 	} else {
@@ -454,6 +467,8 @@
 			$errorMessages[] = "<li>" . getErrorMessage(1,"client_zip", "invalid_input") . "</li>";
 		}	
 	}
+	echo "<br><br>Here is the contact right before we recall the form.";
+	print_r($contact);
 		
 	if ($errorMessages) {
 		displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact);
@@ -465,7 +480,8 @@
 		$client->updateClient($client_id);
 		//$contact->updateContact($client_id);
 		
-		displayClientPage();	}
+		displayClientPage();	
+	}
 }
 
 ?>
