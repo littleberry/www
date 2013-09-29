@@ -1,4 +1,9 @@
 <?php
+	function displayClientPage() {
+		//this probably isn't right, but I'll use it for now. won't work if JavaScript is off.
+		printf("<script>location.href='clients.php'</script>");
+	}
+	
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
@@ -69,7 +74,6 @@
 	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.
 	-->
 <?php function displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact) {
-	//print_r($_POST);
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
 			echo $errorMessage;
@@ -85,6 +89,11 @@
 	<!--BEGIN FORM-->
 	<form action="client-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
 	<input type="hidden" name="action" value="edit_client">
+	<?//we need to get the client_id into the $_POST so it is there when the user posts the form.
+	//perhaps in the $_SESSION variable?
+	if (isset($_GET["client_id"])) {?>
+		<input type="hidden" name="client_id" value="<?php echo $_GET["client_id"]?>">
+	<?php } ?>
 		<figure class="client-logo l-col-20">
 			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
 			<fieldset class="client-logo-upload">
@@ -252,27 +261,32 @@
 						<!--we need to call them into an array of objects, not just an object.-->
 						<!--the object does not hold any values when it is sent back.-->
 						<?php
+						$i = 0;
+						$result_count = count($contact);
+						if ($result_count == 1) {
+							$contact = array($contact);
+						}
 						foreach ($contact as $contact) {
-						?>
-					<li class="client-details-item name">
+							?>
+						<li class="client-details-item name">
 						<label for="contact-name" <?php validateField("contact_name", $missingFields)?> class="contact-details-label required">Your contact's name:</label>
-						<input id="contact-name" name="contact-name" class="contact-info-input" type="text" value=<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
+						<input id="contact-name" name="contact-name-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
 						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
-						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" value="1" />
+						<input id="contact-primary" name="contact-primary-<?php echo $i ?>" class="contact-info-input" type="checkbox" checked="checked" value="1" />
 					</li>
 					<li class="client-details-item phoneNum">
 						<label for="contact-officePhone" class="contact-details-label">Office phone:</label>
-						<input id="contact-officePhone" name="contact-officePhone" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_office_number")?>" /><br />
+						<input id="contact-officePhone" name="contact-officePhone-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_office_number")?>" /><br />
 						<label for="contact-mobilePhone" class="contact-details-label">Mobile phone:</label>
-						<input id="contact-mobilePhone" name="contact-mobilePhone" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_mobile_number")?>" />
+						<input id="contact-mobilePhone" name="contact-mobilePhone-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_mobile_number")?>" />
 					</li>
 					<li class="client-details-item email">
 						<label for="contact-email" class="contact-details-label">Email:</label>
-						<input id="contact-email" name="contact-email" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_email")?>" />
+						<input id="contact-email" name="contact-email-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_email")?>" />
 					</li>
 					<li class="client-details-item fax">
 						<label for="contact-fax" class="contact-details-label">Fax:</label>
-						<input id="contact-fax" name="contact-fax" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_fax_number")?>" />
+						<input id="contact-fax" name="contact-fax-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_fax_number")?>" />
 					</li>
 					<li class="client-details-item cancel-additional">
 						<label for="cancel-contact-link" class="contact-details-label">Need to remove contact?</label>
@@ -290,12 +304,13 @@
 						<label for="contact-save-btn" class="contact-details-label">All done?</label>
 						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="submit" value="+ Save Contact" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
-						<?php //} ?>
+						<?php 
+						$i++;
+						} ?>
 					</li>
 				</ul>
 			</fieldset>
 		</section>
-		<?php } ?>
 <!--END FORM-->
 </form>
 <?php } ?>
@@ -361,17 +376,20 @@
 		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
 	
-	print_r($_POST);
 	//CREATE THE CONTACT OBJECTS ($CONTACT)
-	$contact = new Contact( array(
+	$client_id = $client->getValue("client_id");
+	$numContacts = Contact::getNumberOfContacts($client_id);
+	for ($i=0; $i<$numContacts; $i++) {
+	$contact[] = new Contact( array(
 		//CHECK REG SUBS!!
-		"contact_name" => isset($_POST["contact-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name"]) : "",
-		"contact_primary" => isset($_POST["contact-primary"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary"]) : "",
-		"contact_office_number" => isset($_POST["contact-officePhone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-officePhone"]) : "",
-		"contact_mobile_number" => isset($_POST["contact-mobilePhone"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone"]) : "",
-		"contact_email" => isset($_POST["contact-email"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-email"]) : "",
-		"contact_fax_number" => isset($_POST["contact-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax"]) : "",
+		"contact_name" => isset($_POST["contact-name-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name-$i"]) : "",
+		"contact_primary" => isset($_POST["contact-primary-$i"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary-$i"]) : "",
+		"contact_office_number" => isset($_POST["contact_office_number_$i"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact_office_number"]) : "",
+		"contact_mobile_number" => isset($_POST["contact_mobile_number_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact_mobile_number"]) : "",
+		"contact_email" => isset($_POST["contact_email_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact_email_$i"]) : "",
+		"contact_fax_number" => isset($_POST["contact_fax_number_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact_fax_number_$i"]) : "",
 	));
+	}
 
 	
 //error messages and validation script.
@@ -440,23 +458,17 @@
 	if ($errorMessages) {
 		displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact);
 	} else {
-		//there were no errors in the form. Update the client, but get out the id first because
-		//of the (&^(%(&(&*% autoincrement field.
-		$client_name=$client->getValue("client_name");
-		$client_id = $client->getClientId($client_name);
+		echo "Updating database...";
+		//OK, all is well, why isn't it showing in the UI?
+		//there were no errors in the form. Update the client
+		$client_id = $client->getValue("client_id");
 		$client->updateClient($client_id);
 		//$contact->updateContact($client_id);
 		
-		//headers already sent, call the page back with blank attributes.
-		//just do this for now, it should really go to the clients page.
-		displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
-	}
+		displayClientPage();	}
 }
 
 ?>
-
-	
-	
 
 <footer id="site-footer" class="site-footer">
 
