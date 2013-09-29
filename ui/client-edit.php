@@ -74,9 +74,6 @@
 	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.
 	-->
 <?php function displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact) {
-echo "<br><br>object after it has been passed back to the function.";
-	print_r($contact);
-	echo count($contact);
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
 			echo $errorMessage;
@@ -266,9 +263,9 @@ echo "<br><br>object after it has been passed back to the function.";
 						<?php
 						$i = 0;
 						$result_count = count($contact);
-						if ($result_count == 1) {
-							$contact = array($contact);
-						}
+						//if ($result_count == 1) {
+						//	$contact = array($contact);
+						//}
 						foreach ($contact as $contacts) {
 							?>
 						<li class="client-details-item name">
@@ -393,11 +390,7 @@ echo "<br><br>object after it has been passed back to the function.";
 		"contact_email" => isset($_POST["contact-email-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-email-$i"]) : "",
 		"contact_fax_number" => isset($_POST["contact-fax-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax-$i"]) : "",
 	));
-	}
-	echo "object after it has been created";
-	print_r($contact);
-	echo count($contact);
-	
+	}	
 	
 //error messages and validation script.
 //these errors may happen in the client OR the contact object, so we have to
@@ -408,19 +401,13 @@ echo "<br><br>object after it has been passed back to the function.";
 				$missingFields[] = $requiredField;
 			}
 		} elseif (preg_match("/contact/", $requiredField)) {
-			echo "<br><br>here is the object after the preg_match";
-			print_r($contact);
 			foreach ($contact as $contacts) {
-				echo "<br><br>here is the object after the foreach";
-				print_r($contact);
 				if (!$contacts->getValue($requiredField)) {
 					$missingFields[] = $requiredField;
 				}
 			}
 		}			
 	}
-	echo "<br><br>Here is the contact after we check the fields..";
-	print_r($contact);
 	
 	
 	if ($missingFields) {
@@ -431,7 +418,8 @@ echo "<br><br>object after it has been passed back to the function.";
 			$i++;
 		}
 	} else {
-		$clientEmail = $client->getValue("client_email");
+		//TAKE THIS OUT FOR NOW AND DEAL WITH IT LATER!!
+		/*$clientEmail = $client->getValue("client_email");
 		$clientPhone = $client->getValue("client_phone");
 		$clientZip = $client->getValue("client_zip");
 		$contactEmail = $contact->getValue("contact_email");
@@ -465,10 +453,8 @@ echo "<br><br>object after it has been passed back to the function.";
 		//validate the zip code
 		if (!preg_match ("/^[0-9]{5}$/", $clientZip)) {
 			$errorMessages[] = "<li>" . getErrorMessage(1,"client_zip", "invalid_input") . "</li>";
-		}	
+		}	*/
 	}
-	echo "<br><br>Here is the contact right before we recall the form.";
-	print_r($contact);
 		
 	if ($errorMessages) {
 		displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact);
@@ -478,7 +464,17 @@ echo "<br><br>object after it has been passed back to the function.";
 		//there were no errors in the form. Update the client
 		$client_id = $client->getValue("client_id");
 		$client->updateClient($client_id);
-		//$contact->updateContact($client_id);
+		//delete all the records for this client.
+		$contact_ids = Contact::getContactIds($client_id);
+		foreach ($contact_ids as $contact_id) {
+				error_log($contact_id[0]);
+				error_log("deleting contact id " . $contact_id[0]);
+				Contact::deleteContactByContactId($contact_id[0]);
+		}
+		//insert all the records for this client.
+		foreach ($contact as $contacts) {
+			$contacts->insertContact($client_id);
+		}
 		
 		displayClientPage();	
 	}
