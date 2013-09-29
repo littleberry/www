@@ -68,7 +68,8 @@
 	2. If first time, pull the client and contact objects from the database.
 	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.
 	-->
-<?php function displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact) { 
+<?php function displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact) {
+	//print_r($_POST);
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
 			echo $errorMessage;
@@ -76,7 +77,7 @@
 	}
 	if (isset($_GET["client_id"])) {
 		$client=Client::getClient($_GET["client_id"]);
-		list($contact)=Contact::getContacts($_GET["client_id"]);
+		$contact=Contact::getContacts($_GET["client_id"]);
 	}
 ?>
 
@@ -231,6 +232,7 @@
 				</ul>
 			</fieldset>
 		</section>
+		<input type="hidden" name="action" value="edit_client">
 		<section id="contact-detail" class="contact-detail">
 			<header class="details-header contact-details-header">
 				<h1 class="client-details-title">Contacts</h1>
@@ -243,13 +245,18 @@
 				</header>
 				<!-- <h4 class="required">= Required</h4> -->
 				<ul class="details-list client-details-list">
+				<!--there are multiple contacts. loop through them.--->
+						<!--this is SO going to break the UI!-->
+						<!--need to figure out how to get these things into an array.-->
+						<!--these values ARE part of the post, but there could be many of them.-->
+						<!--we need to call them into an array of objects, not just an object.-->
+						<!--the object does not hold any values when it is sent back.-->
+						<?php
+						foreach ($contact as $contact) {
+						?>
 					<li class="client-details-item name">
 						<label for="contact-name" <?php validateField("contact_name", $missingFields)?> class="contact-details-label required">Your contact's name:</label>
-						<!--there are multiple contacts. loop through them.--->
-						<!--this is SO going to break the UI!-->
-						<? foreach ($contact as $contact) {
-						?>
-						<input id="contact-name" name="contact-name" class="contact-info-input" type="text" value="<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
+						<input id="contact-name" name="contact-name" class="contact-info-input" type="text" value=<?php echo $contact->getValueEncoded("contact_name")?>" /><br />
 						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
 						<input id="contact-primary" name="contact-primary" class="contact-info-input" type="checkbox" checked="checked" value="1" />
 					</li>
@@ -283,11 +290,12 @@
 						<label for="contact-save-btn" class="contact-details-label">All done?</label>
 						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="submit" value="+ Save Contact" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
-						<?php } ?>
+						<?php //} ?>
 					</li>
 				</ul>
 			</fieldset>
 		</section>
+		<?php } ?>
 <!--END FORM-->
 </form>
 <?php } ?>
@@ -353,7 +361,8 @@
 		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
 	
-	//CREATE THE CONTACT OBJECT ($CONTACT)
+	print_r($_POST);
+	//CREATE THE CONTACT OBJECTS ($CONTACT)
 	$contact = new Contact( array(
 		//CHECK REG SUBS!!
 		"contact_name" => isset($_POST["contact-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name"]) : "",
@@ -363,7 +372,6 @@
 		"contact_email" => isset($_POST["contact-email"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-email"]) : "",
 		"contact_fax_number" => isset($_POST["contact-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax"]) : "",
 	));
-
 
 	
 //error messages and validation script.
@@ -375,8 +383,10 @@
 				$missingFields[] = $requiredField;
 			}
 		} elseif (preg_match("/contact/", $requiredField)) {
+			foreach ($contact as $contact) {
 			if (!$contact->getValue($requiredField)) {
 				$missingFields[] = $requiredField;
+			}
 			}
 		}			
 	}
