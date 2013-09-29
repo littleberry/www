@@ -6,6 +6,7 @@
 
 require_once("../config/config.php");
 
+
 abstract class DataObject  {
 	//the array can be used by objects but not directly accessed. This is the array that holds the individual objects created with their values retrieved from the database.
 	protected $data = array();
