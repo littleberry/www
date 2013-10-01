@@ -59,10 +59,10 @@
 		5. If there are no missing required fields, call Client::updateClient AND Contact:updateContact--->	
 <?php 			
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_client") {
-					echo "user came in from form.";
+					error_log("user came in from form, calling editClientAndContacts");
 					editClientAndContacts();
 				} else {
-					echo "showing the form, this is the first time the user has come in.";
+					error_log("showing the edit form, this is the first time the user has come in.");
 					displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
 				}
 ?>
@@ -82,7 +82,13 @@
 	if (isset($_GET["client_id"])) {
 		$client=Client::getClient($_GET["client_id"]);
 		$contact=Contact::getContacts($_GET["client_id"]);
+	} else {
+		error_log("this is not the first time the user displayed this form.");
+		error_log(print_r($contact,true));
+		error_log(gettype($contact));
 	}
+	
+	
 ?>
 
 	<section class="content">
@@ -93,6 +99,9 @@
 	//perhaps in the $_SESSION variable?
 	if (isset($_GET["client_id"])) {?>
 		<input type="hidden" name="client_id" value="<?php echo $_GET["client_id"]?>">
+	<?php } 
+	if (isset($_POST["client_id"])) {?>
+		<input type="hidden" name="client_id" value="<?php echo $_POST["client_id"]?>">
 	<?php } ?>
 		<figure class="client-logo l-col-20">
 			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
@@ -261,32 +270,34 @@
 						<!--we need to call them into an array of objects, not just an object.-->
 						<!--the object does not hold any values when it is sent back.-->
 						<?php
-						$i = 0;
-						$result_count = count($contact);
-						//if ($result_count == 1) {
-						//	$contact = array($contact);
-						//}
+						$i = 1;
+						global $counter;
+						error_log("Setting up the input fields in the HTML");
+						error_log(print_r($contact,true));
+						error_log("the post variable is:");
+						error_log(print_r($_POST,true));
+						error_log(gettype($contact));
 						foreach ($contact as $contacts) {
 							?>
 						<li class="client-details-item name">
 						<label for="contact-name" class="contact-details-label required">Your contact's name:</label>
-						<input id="contact-name" name="contact-name-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_name")?>" /><br />
+						<input id="contact-name" name="contact-name[]" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_name")?>" /><br />
 						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
-						<input id="contact-primary" name="contact-primary-<?php echo $i ?>" class="contact-info-input" type="checkbox" checked="checked" value="1" />
+						<input id="contact-primary" name="contact-primary[] class="contact-info-input" type="checkbox" checked="checked" value="1" />
 					</li>
 					<li class="client-details-item phoneNum">
 						<label for="contact-officePhone" class="contact-details-label">Office phone:</label>
-						<input id="contact-officePhone" name="contact-officePhone-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_office_number")?>" /><br />
+						<input id="contact-officePhone" name="contact-officePhone[]" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_office_number")?>" /><br />
 						<label for="contact-mobilePhone" class="contact-details-label">Mobile phone:</label>
-						<input id="contact-mobilePhone" name="contact-mobilePhone-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_mobile_number")?>" />
+						<input id="contact-mobilePhone" name="contact-mobilePhone[]" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_mobile_number")?>" />
 					</li>
 					<li class="client-details-item email">
 						<label for="contact-email" class="contact-details-label">Email:</label>
-						<input id="contact-email" name="contact-email-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_email")?>" />
+						<input id="contact-email" name="contact-email[]" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_email")?>" />
 					</li>
 					<li class="client-details-item fax">
 						<label for="contact-fax" class="contact-details-label">Fax:</label>
-						<input id="contact-fax" name="contact-fax-<?php echo $i ?>" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_fax_number")?>" />
+						<input id="contact-fax" name="contact-fax[]" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_fax_number")?>" />
 					</li>
 					<li class="client-details-item cancel-additional">
 						<label for="cancel-contact-link" class="contact-details-label">Need to remove contact?</label>
@@ -306,7 +317,10 @@
 						<a class="" href="#" tabindex="11">Cancel</a>
 						<?php 
 						$i++;
-						} ?>
+						$counter = $i;
+						} 
+						error_log("here is the counter variable: " . $counter++ );?>
+						<input type="hidden" name="contact_count" value="<?php echo $counter++?>">
 					</li>
 				</ul>
 			</fieldset>
@@ -379,18 +393,45 @@
 	
 	//CREATE THE CONTACT OBJECTS ($CONTACT)
 	$client_id = $client->getValue("client_id");
+	error_log("The client id is " . $client_id);
 	$numContacts = Contact::getNumberOfContacts($client_id);
-	for ($i=0; $i<$numContacts; $i++) {
-	$contact[] = new Contact( array(
+	error_log("The number of contacts in the database is " . $numContacts);
+	$contact_count = $_POST["contact_count"];
+	error_log("the contact count is " . $contact_count);
+	//for ($i=0; $i<=1; $i++) {
+	$i = 0;
+	//print_r($_POST);
+	$holderArray[] = new Contact( array(
 		//CHECK REG SUBS!!
-		"contact_name" => isset($_POST["contact-name-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name-$i"]) : "",
-		"contact_primary" => isset($_POST["contact-primary-$i"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary-$i"]) : "",
-		"contact_office_number" => isset($_POST["contact-officePhone-$i"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-officePhone-$i"]) : "",
-		"contact_mobile_number" => isset($_POST["contact-mobilePhone-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone-$i"]) : "",
-		"contact_email" => isset($_POST["contact-email-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-email-$i"]) : "",
-		"contact_fax_number" => isset($_POST["contact-fax-$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax-$i"]) : "",
+		"contact_name" => isset($_POST["contact-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name"]) : "",
+		"contact_primary" => isset($_POST["contact-primary"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-primary"]) : "",
+		"contact_office_number" => isset($_POST["contact-officePhone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["contact-officePhone"]) : "",
+		"contact_mobile_number" => isset($_POST["contact-mobilePhone"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone"]) : "",
+		"contact_email" => isset($_POST["contact-email"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-email"]) : "",
+		"contact_fax_number" => isset($_POST["contact-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax"]) : "",
 	));
+	
+	//get out the number of contacts to use to control the loop. Use contact_name, which is the required field.
+	$numContacts = count($holderArray[0]->getValue("contact_name"));
+	error_log("HERE IS THE ITEM COUNT ");
+	error_log($numContacts);
+	
+	//X contacts, create the array.
+	for ($i=0; $i<$numContacts; $i++) {
+		error_log("creating the objects");
+		$contact[] = new Contact(array(
+			"contact_name"=>$holderArray[0]->getValue("contact_name")[$i],
+			"contact_primary"=>$holderArray[0]->getValue("contact_primary")[$i],
+			"contact_office_number"=>$holderArray[0]->getValue("contact_office_number")[$i],
+			"contact_mobile_number"=>$holderArray[0]->getValue("contact_mobile_number")[$i],
+			"contact_email"=>$holderArray[0]->getValue("contact_email")[$i],
+			"contact_fax_number"=>$holderArray[0]->getValue("contact_fax_number")[$i],	
+		));
+		error_log("Here is the contact array:");
+		error_log(print_r($contact,true));
 	}	
+	
+	
 	
 //error messages and validation script.
 //these errors may happen in the client OR the contact object, so we have to
@@ -457,22 +498,26 @@
 	}
 		
 	if ($errorMessages) {
+		error_log("There were errors in the input (errorMessages was not blank. Redisplaying the edit form with missing fields.");
+		error_log($contact);
+		error_log(gettype($contact));
 		displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact);
 	} else {
-		echo "Updating database...";
-		//OK, all is well, why isn't it showing in the UI?
-		//there were no errors in the form. Update the client
+		error_log("All of the required fields are there...Updating database...");
 		$client_id = $client->getValue("client_id");
 		$client->updateClient($client_id);
 		//delete all the records for this client.
 		$contact_ids = Contact::getContactIds($client_id);
 		foreach ($contact_ids as $contact_id) {
-				error_log($contact_id[0]);
-				error_log("deleting contact id " . $contact_id[0]);
+				error_log("Now deleting contact id " . $contact_id[0]);
 				Contact::deleteContactByContactId($contact_id[0]);
 		}
 		//insert all the records for this client.
 		foreach ($contact as $contacts) {
+			error_log("Now inserting these contacts:");
+			$contact_id = $contacts->getValue("contact_id");
+			error_log(print_r($contact,true));
+			error_log($contact_id);
 			$contacts->insertContact($client_id);
 		}
 		
