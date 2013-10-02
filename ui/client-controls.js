@@ -142,4 +142,9 @@ $(document).ready( function() {
 		
 		evt.preventDefault();
 	});
+	
+	$( '#client-info' ).submit( function( evt ) {
+		console.log( $( this ).serializeArray() );
+		evt.preventDefault();
+	});
 });
