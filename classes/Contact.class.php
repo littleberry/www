@@ -24,7 +24,7 @@ class Contact extends DataObject {
 		try {
 			$st = $conn->prepare($sql);
 			$st->execute();
-			$contact=array();
+			//$contact=array();
 			foreach ($st->fetchAll() as $row) {
 				$contact[] = new Contact($row);
 			}
