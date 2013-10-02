@@ -243,7 +243,7 @@
 <!--PROCESS THE CLIENT & THE CONTACT THAT WERE SUBMITTED--->
 <?php function processClient() {
  	//these are the required client fields in this form
-	$requiredFields = array("client_name","client_address","client_state","client_phone","client_city","client_zip","client_email","client_name", "contact_name");
+	$requiredFields = array("client_name","contact_primary", "contact_name");
 	$missingFields = array();
 	$errorMessages = array();
 	
