@@ -94,7 +94,8 @@
 	<!--BEGIN FORM-->
 	<form action="client-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
 	<input type="hidden" name="action" value="edit_client">
-	<?//we need to get the client_id into the $_POST so it is there when the user posts the form.
+	<?php
+	//we need to get the client_id into the $_POST so it is there when the user posts the form.
 	//perhaps in the $_SESSION variable?
 	if (isset($_GET["client_id"])) {?>
 		<input type="hidden" name="client_id" value="<?php echo $_GET["client_id"]?>">
