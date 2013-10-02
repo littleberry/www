@@ -28,8 +28,10 @@ function displayPageFooter() {
 </html>
 <?php
 }
-*/
 
+*/
+//turn off errors in the UI
+ini_set ('display_errors', 0);
 
 //is the value in the missing field array? If so, highlight the field using the "error" style..
 function validateField($fieldName, $missingFields) {
