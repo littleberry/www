@@ -41,8 +41,9 @@ function validateField($fieldName, $missingFields) {
 //these functions pre-select checkboxes and menus on the page.
 function setChecked(DataObject $obj, $fieldName, $fieldValue) {
 	if ($obj->getValue($fieldName) == $fieldValue) {
-		echo ' checked="checked"';
+		echo ' checked=checked';
 	}
+	//echo "CALLED ERT";
 }
 
 function setSelected(DataObject $obj, $fieldName, $fieldValue) {
