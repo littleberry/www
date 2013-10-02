@@ -2,9 +2,14 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
-	//retrieve the active clients array into a list
-	//so we can get the items out easily in the for loop
-	list($clients) = Client::getClients(); 
+	
+	
+	//FUNCTION RETURNS THE INDIVIDUAL OBJECTS. 
+	$clients[] = Client::getClients();
+	error_log("the client is an ARRAY ");
+	list($clients) = Client::getClients();
+	//LEAVE THIS AS A LIST FOR INVESTIGATION.
+	error_log("the client is a LIST");
 	?>
 	<!DOCTYPE html>
 <html lang="en">
@@ -42,7 +47,6 @@
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
 				<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.php">+ Add Client</a></li>
-				<!--not sure why there are two add client buttons, so I'm removing the second one. I'm quite positive it's because i don't know what's going on here.-->
 				<!--<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>-->
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.php">View Archives</a></li>
 			</ul>
@@ -51,25 +55,22 @@
 	<section class="content">
 		<ul id="client-list" class="client-list">
 		<?php foreach ($clients as $client) { 
-				//get out the client id, since it is an autoincrement field, and we need it to retrieve the primary contact.
+				//RETRIEVE THE CLIENT ID
 				$client_id = Client::getClientId($client->getValueEncoded("client_name"));
-				//get the flag to out of the db for display on the non-archived page.
+				//GET OUT THE ARCHIVE FLAG
 				$archive_flag = Client::getArchiveFlag($client_id[0]); 
-				//echo "the archive flag for " . $client_id[0] . " is " .$archive_flag;
-				//the user changed the value of the archive button to 1 (archived) for this specific client, update
-				//it in the client table. The client-archive-btn has the client_id as its value.
+				//THIS IS NOT THE WAY TO DO THIS. 
 				if (isset($_POST["client-archive-btn"]) && $_POST["client-archive-btn"] == $client_id[0]){
 					//echo "you clicked the archive button on the client page.";
 					$archive_flag = 1;
 					Client::setArchiveFlag($archive_flag, $client_id[0]);
 					$archive_flag = Client::getArchiveFlag($client_id[0]);
 				}
-				//retrieve the primary contact for the UI
+				//GET THE PRIMARY CONTACT OUT. ALL CONTACTS MUST HAVE A PRIMARY CONTACT, CHECK THE FLAG IN THE CLIENT TABLE.
 				$primary_contact = Contact::getPrimaryContact($client_id[0]);
-				//if the client has no contacts, spit that info out to the UI.
 				if (!isset($primary_contact)) $primary_contact = new Contact(array("contact_name"=>"No contacts found, please investigate why this client doesn't have a contact."));
 				
-				//only show active clients in this page.
+				//DISPLAY ONLY ACTIVE CLIENTS, ARCHIVED CLIENTS ARE ON THE ARCHIVE PAGE.
 				if ($archive_flag != 1) {
 				?>
 			<li class="client-list-item l-col-33">
@@ -78,16 +79,12 @@
 					<li class="client-info-name"><a class="client-info-name-link" href="<?php echo "client-detail.php?client_id=" . $client_id[0]?>" title="View client details"><?php echo $client->getValueEncoded("client_name")?></a></li>
 					<li class="client-info-contact">Contact: <a class="client-info-contact-link" href="#" title="View contact details"><?php echo $primary_contact->getValue("contact_name") ?></a></li>
 					<li class="client-info-active-projects">X Active <a class="client-info-active-projects-link" href="#" title="View active projects">Projects</a></li>
-				<?php 
-				//just putting this here for now, remove it once the appropriate UI solution is in place.?>
-				<!--so, you want I should archive your client?-->
-				<form action="clients.php" method="post" style="margin-bottom:50px;">
-				<button id="client-archive-btn" name="client-archive-btn" class="client-archive-btn" type="submit" value="<?php echo $client_id[0] ?>" tabindex="11">Archive Client</button></form> 
-				
+					<form action="clients.php" method="post" style="margin-bottom:50px;">
+						<button id="client-archive-btn" name="client-archive-btn" class="client-archive-btn" type="submit" value="<?php echo $client_id[0] ?>" tabindex="11">Archive Client</button></form> 			
 			<?php	} ?>
 				</ul>		
 			</li>
-          <?php } ?>
+<?php } ?>
 <!--			<li class="client-list-item l-col-33">
 				<img class="client-logo-thumbnail" src="images/default.jpg" title="Client Logo" alt="Client Logo" />
 				<ul class="client-info-list">
