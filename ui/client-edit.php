@@ -62,7 +62,7 @@
 					//error_log("user came in from form, calling editClientAndContacts");
 					editClientAndContacts();
 				} else {
-					//error_log("showing the edit form, this is the first time the user has come in.");
+					//error_log("showing the edit form, this is the first time the user has come iin.");
 					displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
 				}
 	
