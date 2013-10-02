@@ -333,7 +333,7 @@
 			</fieldset>
 		</section>
 <!--END FORM-->
-</form><?php //} ?>
+</form><?php } ?>
 		
 		<section class="client-projects">
 			<header class="details-header client-projects-header">
