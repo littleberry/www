@@ -157,14 +157,16 @@ class Client extends DataObject {
 				client_phone,
 				client_fax,
 				client_currency_index,
-				client_logo_link
+				client_logo_link,
+				client_archived
 				) VALUES (
 				:client_name,
 				:client_email,
 				:client_phone,
 				:client_fax,
 				:client_currency_index,
-				:client_logo_link
+				:client_logo_link,
+				:client_archived
 				)";
 			try {
 				$st = $conn->prepare($sql);
@@ -173,7 +175,8 @@ class Client extends DataObject {
 				$st->bindValue(":client_phone", $this->data["client_phone"], PDO::PARAM_INT);
 				$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
 				$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
-				$st->bindValue(":client_logo_link", "images/" . $this->data["client_logo_link"], PDO::PARAM_STR);
+				$st->bindValue(":client_archived", $this->data["client_archived"], PDO::PARAM_INT);
+				//NO NO NO THIS IS TOO HARDCODED!!
 				if ($this->data["client_logo_link"]) {
 					$st->bindValue(":client_logo_link", "images/" . $this->data["client_logo_link"], PDO::PARAM_STR);
 				} else {
@@ -266,7 +269,8 @@ class Client extends DataObject {
 				client_phone = :client_phone,
 				client_fax = :client_fax,
 				client_currency_index = :client_currency_index,
-				client_logo_link = :client_logo_link
+				client_logo_link = :client_logo_link,
+				client_archived = :client_archived
 				WHERE client_id = :client_id";
 			try {
 				$st = $conn->prepare($sql);
@@ -274,8 +278,14 @@ class Client extends DataObject {
 				$st->bindValue(":client_email", $this->data["client_email"], PDO::PARAM_STR);
 				$st->bindValue(":client_phone", $this->data["client_phone"], PDO::PARAM_INT);
 				$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
+				$st->bindValue(":client_archived", $this->data["client_archived"], PDO::PARAM_INT);
 				$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
-				$st->bindValue(":client_logo_link", $this->data["client_logo_link"], PDO::PARAM_INT);
+				//NO NO NO THIS IS TOO HARDCODED!!
+				if ($this->data["client_logo_link"]) {
+					$st->bindValue(":client_logo_link", "images/" . $this->data["client_logo_link"], PDO::PARAM_STR);
+				} else {
+					$st->bindValue(":client_logo_link", "images/default.jpg", PDO::PARAM_STR);
+				}				
 				$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
 				$st->execute();	
 				parent::disconnect($conn);
