@@ -435,8 +435,8 @@
 	
 		//error_log("creating the objects");
 		$contact[] = new Contact( array(
-			//"contact_name" => $holderArray[0]->getValue("contact_name")[$i],
-			"contact_primary" => $holderArray[0]->getValue("contact_primary")[$i],
+			"contact_name" => ($holderArray[0]->getValue("contact_name")[$i]),
+			"contact_primary" => ($holderArray[0]->getValue("contact_primary")[$i]),
 			"contact_office_number" => $holderArray[0]->getValue("contact_office_number")[$i],
 			"contact_mobile_number" => $holderArray[0]->getValue("contact_mobile_number")[$i],
 			"contact_email" => $holderArray[0]->getValue("contact_email")[$i],
