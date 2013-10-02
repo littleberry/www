@@ -29,6 +29,7 @@ function getErrorMessage($client_currency_index, $errorMessage, $errorType) {
 			$errorArray["contact_office_number"]["invalid_input"] = "Please check you entered a valid office phone number for the contact in format XXX-XXX-XXXX.";
 			$errorArray["contact_mobile_number"]["invalid_input"] = "Please check you entered a valid mobile phone number for the contact in format XXX-XXX-XXXX.";
 			$errorArray["contact_fax_number"]["invalid_input"] = "Please check you entered a valid fax phone number for the contact in format XXX-XXX-XXXX.";
+			$errorArray["contact_primary"]["required"] = "All clients must have at least one primary contact.";
 			return $errorArray[$errorMessage][$errorType];
 			break;
 		default:
