@@ -289,8 +289,7 @@
 							<?php } else {	
 								?>
 								<option value="1"> Yes</option>
-									<option value="0" selected="selected">No</option>
-							<?php } ?>
+									<option value="0" selected="selected">No</option><?php } ?>
 						</select>
 					</li>
 					<li class="client-details-item phoneNum">
@@ -327,14 +326,14 @@
 						//$i++;
 						//$counter = $i;
 						} 
-						//error_log("here is the counter variable: " . $counter++ );?>
+						//error_log("here is the counter variable: " . $counter++ );
+						?>
 					</li>
 				</ul>
 			</fieldset>
 		</section>
 <!--END FORM-->
-</form>
-<?php } ?>
+</form><?php } ?>
 		
 		<section class="client-projects">
 			<header class="details-header client-projects-header">
