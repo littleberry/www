@@ -35,7 +35,7 @@
 		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Projects</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="manage.html">Clients</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Team</a></li>
 		</ul>
 	</nav>
@@ -47,7 +47,7 @@
 			<ul class="client-page-controls">
 				<li class="page-controls-item link-btn"><a class="add-client-link" href="client-add.php">+ Add Client</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.php">View Archives</a></li>
-				<li class="page-controls-item"><a class="view-all-link" href="clients.html">View All</a></li>
+				<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -110,7 +110,9 @@
 				<header class="client-logo-header">
 					<h1 class="client-logo-title">Upload Client Logo</h1>
 				</header>
-				<input id="client-logo-file" name="client-logo-file" class="client-logo-file" type="file" value="Browse" tabindex="21" />
+				<?//hack the image by using a hidden field.?>
+				<input type="hidden" name="client-logo-file" value="<?php echo $client->getValue("client_logo_link")?>">
+				<input id="client-logo-file" name="client-logo-file" class="client-logo-file" type="file" value="browse" tabindex="21" />
 				<input id="client-logo-upload-btn" name="client-logo-upload-btn" class="client-logo-upload-btn" type="button" value="Upload" tabindex="22" /> or <a class="" href="#">Cancel</a>
 			</fieldset>
 		</figure>
@@ -275,6 +277,9 @@
 						error_log("the post variable is:");
 						error_log(print_r($_POST,true));
 						//error_log(gettype($contact));
+						if (!isset($contact)) {
+						$contact = new Contact(array());
+						}
 						foreach ($contact as $contacts) {
 							?>
 						<li class="client-details-item name">
@@ -368,6 +373,8 @@
 	$errorMessages = array();
 	
 		//this is for the photo upload, and it is in the wrong place.
+		//this is also really hacky. We use a hidden field to get the value back into the post variable
+		//and then spit it back into the database. EW!!
 	if (isset($_FILES["client-logo-file"]) and $_FILES["client-logo-file"]["error"] == UPLOAD_ERR_OK) {
 		if ( $_FILES["client-logo-file"]["type"] != "image/jpeg") {
 			
@@ -378,6 +385,8 @@
 		} else {
 			$_POST["client_logo_link"] = $_FILES["client-logo-file"]["name"];
 		}
+	} else {
+		$_POST["client_logo_link"] = (basename($_POST["client-logo-file"]));
 	}
 
 	
@@ -385,7 +394,7 @@
 	$client = new Client( array(
 		//CHECK REG SUBS!!
 		"client_id" => isset($_POST["client_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["client_id"]) : "",
-		"client_logo_link" => isset($_POST["client_logo_link"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["client_logo_link"]) : "",
+		"client_logo_link" => isset($_POST["client_logo_link"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["client_logo_link"]) : $_FILES["client_logo_link"],
 		"client_name" => isset($_POST["client-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-name"]) : "",
 		"client_phone" => isset($_POST["client-phone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-phone"]) : "",
 		"client_email" => isset($_POST["client-email"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["client-email"]) : "",
@@ -398,6 +407,9 @@
 		"client_archived" => isset($_POST["client-archive"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-archive"]) : "",
 	));
 	
+	error_log("here are the values in the POST array");
+	error_log(print_r($_POST,true));
+	error_log("Here are the values in the client array.");
 	error_log(print_r($client,true));	
 	
 	//CREATE THE CONTACT OBJECTS ($CONTACT)
@@ -434,8 +446,11 @@
 	for ($i=0; $i<$numContacts; $i++) {
 	
 		//error_log("creating the objects");
+		//5.4 $data['data'] = $results->result()[0];
+		//5.3 $data['data'] = $results->result();
+		//$data['data'] = $data['data'][0];
 		$contact[] = new Contact( array(
-			array("contact_name" => $holderArray[0]->getValue("contact_name")[$i]),
+			"contact_name" => $holderArray[0]->getValue("contact_name")[$i],
 			"contact_primary" => $holderArray[0]->getValue("contact_primary")[$i],
 			"contact_office_number" => $holderArray[0]->getValue("contact_office_number")[$i],
 			"contact_mobile_number" => $holderArray[0]->getValue("contact_mobile_number")[$i],
@@ -530,11 +545,11 @@
 				Contact::deleteContactByContactId($contact_id[0]);
 		}
 		//insert all the records for this client.
+		error_log("Now inserting these contacts:");
+		error_log(print_r($contact,true));
+		error_log($contact_id);
 		foreach ($contact as $contacts) {
-			error_log("Now inserting these contacts:");
 			$contact_id = $contacts->getValue("contact_id");
-			error_log(print_r($contact,true));
-			error_log($contact_id);
 			$contacts->insertContact($client_id);
 		}
 		
