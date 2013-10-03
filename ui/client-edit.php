@@ -97,11 +97,15 @@
 	<?PHP
 	//we need to get the client_id into the $_POST so it is there when the user posts the form.
 	//perhaps in the $_SESSION variable?
-	if (isset($_GET["client_id"])) {?>
-		<input type="hidden" name="client_id" value="<?php echo $_GET["client_id"]?>">
+	if (isset($_GET["client_id"])) {
+		$client_id = $_GET["client_id"];
+	?>
+		<input type="hidden" name="client_id" value="<?php echo $client_id?>">
 	<?php } 
-	if (isset($_POST["client_id"])) {?>
-		<input type="hidden" name="client_id" value="<?php echo $_POST["client_id"]?>">
+	if (isset($_POST["client_id"])) {
+		$client_id = $_POST["client_id"];
+	?>
+		<input type="hidden" name="client_id" value="<?php echo $client_id?>">
 	<?php } ?>
 		<figure class="client-logo l-col-20">
 			<img class="client-logo-img small" src="<?php echo $client->getValue("client_logo_link")?>" title="Client/Company name logo" alt="Client/Company name logo" />
@@ -242,7 +246,7 @@
 					</li>
 					<li class="client-details-item delete-client">
 						<label for="client-delete-btn" class="client-details-label">Delete Client?</label>
-						<input id="client-delete-btn" name="client-delete-btn" class="client-delete-btn" type="button" value="- Delete Client" tabindex="11" />
+						<input id="client-delete-btn" name="client-delete-btn" class="client-delete-btn" onclick="window.open('delete.php?client_id=<?php echo $client_id ?>','myWindow','width=200,height=200,left=250%,right=250%,scrollbars=no')" type="button" value="- Delete Client" tabindex="11" />
 					</li>
 					<li class="client-details-item submit-client">
 						<label for="client-save-btn" class="client-details-label">All done?</label>
