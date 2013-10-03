@@ -332,6 +332,34 @@ class Client extends DataObject {
 		}
 	}
 	
+	
+	//get the archive flag out of the client table.
+	public function deleteClient($client_id) {
+		//first delete the contacts.
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_CONTACT . " WHERE client_id = :client_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+			$st->execute();	
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on delete of contact rows.: " . $e->getMessage());
+		}
+		$conn=parent::connect($client_id);
+		$sql = "DELETE FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
+		
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on delete of client: " . $e->getMessage());
+		}
+	}
 /*	// OLD function stubs below this line.
 	//display all client names
 	/*public static function getClientNameAndLogo($clientId) {
