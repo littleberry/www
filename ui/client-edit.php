@@ -284,13 +284,14 @@
 						if (!isset($contact)) {
 						$contact = new Contact(array());
 						}
+						$i = 0;
 						foreach ($contact as $contacts) {
 							?>
 						<li class="client-details-item name">
 						<label for="contact-name" class="contact-details-label required">Your contact's name:</label>
 						<input id="contact-name" name="contact-name[]" class="contact-info-input" type="text" value="<?php echo $contacts->getValueEncoded("contact_name")?>" /><br />
 						<label for="contact-primary" class="contact-details-label">This the primary contact: </label>
-						
+						<?php /*
 						<select id="contact-primary" name="contact-primary[]" class="contact-info-input">
 							<?php if ($contacts->getValueEncoded("contact_primary") == 1) {
 								?><option value="1"	selected="selected">Yes</option>
@@ -299,7 +300,13 @@
 								?>
 								<option value="1"> Yes</option>
 									<option value="0" selected="selected">No</option><?php } ?>
+						
 						</select>
+						*/
+						//whether or not the radio button is checked comes from the database, it should not be hard-coded to be default on.
+						?>
+						<input id="contact-primary" name="contact-primary[<?php echo $i?>]" class="contact-info-input" type="checkbox" <?php setChecked($contacts, "contact_primary", "1") ?>" />
+
 					</li>
 					<li class="client-details-item phoneNum">
 						<label for="contact-officePhone" class="contact-details-label">Office phone:</label>
@@ -332,7 +339,8 @@
 						<input id="contact-save-btn" name="contact-save-btn" class="contact-save-btn" type="submit" value="+ Save Contact" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
 						<?php 
-						//$i++;
+						$i++;
+						echo $i;
 						//$counter = $i;
 						} 
 						//error_log("here is the counter variable: " . $counter++ );
@@ -372,7 +380,7 @@
 	8. If all went well, display the client details page.
 	-->
 <?php function editClientAndContacts() {
-	$requiredFields = array("client_name","contact_primary","contact_name");
+	$requiredFields = array("client_name","contact_name");
 	$missingFields = array();
 	$errorMessages = array();
 	
@@ -424,6 +432,20 @@
 	//$contact_count = $_POST["contact_count"];
 	//error_log("the contact count is " . $contact_count);
 	//print_r($_POST);
+	
+	
+	//I'M PUTTING THIS FUNCTION RIGHT HERE FOR NOW BECAUSE I'M TIRED!!
+	function setCheckbox($checkboxVals, $i) {
+		foreach($checkboxVals as $key=>$value) {
+			if ($i == $key) {
+					return "1";
+			} else {
+					return "0";
+			}
+		}
+	}
+	
+	
 	$holderArray[] = new Contact( array(
 		//CHECK REG SUBS!!
 		"contact_name" => isset($_POST["contact-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-name"]) : "",
@@ -432,7 +454,7 @@
 		"contact_mobile_number" => isset($_POST["contact-mobilePhone"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-mobilePhone"]) : "",
 		"contact_email" => isset($_POST["contact-email"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["contact-email"]) : "",
 		"contact_fax_number" => isset($_POST["contact-fax"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["contact-fax"]) : "",
-	));
+	));	
 	
 	//error_log("CONTACT PRIMARY");
 	//error_log(print_r($_POST,true));
@@ -455,7 +477,7 @@
 		//$data['data'] = $data['data'][0];
 		$contact[] = new Contact( array(
 			"contact_name" => $holderArray[0]->getValue("contact_name")[$i],
-			"contact_primary" => $holderArray[0]->getValue("contact_primary")[$i],
+			"contact_primary" => setCheckbox($_POST["contact-primary"], $i),
 			"contact_office_number" => $holderArray[0]->getValue("contact_office_number")[$i],
 			"contact_mobile_number" => $holderArray[0]->getValue("contact_mobile_number")[$i],
 			"contact_email" => $holderArray[0]->getValue("contact_email")[$i],
@@ -551,7 +573,7 @@
 		//insert all the records for this client.
 		error_log("Now inserting these contacts:");
 		error_log(print_r($contact,true));
-		error_log($contact_id);
+		//error_log($contact_id);
 		foreach ($contact as $contacts) {
 			$contact_id = $contacts->getValue("contact_id");
 			$contacts->insertContact($client_id);
