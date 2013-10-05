@@ -128,6 +128,22 @@ class Project extends DataObject {
 		}
 	}
 
+//return the details for the project as an object.
+public static function getProjectByProjectId($project_id) {
+		$conn=parent::connect();
+		$sql = "SELECT * FROM " . TBL_PROJECT . " WHERE project_id = :project_id'";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return new Project($row);
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage());
+		}
+	}
 
 
 	
