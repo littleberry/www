@@ -102,6 +102,7 @@
    							<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
     					<?php } ?>
     			 </select><br />
+					</li>
 		   			<li class="client-details-item name">
 						<label for="client-name" <?php validateField("project_name", $missingFields)?> class="client-details-label">Project Name:</label>
 						<input id="client-name" name="project-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $project->getValueEncoded("project_name")?>" /><br />
