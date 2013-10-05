@@ -17,6 +17,7 @@ function getErrorMessage($client_currency_index, $errorMessage, $errorType) {
 			$errorArray["client_zip"]["required"] = "You did not fill out the client zip field.";
 			$errorArray["client_logo_link"]["required"] = "You didn't upload a file.";
 			$errorArray["contact_name"]["required"] = "Please enter a name for your contact. Note: All clients must have at least one contact.";
+			$errorArray["project_name"]["required"] = "Please enter a name for your project.";
 			//errorType "invalid input"
 			$errorArray["client_email"]["invalid_input"] = "Please check you entered a valid email address for the client.";
 			$errorArray["client_phone"]["invalid_input"] = "Please check you entered a valid phone number for the client in format XXX-XXX-XXXX.";
