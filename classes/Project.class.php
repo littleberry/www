@@ -147,7 +147,34 @@ public static function getProjectByProjectId($project_id) {
 	}
 
 
-	
+	//update the client record based on the client_id
+	//if we want to break out the address, write the config to do the update later
+	//so that we can update those fields as well.
+	//9/4/13
+	public function updateProject($project_id) {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_PROJECT . " SET
+				project_name = :project_name,
+				project_code = :project_code,
+				client_id = :client_id,
+				project_notes = :project_notes,
+				project_archived = :project_archived
+				WHERE project_id = :project_id";
+			try {
+				$st = $conn->prepare($sql);
+				$st->bindValue(":project_name", $this->data["project_name"], PDO::PARAM_STR);
+				$st->bindValue(":project_code", $this->data["project_code"], PDO::PARAM_STR);
+				$st->bindValue(":client_id", $this->data["client_id"], PDO::PARAM_INT);
+				$st->bindValue(":project_notes", $this->data["project_notes"], PDO::PARAM_INT);
+				$st->bindValue(":project_archived", $this->data["project_archived"], PDO::PARAM_INT);
+				$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
+				$st->execute();	
+				parent::disconnect($conn);
+			} catch (PDOException $e) {
+				parent::disconnect($conn);
+				die("Query failed on project update: " . $e->getMessage());
+			}
+	}	
 	
 	//return the clients name based on the client_id.
 	//I'll keep this here as a utility function in case we need it.
