@@ -18,6 +18,7 @@ class Project extends DataObject {
 		"project_show_budget"=>"",
 		"project_send_email"=>"",
 		"project_notes"=>"",
+		"project_archived"=>"",
 	);
 	
 	//display all information about a project. 
@@ -131,7 +132,7 @@ class Project extends DataObject {
 //return the details for the project as an object.
 public static function getProjectByProjectId($project_id) {
 		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_PROJECT . " WHERE project_id = :project_id'";
+		$sql = "SELECT * FROM " . TBL_PROJECT . " WHERE project_id = :project_id";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
