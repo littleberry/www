@@ -66,8 +66,8 @@ function checkLogin() {
 	session_start();
 	if (!$_SESSION["person"] or !$_SESSION["person"] = Person::getPerson($_SESSION["person"]->getValue( "person_username" ))) {
 		$_SESSION["person"] = "";
-		error_log("no session!");
-		error_log(print_r($_SESSION["person"],true));
+		//error_log("no session!");
+		//error_log(print_r($_SESSION["person"],true));
 		header("Location: login.php");
 		exit;
 	}//else{

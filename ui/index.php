@@ -2,16 +2,12 @@
 
 	require_once("../common/common.inc.php");
 	require_once("../classes/Person.class.php");
-	
-session_start();
+	checkLogin();
 
-if(isset($_POST["action"]) and $_POST["action"] == "login") {
-	processForm();
-}else{
-	displayForm(array(), array(), new Person(array()));
-}
+	
 ?>
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 	<title>Manage</title>
@@ -42,7 +38,7 @@ if(isset($_POST["action"]) and $_POST["action"] == "login") {
 	</nav>
 </header>
 <section id="page-content" class="page-content">
-
+This page will eventually be the dashboard
 </section>
 <footer id="site-footer" class="site-footer">
 
