@@ -2,6 +2,7 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
+	checkLogin();
 	
 	
 	//FUNCTION RETURNS THE INDIVIDUAL OBJECTS. 
@@ -35,7 +36,7 @@
 	<nav id="section-nav" class="section-nav manage">
 		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="#">Projects</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="projects.php">Projects</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Team</a></li>
 		</ul>
