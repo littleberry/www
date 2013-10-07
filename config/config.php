@@ -18,7 +18,9 @@ define ("TBL_CURRENCY", "client_currency");
 define ("TBL_CONTACT", "contact");
 //table definitions for project path
 define ("TBL_PROJECT", "project");
-
+//table definitions for people path
+define ("TBL_PERSON", "person");
+define ("TBL_PERSON_PERMISSIONS", "person_permissions");
 
 //This is a security risk! Login and PW should be stored outside of the file in a prod env.
 ?>
