@@ -130,7 +130,7 @@ function processForm() {
 }
  
 function displayThanks() {
-	echo "Thank you for registering! You are now granted access to the <a href=manage.php>Time Tracker</a>";
+	echo "Thank you for registering! You are now granted access to the <a href=index.php>Time Tracker</a>";
 }
 ?>		 
 </section>
