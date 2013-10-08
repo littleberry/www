@@ -16,14 +16,21 @@ function getErrorMessage($client_currency_index, $errorMessage, $errorType) {
 			$errorArray["client_city"]["required"] = "You did not fill out the client city field.";
 			$errorArray["client_zip"]["required"] = "You did not fill out the client zip field.";
 			$errorArray["client_logo_link"]["required"] = "You didn't upload a file.";
-			$errorArray["contact_name"]["required"] = "Please enter a contact for this client. All clients must have at least one contact.";
+			$errorArray["contact_name"]["required"] = "Please enter a name for your contact. Note: All clients must have at least one contact.";
+			$errorArray["project_name"]["required"] = "Please enter a name for your project.";
 			//errorType "invalid input"
-			$errorArray["client_email"]["invalid_input"] = "Please check you entered a valid email address.";
-			$errorArray["client_phone"]["invalid_input"] = "Please check you entered a valid phone number in format XXX-XXX-XXXX.";
-			$errorArray["client_zip"]["invalid_input"] = "Please check you entered a valid zip code in format XXXXX.";
+			$errorArray["client_email"]["invalid_input"] = "Please check you entered a valid email address for the client.";
+			$errorArray["client_phone"]["invalid_input"] = "Please check you entered a valid phone number for the client in format XXX-XXX-XXXX.";
+			$errorArray["client_zip"]["invalid_input"] = "Please check you entered a valid zip code for this client in format XXXXX.";
 			//errors for file upload
 			$errorArray["client_logo_link"]["invalid_file"] = "You may only upload JPEG images.";
 			$errorArray["client_logo_link"]["upload_problem"] = "Something went wrong uploading your image.";
+			//contact errors
+			$errorArray["contact_email"]["invalid_input"] = "Please check you entered a valid email address for your contact.";
+			$errorArray["contact_office_number"]["invalid_input"] = "Please check you entered a valid office phone number for the contact in format XXX-XXX-XXXX.";
+			$errorArray["contact_mobile_number"]["invalid_input"] = "Please check you entered a valid mobile phone number for the contact in format XXX-XXX-XXXX.";
+			$errorArray["contact_fax_number"]["invalid_input"] = "Please check you entered a valid fax phone number for the contact in format XXX-XXX-XXXX.";
+			$errorArray["contact_primary"]["required"] = "All clients must have at least one primary contact.";
 			return $errorArray[$errorMessage][$errorType];
 			break;
 		default:

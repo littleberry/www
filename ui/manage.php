@@ -1,16 +1,3 @@
-<?php
-
-	require_once("../common/common.inc.php");
-	require_once("../classes/Person.class.php");
-	
-session_start();
-
-if(isset($_POST["action"]) and $_POST["action"] == "login") {
-	processForm();
-}else{
-	displayForm(array(), array(), new Person(array()));
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

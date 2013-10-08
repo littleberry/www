@@ -2,8 +2,8 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
-	//get the client_id
-	//for the new UI, keep this as $_GET, but post is here if we need it. 9/15
+	
+	//RETRIEVE THE CLIENT ID FROM GET OR POST.
 	if (isset ($_GET["client_id"])) {
 		$client_id = $_GET["client_id"];
 	} elseif (isset ($_POST["client_id"])) {
@@ -12,12 +12,15 @@
 		echo "no client identifier provided, cannot find details for empty client.";
 		exit;
 	}
-	//retrieve the active contact list for this client
-	list($contacts) = Contact::getContacts($client_id);
-	//retrieve the clients details to display in the UI
+	
+	//RETRIEVE ALL OF THE CONTACTS FOR THIS CLIENT. NOTE THIS IS ALL CLIENTS, ACTIVE AND ARCHIVED.
+	$contacts = Contact::getContacts($client_id);
+	//RETRIEVE THE CLIENT DETAILS TO DISPLAY IN THE UI.
 	$client_details = Client::getClient($client_id);
+	error_log("HERE ARE THE CLIENT DETAILS IN CLIENT DETAILS PAGE:");
+	error_log(print_r($client_details,true));
 	if (!isset($client_details)) {
-    	echo "The detailed data for this client is not available. YET! :)";
+    	error_log("The detailed data for this client is not available. Please investigate why this happened, client_details.php, line 23");
 		exit;
 	}
 ?>
@@ -45,7 +48,7 @@
 	<nav id="section-nav" class="section-nav manage">
 		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="#">Projects</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="projects.php">Projects</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Team</a></li>
 		</ul>
@@ -60,7 +63,10 @@
 <li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
 -->
-				<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
+				<!-- I am just putting this here because I need to send the client id into the client-edit php file.-->
+				<li class="page-controls-item"><a class="view-all-link" href="client-edit.php?client_id=<?php echo $client_id?>">Edit This Client</a></li>
+<!--end-->
+<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -87,7 +93,9 @@
 			<header class="details-header contact-details-header">
 				<h1 class="client-details-title">Contacts</h1>
 			</header>
-           <?php foreach ($contacts as $contact) { ?>
+           <?php 
+           //DISPLAY THE CONTACT DETAILS FOR THIS CLIENT.
+           foreach ($contacts as $contact) { ?>
 			<ul class="details-list contact-details-list">
 				<li class="contact-details-item name"><?php echo $contact->getValue("contact_name")?></li>
 				<li class="contact-details-item phoneNum"><?php echo $contact->getValue("contact_office_number")?></li>

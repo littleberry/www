@@ -3,12 +3,14 @@
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
 	require_once("../common/errorMessages.php");
+		checkLogin();
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Add Some Client</title>
+	<title>Add A Client</title>
 	<meta charset="utf-8" />
 	<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700,700italic' rel='stylesheet' type='text/css' />
 	<link href="styles.css" rel="stylesheet" type="text/css" />
@@ -29,8 +31,8 @@
 	<nav id="section-nav" class="section-nav manage">
 		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="#">Projects</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="clients.html">Clients</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="projects.php">Projects</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Team</a></li>
 		</ul>
 	</nav>
@@ -243,7 +245,7 @@
 <!--PROCESS THE CLIENT & THE CONTACT THAT WERE SUBMITTED--->
 <?php function processClient() {
  	//these are the required client fields in this form
-	$requiredFields = array("client_name","client_address","client_state","client_phone","client_city","client_zip","client_email","client_name", "contact_name");
+	$requiredFields = array("client_name","contact_primary", "contact_name");
 	$missingFields = array();
 	$errorMessages = array();
 	

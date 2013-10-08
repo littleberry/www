@@ -1,17 +1,11 @@
 <?php
-
 	require_once("../common/common.inc.php");
-	require_once("../classes/Person.class.php");
 	
-session_start();
-
-if(isset($_POST["action"]) and $_POST["action"] == "login") {
-	processForm();
-}else{
-	displayForm(array(), array(), new Person(array()));
-}
-?>
+	session_start();
+	$_SESSION["person"] = "";
+	?>	
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 	<title>Manage</title>
@@ -41,11 +35,50 @@ if(isset($_POST["action"]) and $_POST["action"] == "login") {
 		</ul>
 	</nav>
 </header>
-<section id="page-content" class="page-content">
-
+<section id="page-content" class="page-content">	 
+	Thank you, you have been logged out.
 </section>
 <footer id="site-footer" class="site-footer">
-
 </footer>
 </body>
 </html>
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 

@@ -28,7 +28,14 @@ function displayPageFooter() {
 </html>
 <?php
 }
+
 */
+
+function displayPageHeader($pageTitle, $membersArea = false) {
+}
+
+ini_set ('display_errors', 0);
+require_once("../classes/Person.class.php");
 
 
 //is the value in the missing field array? If so, highlight the field using the "error" style..
@@ -41,8 +48,9 @@ function validateField($fieldName, $missingFields) {
 //these functions pre-select checkboxes and menus on the page.
 function setChecked(DataObject $obj, $fieldName, $fieldValue) {
 	if ($obj->getValue($fieldName) == $fieldValue) {
-		echo ' checked="checked"';
+		echo ' checked=checked';
 	}
+	//echo "CALLED ERT";
 }
 
 function setSelected(DataObject $obj, $fieldName, $fieldValue) {
@@ -51,22 +59,29 @@ function setSelected(DataObject $obj, $fieldName, $fieldValue) {
 	}
 }
 
-/*
-//these functions are for the secuirty piece of the application
-function checkLogin() {
+
+//these functions are for the login part of the application. This function is called at the start of every page. (maybe it should go right here?)
+function checkLogin($page) {
+//if the session variable doesn't exist show the log in page.
 	session_start();
-	if (!$_SESSION["member"] or !$_SESSION["member"] = Member::getMember($_SESSION["member"]->getValue("id"))) {
-		$_SESSION["member"] = "";
+	if (!$_SESSION["person"] or !$_SESSION["person"] = Person::getPerson($_SESSION["person"]->getValue( "person_username" ))) {
+		$_SESSION["person"] = "";
+		error_log("HERE IS THE PAGE " . $page);
+		$_SESSION["callLoginFromPage"] = $page;
+		//error_log("no session!");
+		//error_log(print_r($_SESSION["person"],true));
 		header("Location: login.php");
 		exit;
-	}else{
-		$logEntry = new LogEntry(array (
-		"memberId" => $_SESSION["member"]->getValue("id"),
-		"pageUrl" => basename($_SERVER["PHP_SELF"])
-		));
-		$logEntry->record();
-	}
+	}//else{
+		//not logging right now.
+	//	echo "blerg";
+		//$logEntry = new LogEntry(array (
+		//"memberId" => $_SESSION["member"]->getValue("id"),
+		//"pageUrl" => basename($_SERVER["PHP_SELF"])
+		//));
+		//$logEntry->record();
+	//}
 }
-*/
+
 
 ?>

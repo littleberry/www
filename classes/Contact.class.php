@@ -24,13 +24,13 @@ class Contact extends DataObject {
 		try {
 			$st = $conn->prepare($sql);
 			$st->execute();
-			$contact=array();
+			//$contact=array();
 			foreach ($st->fetchAll() as $row) {
 				$contact[] = new Contact($row);
 			}
 			$row=$st->fetch();
 			parent::disconnect($conn);
-			return array($contact);
+			return $contact;
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
@@ -97,6 +97,78 @@ class Contact extends DataObject {
 			
 		}
 		
+	
+	//get the number of contacts for this client
+	public function getNumberOfContacts($client_id) {
+		$conn=parent::connect();
+		$sql = "SELECT COUNT(*) FROM " . TBL_CONTACT . " WHERE client_id = :client_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+			$st->execute();
+			//this is a small return, so fetch() works fine.
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			//send the client object back to the calling function.
+			//we want to send the array value, not the array.
+			if ($row) return $row[0];
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage());
+		}
+	}
+	
+	//get the contact_id for each contact for this client
+	public function getContactIds($client_id) {
+		$conn=parent::connect();
+		$sql = "SELECT contact_id FROM " . TBL_CONTACT . " WHERE client_id = :client_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+			$st->execute();
+			$contact_ids = array();
+			foreach ($st->fetchAll() as $row) {
+				$contact_ids[] = $row;
+			}
+			return $contact_ids;
+			parent::disconnect($conn);
+			//send the client object back to the calling function.
+			//we want to send the array value, not the array.
+			if ($row) return $row[0];
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage());
+		}
+	}
+	
+	public function deleteContact($client_id) {
+		//we'll try doing a delete and an insert.
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
+			try {
+				$st = $conn->prepare($sql);
+				$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
+				$st->execute();	
+				parent::disconnect($conn);
+			} catch (PDOException $e) {
+				parent::disconnect($conn);
+				die("Query failed on delete.: " . $e->getMessage());
+			}
+	}
+
+	public function deleteContactByContactId($contact_id) {
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_CONTACT . " WHERE contact_id = :contact_id";
+			try {
+				$st = $conn->prepare($sql);
+				$st->bindValue(":contact_id", $contact_id, PDO::PARAM_INT);
+				$st->execute();	
+				parent::disconnect($conn);
+			} catch (PDOException $e) {
+				parent::disconnect($conn);
+				die("Query failed on delete.: " . $e->getMessage());
+			}
+	}	
 	
 /* 9/15	
 	//return the data for a specific contact based on the client_id.
