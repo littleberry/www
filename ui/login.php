@@ -12,7 +12,7 @@ if(isset($_POST["action"]) and $_POST["action"] == "login") {
 }
 
 function displayForm($errorMessages, $missingFields, $person) {
-	displayPageHeader("Login to view this area", true);
+	//displayPageHeader("Login to view this area", true);
 	
 	if ($errorMessages) {
 		foreach ($errorMessages as $errorMessage) {
@@ -98,14 +98,15 @@ function processForm() {
 		displayForm($errorMessages, $missingFields, $person);
 	} else {
 		$_SESSION["person"] = $loggedInPerson;
-		echo "you successfully logged in with ";
-		displayThanks();
+		header( "Location: " . $_SESSION["callLoginFromPage"]) ;
+		//echo "you successfully logged in with ";
+		//displayThanks();
 	}
 }
 
 function displayThanks() {
-	displayPageHeader("Thanks for logging in!", true);
-	echo"<p>Thank you for logging in. Please proceed to the <a href=\"clients.php\">clients page</a>.</p>";
+	//displayPageHeader("Thanks for logging in!", true);
+	header( "Location: " . $_SESSION["callLoginFromPage"]) ;
 }
 ?>
 </section>
