@@ -61,11 +61,13 @@ function setSelected(DataObject $obj, $fieldName, $fieldValue) {
 
 
 //these functions are for the login part of the application. This function is called at the start of every page. (maybe it should go right here?)
-function checkLogin() {
+function checkLogin($page) {
 //if the session variable doesn't exist show the log in page.
 	session_start();
 	if (!$_SESSION["person"] or !$_SESSION["person"] = Person::getPerson($_SESSION["person"]->getValue( "person_username" ))) {
 		$_SESSION["person"] = "";
+		error_log("HERE IS THE PAGE " . $page);
+		$_SESSION["callLoginFromPage"] = $page;
 		//error_log("no session!");
 		//error_log(print_r($_SESSION["person"],true));
 		header("Location: login.php");
