@@ -3,7 +3,7 @@
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
 	require_once("../common/errorMessages.php");
-		checkLogin();
+		checkLogin($_SERVER['PHP_SELF']);
 
 ?>
 
@@ -71,7 +71,7 @@
 ?>
 	<section class="content">
     <!--added because we need the information to be submitted in a form-->
-      <form action="client-add.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+      <form action="<?php echo htmlentities( $_SERVER['PHP_SELF'] ); ?>" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
       <input type="hidden" name="action" value="client-add"/>
     <!--end add-->
 		<figure class="client-logo l-col-20">
@@ -100,7 +100,7 @@
 						<input id="contact-info-sync" name="contact-info-sync" class="contact-info-sync-input" type="checkbox" tabindex="11" value="info-sync" />
 					</li>
 					<li class="client-details-item phoneNum">
-						<label for="client-phone" <?php validateField("client_phone", $missingFields)?> class="client-details-label">Phone number:</label>
+						<label for="client-phone" class="client-details-label">Phone number:</label>
 						<input id="client-phone" name="client-phone" class="client-phone-input" type="text" tabindex="2" value="<?php echo $client->getValueEncoded("client_phone")?>" />
 					</li>
 					<li class="client-details-item email">
