@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <?php
 
 	require_once("../common/common.inc.php");
@@ -21,6 +20,7 @@ function displayForm($errorMessages, $missingFields, $person) {
 		}
 	} else {?>
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>Manage</title>
@@ -80,8 +80,6 @@ function processForm() {
 	"person_password" => isset($_POST["password"]) ? preg_replace("/[^\-\_a-zA-Z0-9]/", "", $_POST["password"]) : "",
 	));
 	
-	error_log(print_r($person,true));
-	
 	foreach($requiredFields as $requiredField) {
 		if (!$person->getValue($requiredField)) {
 			$missingFields[] = $requiredField;
@@ -98,16 +96,12 @@ function processForm() {
 		displayForm($errorMessages, $missingFields, $person);
 	} else {
 		$_SESSION["person"] = $loggedInPerson;
-		header( "Location: " . $_SESSION["callLoginFromPage"]) ;
+		header( "Location: " . $_SESSION["callLoginFromPage"]);
 		//echo "you successfully logged in with ";
 		//displayThanks();
 	}
 }
 
-function displayThanks() {
-	//displayPageHeader("Thanks for logging in!", true);
-	header( "Location: " . $_SESSION["callLoginFromPage"]) ;
-}
 ?>
 </section>
 <footer id="site-footer" class="site-footer">
