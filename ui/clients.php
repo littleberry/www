@@ -2,12 +2,10 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
-	checkLogin();
-	
+	//THIS ISN'T WORKING RIGHT.
+	checkLogin("clients.php");
 	
 	//FUNCTION RETURNS THE INDIVIDUAL OBJECTS. 
-	$clients[] = Client::getClients();
-	error_log("the client is an ARRAY ");
 	list($clients) = Client::getClients();
 	//LEAVE THIS AS A LIST FOR INVESTIGATION.
 	error_log("the client is a LIST");
