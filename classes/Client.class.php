@@ -39,7 +39,6 @@ class Client extends DataObject {
 			foreach ($st->fetchAll() as $row) {
 				$clients[] = new Client($row);
 			}
-			$row=$st->fetch();
 			parent::disconnect($conn);
 			return array($clients);
 		}catch(PDOException $e) {
