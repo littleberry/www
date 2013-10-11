@@ -70,7 +70,6 @@ function checkLogin($page) {
 		//error_log("no session!");
 		//error_log(print_r($_SESSION["person"],true));
 		header("Location: login.php");
-		exit;
 	}//else{
 		//not logging right now.
 	//	echo "blerg";
