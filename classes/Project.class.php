@@ -135,7 +135,7 @@ class Project extends DataObject {
 			$st = $conn->prepare($sql);
 			$st->execute();
 			parent::disconnect($conn);
-			$_clients = array();
+			//$_clients = array();
 			foreach ($st->fetchAll() as $row) {
 				//return $row;
 				$clients[] = $row;
