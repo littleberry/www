@@ -1,15 +1,19 @@
 <?php
-
-	require_once("../common/common.inc.php");
-	require_once("../classes/Person.class.php");
 	
-session_start();
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/usercake/models/config.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] ."/time_tracker/common/common.inc.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Person.class.php");
+	
+if(!isUserLoggedIn()){
+	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+	header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
 
-if(isset($_POST["action"]) and $_POST["action"] == "login") {
-	processForm();
-}else{
-	displayForm(array(), array(), new Person(array()));
-}
+}	
+//if(isset($_POST["action"]) and $_POST["action"] == "login") {
+//	processForm();
+//}else{
+//	displayForm(array(), array(), new Person(array()));
+//}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +21,7 @@ if(isset($_POST["action"]) and $_POST["action"] == "login") {
 	<title>Manage</title>
 	<meta charset="utf-8" />
 	<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700,700italic' rel='stylesheet' type='text/css' />
-	<link href="styles.css" rel="stylesheet" type="text/css" />
+	<link href="ui/styles.css" rel="stylesheet" type="text/css" />
 	<script src="libraries/jquery-1.10.2.min.js" type="text/javascript"></script>
 </head>
 
@@ -35,13 +39,15 @@ if(isset($_POST["action"]) and $_POST["action"] == "login") {
 	<nav id="section-nav" class="section-nav manage">
 		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="projects.php">Projects</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="ui/projects.php">Projects</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="ui/clients.php">Clients</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Team</a></li>
 		</ul>
 	</nav>
 </header>
 <section id="page-content" class="page-content">
+HELLO, I AM THE INDEX.PHP PAGE.
+THIS PAGE WILL EVENTUALLY BE THE DASHBOARD.
 
 </section>
 <footer id="site-footer" class="site-footer">
