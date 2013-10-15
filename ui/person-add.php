@@ -3,6 +3,11 @@
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Project.class.php");
 	require_once("../common/errorMessages.php");
+		if(!isUserLoggedIn()){
+		//redirect if user is not logged in.
+		$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+		header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+	}
 ?>
 
 <!DOCTYPE html>
@@ -133,7 +138,7 @@
 <!--PROCESS THE CLIENT & THE CONTACT THAT WERE SUBMITTED--->
 <?php function processPerson() {
  	//these are the required project fields in this form
-	$requiredFields = array("person_first_name","person_last_name");
+	$requiredFields = array("person_first_name","person_last_name","person_email");
 	$missingFields = array();
 	$errorMessages = array();
 	
@@ -143,7 +148,7 @@
 		//CHECK REG SUBS!!
 		"person_first_name" => isset($_POST["person-first-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["person-first-name"]) : "",
 		"person_last_name" => isset($_POST["person-last-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-last-name"]) : "",
-		"person_email" => isset($_POST["person-email"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["person-email"]) : "",
+		"person_email" => isset($_POST["person-email"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9^@^.]/", "", $_POST["person-email"]) : "",
 		"person_department" => isset($_POST["person-department"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["person-department"]) : "",
 		"person_hourly_rate" => isset($_POST["person-hourly-rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-hourly-rate"]) : "",
 		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
@@ -152,10 +157,10 @@
 //		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
 //		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
-	error_log("here is the post<br>");
-	error_log(print_r($_POST, true));
-	error_log("here is the project array.<br>");
-	error_log(print_r($person,true));
+	//error_log("here is the post<br>");
+//	error_log(print_r($_POST, true));
+	//error_log("here is the project array.<br>");
+	//error_log(print_r($person,true));
 	
 	
 //error messages and validation script
