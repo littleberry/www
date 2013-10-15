@@ -4,7 +4,8 @@
 
 //only require the config file once in the app.
 
-require_once("../config/config.php");
+//require_once("/config/config.php");
+require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/config/config.php");
 
 
 abstract class DataObject  {
