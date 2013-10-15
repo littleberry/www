@@ -7,14 +7,15 @@ $location_id = gethostname();
 echo($location_id);
 
 $catPattern = 'cathlenes-MacBook-Pro.local';
-//$muppetPattern = 
+$muppetPattern = 'FORA';
 switch ($location_id) { 
         case $catPattern : 
             echo "you are on dev.";
             $CONFIG['SITE_URL'] = 'http://localhost/';
             $CONFIG['DOCUMENT_ROOT'] = 'time_tracker/'; 
             break; 
-        case $muppetPattern: 
+        case $muppetPattern:
+        	echo "you are on muppetlabs"; 
             $CONFIG['SITE_URL'] = 'http://example.com/';
             $CONFIG['DOCUMENT_ROOT'] = '';
             break; 
