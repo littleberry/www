@@ -2,6 +2,11 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
+	if(!isUserLoggedIn()){
+		//redirect if user is not logged in.
+		$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+		header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+	}
 	//retrieve the active clients array into a list
 	//so we can get the items out easily in the for loop
 	list($clients) = Client::getClients();
