@@ -1,9 +1,15 @@
 <?php
-	require_once("../common/common.inc.php");
-	require_once("../classes/Client.class.php");
-	require_once("../classes/Contact.class.php");
-	//THIS ISN'T WORKING RIGHT.
-	checkLogin("clients.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/usercake/models/config.php");
+
+	
+if(!isUserLoggedIn()){
+	//redirect if user is not logged in.
+	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+	header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+}
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/common/common.inc.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Client.class.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Contact.class.php");
 	
 	//FUNCTION RETURNS THE INDIVIDUAL OBJECTS. 
 	list($clients) = Client::getClients();
