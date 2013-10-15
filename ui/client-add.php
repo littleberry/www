@@ -3,7 +3,11 @@
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
 	require_once("../common/errorMessages.php");
-		checkLogin($_SERVER['PHP_SELF']);
+	if(!isUserLoggedIn()){
+		//redirect if user is not logged in.
+		$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+		header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+	}
 
 ?>
 
