@@ -4,6 +4,23 @@
 //}
 
 ini_set ('display_errors', 0);
+//server configuration variables for each server.
+$location_id = gethostname();
+//AFTER DINNER, TEST THIS ON MUPPETLABS
+//echo($location_id);
+
+$catPattern = 'cathlenes-MacBook-Pro.local';
+$muppetPattern = 'FORA';
+switch ($location_id) { 
+        case $catPattern : 
+            $_SERVER["SITE_BASE"] = "/Applications/MAMP/htdocs/";
+            $_SERVER["DOCUMENT"] = "time_tracker/"; 
+            break; 
+        case $muppetPattern:
+        	$_SERVER["SITE_BASE"] = "C:\\WAMP\\WWW\\";
+            $_SERVER["DOCUMENT"] = "";
+            break; 
+    } 
 
 
 //THIS FILE IS ALWAYS INCLUDED, SO GET THE CONFIG FOR THE AUTH.
