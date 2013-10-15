@@ -1,6 +1,10 @@
 <?php
 //this is the php file with all of the configuration information for the application.
 //this is a local config file, do not change on dev server.
+//define the hostnames
+
+$CONFIG['WIN'] = (substr(PHP_OS, 0, 3) == "WIN"); 
+echo ("the configuration is " . print_r($CONFIG,true));
 
 //dsn used to connect to database
 define ("DB_DSN", "mysql:dbname=time_tracker");
