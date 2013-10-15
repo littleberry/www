@@ -1,11 +1,24 @@
 <?php
 //this is the php file with all of the configuration information for the application.
 //this is a local config file, do not change on dev server.
-//define the hostnames
+//define the hostnames...win = 1 is muppetlabs.
 
-$CONFIG['WIN'] = (substr(PHP_OS, 0, 3) == "WIN"); 
-echo ("the configuration is " . print_r($CONFIG,true));
+$location_id = gethostname();
+echo($location_id);
 
+$catPattern = 'cathlenes-MacBook-Pro.local';
+//$muppetPattern = 
+switch ($location_id) { 
+        case $catPattern : 
+            echo "you are on dev.";
+            $CONFIG['SITE_URL'] = 'http://localhost/';
+            $CONFIG['DOCUMENT_ROOT'] = 'time_tracker/'; 
+            break; 
+        case $muppetPattern: 
+            $CONFIG['SITE_URL'] = 'http://example.com/';
+            $CONFIG['DOCUMENT_ROOT'] = '';
+            break; 
+    } 
 //dsn used to connect to database
 define ("DB_DSN", "mysql:dbname=time_tracker");
 define ("DB_USERNAME", "root");
