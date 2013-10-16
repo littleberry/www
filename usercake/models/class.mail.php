@@ -15,7 +15,7 @@ switch ($location_id) {
         	
         	require_once("c:\wamp\bin\php\php-5.4.20-Win32-VC9-x86\PEAR\pear\Mail\smtp.php");
 			//require_once("c:\wamp\bin\php\php-5.4.20-Win32-VC9-x86\PEAR\pear\Mail\Mail.php");
-        	require_once("c:\wamp\bin\php\php-5.4.20-Win32-VC9-x86\PEAR\pear\Mail\mail.php");
+        	require_once("c:\wamp\bin\php\php-5.4.20-Win32-VC9-x86\PEAR\pear\Mail.php");
 			break; 
     } 
 
