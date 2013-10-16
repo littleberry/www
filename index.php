@@ -2,15 +2,15 @@
 	//put this in a general place, htdocs.
 	//change this if it is on muppetlabs or on localhost...
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
+	//require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Person.class.php");
 
-if(!isUserLoggedIn()){
-	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
-	header( 'Location: usercake/login.php' ) ;
+//if(!isUserLoggedIn()){
+//	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+//	header( 'Location: usercake/login.php' ) ;
 
-}	
+//}	
 
 
 //if(isset($_POST["action"]) and $_POST["action"] == "login") {
