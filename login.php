@@ -1,24 +1,23 @@
 <?php
 
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/usercake/models/config.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Person.class.php");
+	//require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Person.class.php");
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/common/common.inc.php");
 
-if(!isUserLoggedIn()){
+//if(!isUserLoggedIn()){
 	//THE LOGIN FAILED. DISPLAY THE LOGIN PAGE. Once the user comes back in, display the error message, whatever it was..
 	if(isset($_POST["action"]) and $_POST["action"] == "login") {
 		processForm();
 	}else{
 		displayForm(array(), array(), new Person(array()));
 	}
-} else {
-	echo "USER IS IN";
-}
+//} else {
+//	echo "USER IS IN";
+//}
 
 
 function displayForm($errorMessages, $missingFields, $person) {
 	//displayPageHeader("Login to view this area", true);
-<<<<<<< HEAD:ui/login.php
 	
 	if ($errorMessages) {
 		foreach ($errorMessages as $errorMessage) {
@@ -27,8 +26,6 @@ function displayForm($errorMessages, $missingFields, $person) {
 	} else {
 		include('header.php'); //add header.php to page
 		
-	?>
-=======
 	?>
 
 <!DOCTYPE html>
@@ -40,7 +37,6 @@ function displayForm($errorMessages, $missingFields, $person) {
 	<link href="ui/styles.css" rel="stylesheet" type="text/css" />
 	<script src="ui/libraries/jquery-1.10.2.min.js" type="text/javascript"></script>
 </head>
->>>>>>> catsbap-master:login.php
 
 <section id="page-content" class="page-content">
 		<?php
