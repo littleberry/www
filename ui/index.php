@@ -1,8 +1,8 @@
 <?php
 
-	require_once("../common/common.inc.php");
-	require_once("../classes/Person.class.php");
-	checkLogin(basename($_SERVER["PHP_SELF"]));
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Person.class.php");
+	//checkLogin(basename($_SERVER["PHP_SELF"]));
 
 	include('header.php'); //add header.php to page
 ?>
