@@ -1,11 +1,11 @@
 <?php
 	require_once("../common/common.inc.php");
 	require_once("../classes/Project.class.php");
-		if(!isUserLoggedIn()){
-		//redirect if user is not logged in.
-		$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
-		header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
-	}
+	//	if(!isUserLoggedIn()){
+	//	//redirect if user is not logged in.
+	//	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+	//	header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+	//}
 	
 	//RETRIEVE THE CLIENT ID FROM GET OR POST.
 	if (isset ($_GET["project_id"])) {
