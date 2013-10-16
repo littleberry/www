@@ -4,6 +4,7 @@ UserCake Version: 2.0.2
 http://usercake.com
 */
 //let's use the PEAR PHP mail module
+$location_id = gethostname();
 $catPattern = 'cathlenes-MacBook-Pro.local';
 $muppetPattern = 'FORA';
 switch ($location_id) { 
@@ -12,7 +13,7 @@ switch ($location_id) {
 			break; 
         case $muppetPattern:
         	
-        	require_once("c:\wamp\bin\php\php-5.4.20-Win32-VC9-x86\PEAR\pear\Mail\Mail.php");
+        	require_once("c:\wamp\bin\php\php-5.4.20-Win32-VC9-x86\PEAR\pear\Mail.php");
 			break; 
     } 
 
