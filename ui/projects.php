@@ -3,12 +3,12 @@
 	require_once("../classes/Project.class.php");
 	include('header.php'); //add header.php to page
 
-	if(!isUserLoggedIn()){
-		//redirect if user is not logged in.
-		$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
-		header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
-		//header( 'Location: http://strawberry.dev/MBTimeTtracker/usercake/login.php' ) ;
-	}
+	//if(!isUserLoggedIn()){
+	//	//redirect if user is not logged in.
+	//	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+	//	header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+	//	//header( 'Location: http://strawberry.dev/MBTimeTtracker/usercake/login.php' ) ;
+	//}
 	
 	?>
 
