@@ -149,6 +149,9 @@ input[type=submit]:focus {
 .link-btn:hover {
 	background-color: #FFBE12;
 }
+.link-btn a:link {
+	text-decoration: none;
+}
 
 .required {
 	color: #D22F12;
@@ -423,16 +426,7 @@ input[type=submit]:focus {
 	font-size: .8em;
 	float: left;
 }
-.add-client-button {
-	position: relative;
-	text-align: center;
-	font-weight: 700;
-	width: auto;
-	padding: .25em .5em;
-	color: #FAF9FF;
-	background-color: #A9BFF5;
-	border: 1px dotted #193E73;
-}
+
 .add-client-link:link,
 .add-client-link:visited {
 	text-decoration: none;

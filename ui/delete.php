@@ -20,6 +20,8 @@
 			echo "<script>window.close()</script>";
 			echo "</body></html>";
 	} else {
+	
+	//include('header.php'); //add header.php to page
 	?>
 
 <!DOCTYPE html>
