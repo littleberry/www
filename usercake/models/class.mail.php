@@ -36,12 +36,13 @@ class userCakeMail {
 	
 	public function sendMail($email,$subject,$msg = NULL)
 	{
+		error_log("XKHASLKFHJASLKJHFKSAJHKHJFSLKHJFLHAFLKH");
 		global $websiteName,$emailAddress;
 		
 		
-		$from = "Cathy <catsbap@gmail.com>";
+		$from = "admin@time_tracker.com";
 		$to = "Cathy <catsbap@gmail.com>";
-		$subject = "Hi!";
+		//$subject = "Hi!";
 		$body = "Hi,\n\nHow are you?";
  
  		$host = "ssl://smtp.gmail.com";
@@ -62,7 +63,7 @@ class userCakeMail {
 		$header .= "From: ". $websiteName . " <" . $emailAddress . ">\r\n";
 		$headers = array (
 		'From' => $from,
-   'To' => $to,
+   'To' => $email,
    'Subject' => $subject);
 		
 		//Check to see if we sending a template email.
@@ -73,6 +74,7 @@ class userCakeMail {
 		
 		
 		$message = wordwrap($message, 70);
+		error_log("sending message with the following options: email: " . $email . " headers: " . $headers . " message: " . $message);
 		$mail = $smtp->send($email,$headers,$message);
 		return $mail;
 		//return mail($email,$subject,$message,$header);
