@@ -16,7 +16,6 @@ switch ($location_id) {
         	require_once($_SERVER["DOCUMENT_ROOT"] . "config/config.php");
         	break; 
     } 
-require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/config/config.php");
 
 
 abstract class DataObject  {
