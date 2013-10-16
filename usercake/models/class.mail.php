@@ -4,6 +4,7 @@ UserCake Version: 2.0.2
 http://usercake.com
 */
 //let's use the PEAR PHP mail module
+//take this out, change on the server.
 $location_id = gethostname();
 $catPattern = 'cathlenes-MacBook-Pro.local';
 $muppetPattern = 'FORA';
