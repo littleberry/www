@@ -1,14 +1,15 @@
 <?php
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/common/common.inc.php");
-	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/usercake/models/config.php");
-	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/classes/Client.class.php");
-	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/classes/Contact.class.php");
-	
-if(!isUserLoggedIn()){
-	//redirect if user is not logged in.
-	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
-	header( 'Location: ../usercake/login.php' ) ;
-}
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Client.class.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Contact.class.php");
+
+//removed auth via userCake re:keith 10/17	
+//if(!isUserLoggedIn()){
+///	//redirect if user is not logged in.
+	//$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+	//header( 'Location: ../usercake/login.php' ) ;
+//}
 	
 	//FUNCTION RETURNS THE INDIVIDUAL OBJECTS. 
 	list($clients) = Client::getClients();
