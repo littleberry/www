@@ -1,6 +1,6 @@
 <?php
 	//put this in a general place, htdocs.
-	//change this if it is on muppetlabs or on localhost.
+	//change this if it is on muppetlabs or on localhost...
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/common/common.inc.php");
 	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/usercake/models/config.php");
 	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/common/common.inc.php");
