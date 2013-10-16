@@ -4,7 +4,17 @@ UserCake Version: 2.0.2
 http://usercake.com
 */
 //let's use the PEAR PHP mail module
-require_once("/Applications/MAMP/bin/php/php5.4.10/lib/php/Mail.php");
+$catPattern = 'cathlenes-MacBook-Pro.local';
+$muppetPattern = 'FORA';
+switch ($location_id) { 
+        case $catPattern : 
+            require_once("/Applications/MAMP/bin/php/php5.4.10/lib/php/Mail.php");
+			break; 
+        case $muppetPattern:
+        	
+        	require_once("c:\wamp\bin\php\php-5.4.20-Win32-VC9-x86\PEAR\pear\Mail.php");
+			break; 
+    } 
 
 class userCakeMail {
 	//UserCake uses a text based system with hooks to replace various strs in txt email templates
@@ -36,7 +46,6 @@ class userCakeMail {
 	
 	public function sendMail($email,$subject,$msg = NULL)
 	{
-		error_log("XKHASLKFHJASLKJHFKSAJHKHJFSLKHJFLHAFLKH");
 		global $websiteName,$emailAddress;
 		
 		
