@@ -1,12 +1,12 @@
 <?php
-	require_once("../common/common.inc.php");
-	require_once("../classes/Client.class.php");
-	require_once("../classes/Project.class.php");
-	require_once("../common/errorMessages.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/common/common.inc.php");
+	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/usercake/models/config.php");
+	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/common/common.inc.php");
+	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/classes/Person.class.php");
 		if(!isUserLoggedIn()){
 		//redirect if user is not logged in.
 		$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
-		header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+		header( 'Location: ../usercake/login.php' ) ;
 	}
 ?>
 
