@@ -6,7 +6,6 @@
 ini_set ('display_errors', 0);
 //server configuration variables for each server.
 $location_id = gethostname();
-//AFTER DINNER, TEST THIS ON MUPPETLABS
 //echo($location_id);
 
 $catPattern = 'cathlenes-MacBook-Pro.local';
