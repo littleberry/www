@@ -1175,7 +1175,7 @@ function securePage($uri){
 			return true;
 		}
 		else {
-			header("Location: ../index.php");
+			header("Location: index.php");
 			return false;	
 		}
 	}
