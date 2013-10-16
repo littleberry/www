@@ -1,8 +1,8 @@
 <?php
-	require_once("../common/common.inc.php");
-	require_once("../classes/Client.class.php");
-	require_once("../classes/Project.class.php");
-	require_once("../common/errorMessages.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Client.class.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Project.class.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/errorMessages.php");
 	include('header.php'); //add header.php to page
 ?>
 
