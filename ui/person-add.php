@@ -1,6 +1,6 @@
 <?php
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
+	//require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Person.class.php");
 		//removed auth via userCake re:keith 10/17
