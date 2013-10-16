@@ -1,6 +1,6 @@
 <?php
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
+	//require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Client.class.php");
 	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Contact.class.php");
 
