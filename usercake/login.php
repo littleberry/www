@@ -5,7 +5,7 @@ http://usercake.com
 */
 
 require_once("models/config.php");
-if (!securePage($_SERVER['PHP_SELF'])){die();}
+//if (!securePage($_SERVER['PHP_SELF'])){die();}
 //try to get the redirect back to the calling page.
 if(isset($_SESSION["redirect"])) 
 { 
