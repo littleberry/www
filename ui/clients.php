@@ -1,13 +1,17 @@
 <?php
-	require_once("../common/common.inc.php");
-	require_once("../classes/Client.class.php");
-	require_once("../classes/Contact.class.php");
-	checkLogin();
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/usercake/models/config.php");
+
 	
+if(!isUserLoggedIn()){
+	//redirect if user is not logged in.
+	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
+	header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+}
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/common/common.inc.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Client.class.php");
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Contact.class.php");
 	
 	//FUNCTION RETURNS THE INDIVIDUAL OBJECTS. 
-	$clients[] = Client::getClients();
-	error_log("the client is an ARRAY ");
 	list($clients) = Client::getClients();
 	//LEAVE THIS AS A LIST FOR INVESTIGATION.
 	error_log("the client is a LIST");
