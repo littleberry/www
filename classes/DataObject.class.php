@@ -5,6 +5,17 @@
 //only require the config file once in the app.
 
 //require_once("/config/config.php");
+$catPattern = 'cathlenes-MacBook-Pro.local';
+$muppetPattern = 'FORA';
+switch ($location_id) { 
+        case $catPattern : 
+            require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/config/config.php");
+            break; 
+        case $muppetPattern:
+        	
+        	require_once($_SERVER["DOCUMENT_ROOT"] . "config/config.php");
+        	break; 
+    } 
 require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/config/config.php");
 
 
