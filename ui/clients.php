@@ -1,20 +1,17 @@
 <?php
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/usercake/models/config.php");
-
+	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/common/common.inc.php");
+	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/usercake/models/config.php");
+	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/classes/Client.class.php");
+	require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "/classes/Contact.class.php");
 	
 if(!isUserLoggedIn()){
 	//redirect if user is not logged in.
 	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
-	header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
+	header( 'Location: ../usercake/login.php' ) ;
 }
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/common/common.inc.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Client.class.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/time_tracker/classes/Contact.class.php");
 	
 	//FUNCTION RETURNS THE INDIVIDUAL OBJECTS. 
 	list($clients) = Client::getClients();
-	//LEAVE THIS AS A LIST FOR INVESTIGATION.
-	error_log("the client is a LIST");
 	
 	include('header.php'); //add header.php to page
 	
