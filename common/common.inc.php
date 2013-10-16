@@ -16,6 +16,8 @@ switch ($location_id) {
             $_SERVER["DOCUMENT"] = "time_tracker/"; 
             break; 
         case $muppetPattern:
+        	error_log($_SERVER["SITE_BASE"]);
+        	error_log($_SERVER["DOCUMENT"]);
         	$_SERVER["SITE_BASE"] = "C:\\WAMP\\WWW\\";
             $_SERVER["DOCUMENT"] = "";
             break; 
