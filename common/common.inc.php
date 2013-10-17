@@ -29,7 +29,7 @@ ini_set ('display_errors', 0);
 //require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "usercake/models/config.php");
 //if (!securePage($_SERVER['PHP_SELF'])){die();}
 
-require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "classes/Person.class.php");
+//require_once("../classes/Person.class.php");
 
 
 //is the value in the missing field array? If so, highlight the field using the "error" style..
