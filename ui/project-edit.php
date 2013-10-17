@@ -5,9 +5,9 @@
 		printf("<script>location.href='projects.php'</script>");
 	}
 	
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Project.class.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Client.class.php");
+	require_once("../common/common.inc.php");
+	require_once("../classes/Project.class.php");
+	require_once("../classes/Client.class.php");
 
 	include('header.php'); //add header.php to page
 ?>
@@ -78,15 +78,20 @@
 						<input id="client-city" name="project_code" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_code")?>" /><br />
 						<li class="client-details-item currency">
 						<label for="client-currency" class="client-details-label">Please select a client:</label>
-                        <select name="client_id" id="client_currency_index" size="1">    
+                        <select name="client-id" id="client_currency_index" size="1">    
 						<?php foreach ($clients as $client) { ?>
    							<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
     					<?php } ?>
     			 </select><br />
+    			 <label for="client-currency" class="client-details-label">Invoice Method</label>
+    			 <input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />
+						<input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> /><br/>
 						<label for="client-streetAddress" <?php validateField("project_notes", $missingFields)?> class="client-details-label">Project Notes:</label>
 						<textarea id="client-streetAddress" name="project-notes" class="client-streetAddress-input" tabindex="5"><?php echo $project->getValueEncoded("project_notes")?></textarea><br />
+						
+
 						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="client-details-label">Project is Archived?</label>
-						<input id="client-city" name="project-archived" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_archived")?>" /><br />
+						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="client-details-label">						<input id="client-city" name="project-archived" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_archived")?>" /><br />
 				</ul>
 			</fieldset>
 		</section>
@@ -119,7 +124,7 @@
 		//not available for edit.
 		"project_code" => isset($_POST["project_code"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_code"]) : "",
 		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
-		"client_id" => isset($_POST["client_id"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client_id"]) : "",
+		"client_id" => isset($_POST["client-id"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-id"]) : "",
 		"project_invoice_method" => isset($_POST["project_invoice_method"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project_invoice_method"]) : "",
 		"project_invoice_rate" => isset($_POST["project_invoice_rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_invoice_rate"]) : "",
 		"project_budget_type" => isset($_POST["project_budget_type"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_type"]) : "",
