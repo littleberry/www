@@ -1,5 +1,5 @@
 <?php
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
+	require_once("../common/common.inc.php");
 	
 	session_start();
 	$_SESSION["person"] = "";
