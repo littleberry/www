@@ -1,7 +1,7 @@
 <?php
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Client.class.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Contact.class.php");
+	require_once("../common/common.inc.php");
+	require_once("../classes/Client.class.php");
+	require_once("../classes/Contact.class.php");
 	
 	//RETRIEVE THE CLIENT ID FROM GET OR POST.
 	if (isset ($_GET["client_id"])) {
