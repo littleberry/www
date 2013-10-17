@@ -26,8 +26,8 @@ switch ($location_id) {
 
 
 //THIS FILE IS ALWAYS INCLUDED, SO GET THE CONFIG FOR THE AUTH.
-require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "usercake/models/config.php");
-if (!securePage($_SERVER['PHP_SELF'])){die();}
+//require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "usercake/models/config.php");
+//if (!securePage($_SERVER['PHP_SELF'])){die();}
 
 require_once($_SERVER["SITE_BASE"] . $_SERVER["DOCUMENT"] . "classes/Person.class.php");
 
