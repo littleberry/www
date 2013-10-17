@@ -1,6 +1,6 @@
 <?php
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Project.class.php");
+	require_once("../common/common.inc.php");
+	require_once("../classes/Project.class.php");
 	include('header.php'); //add header.php to page
 
 	//if(!isUserLoggedIn()){
