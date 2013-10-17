@@ -1,6 +1,6 @@
 <?php
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/common/common.inc.php");
-	require_once($_SERVER["DOCUMENT_ROOT"] . "/classes/Person.class.php");
+	require_once("../common/common.inc.php");
+	require_once("../classes/Person.class.php");
 		//remove auth
 		//if(!isUserLoggedIn()){
 		//redirect if user is not logged in.
