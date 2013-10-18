@@ -83,21 +83,31 @@
    							<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
     					<?php } ?>
     			 </select><br />
-    			 <label for="client-currency" class="client-details-label">Invoice Method</label>
-    			 <input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />
-						<input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> /><br/>
+    			 
+    			 <!--label for="client-currency" class="project-billable">Invoice Method:</label><br/>
+    			 <input id="project-billable" name="project-billable" class="project-billable" value="N" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />This project is not billable<br/>
+						<input id="project-billable" name="project-billable" class="project-billable" value="Y" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />This project is billable and we invoice by<br/-->
 						<label for="client-streetAddress" <?php validateField("project_notes", $missingFields)?> class="client-details-label">Project Notes:</label>
 						<textarea id="client-streetAddress" name="project-notes" class="client-streetAddress-input" tabindex="5"><?php echo $project->getValueEncoded("project_notes")?></textarea><br />
 						
 
 						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="client-details-label">Project is Archived?</label>
-						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="client-details-label">						<input id="client-city" name="project-archived" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_archived")?>" /><br />
+						<?php
+						$row = Project::getEnumValues("project_archived");
+						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
+						echo "<select>";
+						foreach($enumList as $value) { ?>
+							<option value="<?php echo $project->getValueEncoded('project_archived')?>"><?php echo $value ?></option>";
+						<?php }
+						echo "</select>";
+?>
+<br />
 				</ul>
 			</fieldset>
 		</section>
 						<input id="contact-save-btn" name="project-save-btn" class="contact-save-btn" type="submit" value="+ Save Project" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
-<!--END FORM-->
+						<!--END FORM-->
 </form><?php } ?>
 		
 
@@ -125,12 +135,15 @@
 		"project_code" => isset($_POST["project_code"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_code"]) : "",
 		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
 		"client_id" => isset($_POST["client-id"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-id"]) : "",
-		"project_invoice_method" => isset($_POST["project_invoice_method"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project_invoice_method"]) : "",
-		"project_invoice_rate" => isset($_POST["project_invoice_rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_invoice_rate"]) : "",
-		"project_budget_type" => isset($_POST["project_budget_type"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_type"]) : "",
-		"project_budget_hours" => isset($_POST["project_budget_hours"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project_budget_hours"]) : "",
-		"project_show_budget" => isset($_POST["project_show_budget"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_show_budget"]) : "",
-		"project_send_email" => isset($_POST["project_send_email"])? preg_replace("/[^0-9]/", "", $_POST["project_send_email"]) : "",
+		"project_billable" => isset($_POST["project-billable"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project-billable"]) : "",
+		"project_invoice_by" => isset($_POST["project-invoice-by"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-invoice-by"]) : "",
+		"project_hourly_rate" => isset($_POST["project-hourly_rate"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-hourly_rate"]) : "",
+		"project_budget_by" => isset($_POST["project-budget-by"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-budget-by"]) : "",
+		"project_budget_total_fees" => isset($_POST["project-budget-total-fees"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-total-fees"]) : "",
+		"project_budget_total_hours" => isset($_POST["project-budget-total-hours"])? preg_replace("/[^0-9]/", "", $_POST["project-budget-total-hours"]) : "",
+		"project_send_email" => isset($_POST["project-send-email"])? preg_replace("/[^0-9]/", "", $_POST["project-send-email"]) : "",
+		"project_show_budget" => isset($_POST["project-show-budget"])? preg_replace("/[^0-9]/", "", $_POST["project-show-budget"]) : "",
+		"project_budget_includes_expenses" => isset($_POST["project-budget-includes-expenses"])? preg_replace("/[^0-9]/", "", $_POST["project-budget-includes-expenses"]) : "",
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-notes"]) : "",
 		"project_archived" => isset($_POST["project-archived"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-archived"]) : "",
 	));
