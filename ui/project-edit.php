@@ -97,7 +97,7 @@
 						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 						echo "<select>";
 						foreach($enumList as $value) { ?>
-							<option value="<?php echo $project->getValueEncoded('project_archived')?>"><?php echo $value ?></option>";
+							<option name="project-archived" value="<?php echo $project->getValueEncoded('project_archived')?>"><?php echo $value ?></option>";
 						<?php }
 						echo "</select>";
 ?>
