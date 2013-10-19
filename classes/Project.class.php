@@ -220,7 +220,7 @@ public static function getProjectByProjectId($project_id) {
 		$sql = "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" . TBL_PROJECT . "' AND COLUMN_NAME = :colName";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":colName", $colName, PDO::PARAM_INT);
+			$st->bindValue(":colName", $colName, PDO::PARAM_STR);
 			$st->execute();
 			$row=$st->fetch();
 			parent::disconnect($conn);
