@@ -34,23 +34,15 @@
 <header class="page-header">
 		<h1 class="page-title">Project Details</h1>
 		<nav class="page-controls-nav">
-			<ul class="client-page-controls">
-				<!--
-<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
-				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
--->
+			<ul class="page-controls-list project">
 				<!-- I am just putting this here because I need to send the client id into the client-edit php file.-->
-				<li class="page-controls-item"><a class="view-all-link" href="project-edit.php?project_id=<?php echo $project_id?>">Edit This Project</a></li>
-<!--end-->
-<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
+				<li class="page-controls-item link-btn"><a class="view-all-link" href="project-edit.php?project_id=<?php echo $project_id?>">Edit Project</a></li>
+				<!--end-->
+				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 			</ul>
 		</nav>
 	</header>
 	<section class="content">
-		<!--we don't have an image for the project here.
-		<figure class="client-logo l-col-20">
-			<img class="client-logo-img small" src="<?php //echo $project_details->getValue("client_logo_link")?>" title="Client/Company name logo" alt="Client/Company name logo" />
-		</figure>-->
 		<section class="client-detail l-col-80">
 			<header class="client-details-header">
 				<h1 class="client-details-title"><?php echo $project_details->getValue("project_name")?></h1>

@@ -14,9 +14,9 @@
 
 <section id="page-content" class="page-content">
 	<header class="page-header">
-		<h1 class="page-title">Edit Client Details</h1>
+		<h1 class="page-title">Edit Project Details</h1>
 		<nav class="page-controls-nav">
-			<ul class="client-page-controls">
+			<ul class="page-controls-list project">
 				<li class="page-controls-item link-btn"><a class="add-client-link" href="project-add.php">+ Add Project</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="project-archives.php">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
@@ -60,38 +60,42 @@
 	<input type="hidden" name="action" value="edit_project">
 	<input type="hidden" name="project_id" value="<?php echo $_GET["project_id"]?>">
 		<section class="client-detail l-col-80">
-			<fieldset class="client-details-entry">
-				<!-- <legend class="client-details-title">Edit client details:</legend> -->
-				<header class="client-details-header">
-					<h1 class="client-details-title">Edit project details:</h1>
+			<fieldset class="project-details-entry">
+				<header class="entity-details-header client">
+					<h1 class="entity-details-title">Edit project details:</h1>
 					<h4 class="required">= Required</h4>
 				</header>
-				<ul class="details-list client-details-list">
+				<ul class="details-list entity-details-list project">
 				<?php 
 						//get the clients out to populate the drop down.
 						list($clients) = Client::getClients();
 					?>
-					<li class="client-details-item address">
-						<label for="client-zip" <?php validateField("project_name", $missingFields)?> class="client-details-label">Project Name:</label>
-						<input id="client-zip" name="project-name" class="client-zip-input" type="text" tabindex="8" value="<?php echo $project->getValueEncoded("project_name")?>" /><br />
-						<label for="client-city" <?php validateField("project_code", $missingFields)?> class="client-details-label">Project Code</label>
-						<input id="client-city" name="project_code" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_code")?>" /><br />
-						<li class="client-details-item currency">
-						<label for="client-currency" class="client-details-label">Please select a client:</label>
-                        <select name="client-id" id="client_currency_index" size="1">    
-						<?php foreach ($clients as $client) { ?>
-   							<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
-    					<?php } ?>
-    			 </select><br />
-    			 <label for="client-currency" class="client-details-label">Invoice Method</label>
-    			 <input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />
+					<li class="entity-details-item name project">
+						<label for="project-name" <?php validateField("project_name", $missingFields)?> class="entity-details-label">Project Name:</label>
+						<input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="8" value="<?php echo $project->getValueEncoded("project_name")?>" />
+					</li>
+					<li class="entity-details-item project-code project">
+						<label for="project-code" <?php validateField("project_code", $missingFields)?> class="entity-details-label">Project Code</label>
+						<input id="project-code" name="project_code" class="project-code-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_code")?>" />
+					</li>
+					<li class="entity-details-item project-client project">
+						<label for="client-id" class="entity-details-label">Select the client:</label>
+                  <select name="client-id" id="project-client-select" size="1">    
+							<?php foreach ($clients as $client) { ?>
+								<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
+							<?php } ?>
+						</select>
+					</li>
+					<li class="entity-details-item invoice-method project">
+						<label for="client-currency" class="entity-details-label">Invoice Method</label>
+						<input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />
 						<input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> /><br/>
-						<label for="client-streetAddress" <?php validateField("project_notes", $missingFields)?> class="client-details-label">Project Notes:</label>
+						<label for="client-streetAddress" <?php validateField("project_notes", $missingFields)?> class="entity-details-label">Project Notes:</label>
 						<textarea id="client-streetAddress" name="project-notes" class="client-streetAddress-input" tabindex="5"><?php echo $project->getValueEncoded("project_notes")?></textarea><br />
 						
 
-						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="client-details-label">Project is Archived?</label>
-						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="client-details-label">						<input id="client-city" name="project-archived" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_archived")?>" /><br />
+						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="entity-details-label">Project is Archived?</label>
+						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="entity-details-label">						<input id="client-city" name="project-archived" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_archived")?>" /><br />
 				</ul>
 			</fieldset>
 		</section>
