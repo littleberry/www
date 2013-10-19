@@ -18,6 +18,9 @@ function getErrorMessage($client_currency_index, $errorMessage, $errorType) {
 			$errorArray["client_logo_link"]["required"] = "You didn't upload a file.";
 			$errorArray["contact_name"]["required"] = "Please enter a name for your contact. Note: All clients must have at least one contact.";
 			$errorArray["project_name"]["required"] = "Please enter a name for your project.";
+			$errorArray["person_first_name"]["required"] = "Please enter a first name for this person.";
+			$errorArray["person_last_name"]["required"] = "Please enter a last name for this person.";
+			$errorArray["person_email"]["required"] = "Please enter an email address for this person.";
 			//errorType "invalid input"
 			$errorArray["client_email"]["invalid_input"] = "Please check you entered a valid email address for the client.";
 			$errorArray["client_phone"]["invalid_input"] = "Please check you entered a valid phone number for the client in format XXX-XXX-XXXX.";
