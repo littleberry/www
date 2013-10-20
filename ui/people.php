@@ -56,15 +56,19 @@
 			//1. Get out the employee types, display the folks by their jobs.
 			list($personTypes) = Person::getPersonTypes();
 			list($people) = Person::getPeople();
-			foreach($personTypes as $personType) {
-				echo $personType->getValue("person_type") . "s";
-					foreach($people as $person) {
-						if ($personType->getValue("person_type") == $person->getValue("person_type")) {?>
+			foreach($personTypes as $personType) { ?>
+				<li style="background-color:lightgray;" class="client-info-contact"><?php echo $personType->getValue("person_type") . "s"; ?></li>
+				<?php	
+				foreach($people as $person) {
+						//display the people as employees or contractors
+						if ($personType->getValue("person_type") == $person->getValue("person_type")) {
+						?>
 						<section class="content">
 							<ul id="client-list" class="client-list">
 								<li class="client-list-item l-col-33">
 									<ul class="client-info-list">
-										<li style="background-color:lightgray;" class="client-info-contact"><a class="client-info-contact-link" href="<?php echo "person-detail.php?person_id=" . $person->getValue("person_id")?>" title="View contact details">Edit</a>  <?php echo ($person->getValue("person_first_name") . " " . $person->getValue("person_last_name")); ?></li>
+										<li class="client-info-contact"><a class="client-info-contact-link" href="person-basic-info.php?person=<?php echo urlencode(serialize($person)) ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($person->getValue("person_first_name") . " " . $person->getValue("person_last_name")); ?></li>
+										<br/><hr/>
 									</ul>		
 								</li>
 							</ul>
