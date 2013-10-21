@@ -244,6 +244,23 @@ public static function getByUserName($person_username) {
 		}
 	}
 	
+	public function setUserPassword($person_email, $person_password) {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_PERSON . " SET 
+		person_password = password(:person_password) 
+		WHERE person_email = :person_email";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_email", $person_email, PDO::PARAM_STR);
+			$st->bindValue(":person_password", $person_password, PDO::PARAM_STR);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage() . " sql is " . $sql);
+		}
+	}
+	
 }
 	
 

@@ -3,6 +3,7 @@
 	require_once("../common/common.inc.php");
 	require_once("../common/errorMessages.php");
 	require_once("../classes/Person.class.php");
+	
 		
 		session_start();
 		
@@ -242,9 +243,6 @@ include('header.php'); //add header.php to page
 	} else {
 		//lets put this into a try/catch for added security.
 		try {
-			//this is really an edit
-			//session_start();
-			//$_SESSION['person'] = serialize($person);
 			$person->updatePerson($person->getValueEncoded('person_email'));
 			displayPersonInsertForm($errorMessages, $missingFields, $person);
 		} catch (Exception $e) {

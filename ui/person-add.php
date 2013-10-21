@@ -196,9 +196,10 @@ include('header.php'); //add header.php to page
 	} else {
 		//lets put this into a try/catch for added security.
 		try {
+			//update the person
 			$person->insertPerson();
-			error_log("here is the person");
-			error_log(print_r($person,true));
+			//send the person an email that they have been added
+			include("newUserEmail.php");
 			session_start();
 			$_SESSION['person'] = serialize($person);
 			header("Location: person-basic-info.php");
