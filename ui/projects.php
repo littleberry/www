@@ -1,27 +1,22 @@
 <?php
 	require_once("../common/common.inc.php");
 	require_once("../classes/Project.class.php");
-	include('header.php'); //add header.php to page
-
+	
 	//if(!isUserLoggedIn()){
 	//	//redirect if user is not logged in.
 	//	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
 	//	header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
 	//	//header( 'Location: http://strawberry.dev/MBTimeTtracker/usercake/login.php' ) ;
 	//}
+	//I am taking this out temporarily until we come back to it.
+	//checkLogin();
+	//$person = unserialize($_SESSION['person']);
+
+	include('header.php'); //add header.php to page
+?>
 	
-	?>
 
 <section id="page-content" class="page-content">
-	<header class="page-header">
-		<h1 class="page-title">Projects</h1>
-		<nav class="page-controls-nav">
-			<ul class="page-controls-list project">
-				<li class="page-controls-item link-btn"><a class="add-project-link" href="project-add.php">+ Create Project</a></li>
-				<li class="page-controls-item"><a class="view-project-archive-link" href="project_archives.php">View Project Archives</a></li>
-			</ul>
-		</nav>
-	</header>
 	<section class="content">
 		<table id="project-list" class="entity-table projects tablesorter">
 			<thead>
