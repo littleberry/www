@@ -24,6 +24,12 @@ include('header.php'); //add header.php to page
 		</nav>
 	</header>
 		<?php 
+		//this is the add task UI (IT IS NOT SEPARATE IN THIS MODULE!!!)
+		
+		
+		
+		
+		//this is the display of all tasks.
 			//1. Get out the task types, this is ugly but it works. Could have called a bunch of functions to get this right but NAAAAAH!!
 			list($tasks) = Task::getTasks(); 
 				//common tasks here 
