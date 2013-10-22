@@ -25,7 +25,8 @@ class Person extends DataObject {
 
 	public function authenticate() {
 		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_username = :person_username AND person_password = password(:person_password)";
+		//we're using the user's email address as the login right now. 
+		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_email = :person_username AND person_password = password(:person_password)";
 		
 		try {
 			$st = $conn->prepare($sql);
@@ -34,7 +35,7 @@ class Person extends DataObject {
 			$st->execute();
 			$row=$st->fetch();
 			parent::disconnect( $conn );
-			if ($row) return new Person($row);
+			if ($row)  return new Person($row);
 		} catch (PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed: " . $e->getMessage() );

@@ -4,8 +4,8 @@
 	require_once("../common/errorMessages.php");
 	require_once("../classes/Person.class.php");
 	
-		
-		session_start();
+		//this is now being started in common because of the auth.
+		//session_start();
 		
 	//get the person off the URL if they came in from EDIT and $_GET
 	//if they came in from add, use the session variable, since they come in from $_POST.
@@ -13,7 +13,8 @@
 		$person = unserialize(urldecode($_GET['person']));
 	} elseif (isset($_SESSION['person'])) {
 		$person = unserialize($_SESSION['person']);
-	}
+		//what if we get rid of this here?
+		unset($_SESSION['person']);	}
 	
 		//print_r($person);
 		//removed auth via userCake re:keith 10/17

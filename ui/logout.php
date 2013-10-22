@@ -1,7 +1,7 @@
 <?php
 	require_once("../common/common.inc.php");
 	
-	session_start();
+	//session_start();
 	$_SESSION["person"] = "";
 	
 	include('header.php'); //add header.php to page

@@ -200,7 +200,8 @@ include('header.php'); //add header.php to page
 			$person->insertPerson();
 			//send the person an email that they have been added
 			include("newUserEmail.php");
-			session_start();
+			//I don't think we need this anymore since the session is started in common for auth.
+			//session_start();
 			$_SESSION['person'] = serialize($person);
 			header("Location: person-basic-info.php");
 		} catch (Exception $e) {
