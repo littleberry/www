@@ -10,7 +10,7 @@ if (isset($_POST["action"]) and $_POST["action"] == "change_password") {
 }
 
 function displayForm($errorMessages, $missingFields, $person) {
-	//displayPageHeader("Please create a user name and password.");
+
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
 			echo $errorMessage;
@@ -26,7 +26,7 @@ function displayForm($errorMessages, $missingFields, $person) {
 				$emailAddress = "";
 		}
 		
-			include('header.php'); //add header.php to page
+			include('header.php');
 
 		?>
 		<!DOCTYPE html>
@@ -80,13 +80,7 @@ function processForm() {
 		$errorMessages[] = '<p class="error">Please make sure you enter your password correctly in both password fields.</p>';
 	}
 		
-	//if (Person::getByUsername($person->getValue("person_username"))) {
-	//	$errorMessages[] = '<p class="error">A member with that username already exists in the database. Please choose another username.</p>';
-	//}
-		
-	//if (Person::getByEmailAddress($person->getValue("person_email"))) {
-	//	$errorMessages[] = '<p class="error">A member with that email address already exists in the database. Please choose another email address, or contact the webmaster to retrieve your password.</p>';
-	//}
+
 		
 	if ($errorMessages) {
 		displayForm($errorMessages, $missingFields, $person);
