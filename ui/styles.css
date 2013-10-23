@@ -173,6 +173,22 @@ input[type=button].delete-btn:hover {
 .disabled {
 	display: none;
 }
+.error {
+	position: relative;
+	color: #D22F12;
+	background-color: #e59e9e;
+	margin: 1em;
+	padding: 1em;
+	border: #D22F12;
+}
+.success {
+	position: relative;
+	color: #046506;
+	background-color: #a9e69f;
+	margin: 1em;
+	padding: 1em;
+	border: #046506;
+}
 
 /* !LAYOUT 
 **************************************************/
