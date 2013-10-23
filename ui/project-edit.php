@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <?php
 	//this shouldn't be necessary. headers are NOT sent yet if this is coded correctly.
 	//function displayProjectPage() {
@@ -9,28 +8,20 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Client.class.php");
+	require_once("../classes/Project_Person.class.php");
+	require_once("../classes/Project_Task.class.php");
+	require_once("../classes/Project.class.php");
+	require_once("../classes/Task.class.php");
 
-	include('header.php'); //add header.php to page
-?>
+	
 
-<section id="page-content" class="page-content">
-	<header class="page-header">
-		<h1 class="page-title">Edit Client Details</h1>
-		<nav class="page-controls-nav">
-			<ul class="client-page-controls">
-				<li class="page-controls-item link-btn"><a class="add-client-link" href="project-add.php">+ Add Project</a></li>
-				<li class="page-controls-item"><a class="view-client-archive-link" href="project-archives.php">View Archives</a></li>
-				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
-			</ul>
-		</nav>
-	</header>
-	<!--OVERALL CONTROL
-		1. first time user comes in, call the displayClientAndContactsEditForm function.
-		2. Set the client and contact objects to the value pulled from the database.
-		3. User clicks on a button to submit the form, call the editClientAndContacts function.
-		4. If required fields are missing in the form, re-display the form with error messages.
-		5. If there are no missing required fields, call Project::updateProject-->	
-<?php 			
+	//OVERALL CONTROL
+	//	1. first time user comes in, call the displayClientAndContactsEditForm function.
+	//	2. Set the client and contact objects to the value pulled from the database.
+	//	3. User clicks on a button to submit the form, call the editClientAndContacts function.
+	//	4. If required fields are missing in the form, re-display the form with error messages.
+	//	5. If there are no missing required fields, call Project::updateProject-->	
+ 			
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_project") {
 					editProject();
 				} else {
@@ -53,8 +44,21 @@
 		$project=Project::getProjectByProjectId($_GET["project_id"]);
 	}
 	
-?>
 
+include('header.php'); //add header.php to page
+?>
+<!DOCTYPE html>
+<section id="page-content" class="page-content">
+	<header class="page-header">
+		<h1 class="page-title">Edit Project Details</h1>
+		<nav class="page-controls-nav">
+			<ul class="client-page-controls">
+				<li class="page-controls-item link-btn"><a class="add-client-link" href="project-add.php">+ Add Project</a></li>
+				<li class="page-controls-item"><a class="view-client-archive-link" href="project-archives.php">View Archives</a></li>
+				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
+			</ul>
+		</nav>
+	</header>
 	<section class="content">
 	<!--BEGIN FORM-->
 	<form action="project-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
@@ -92,38 +96,105 @@
 						<textarea id="client-streetAddress" name="project-notes" class="client-streetAddress-input" tabindex="5"><?php echo $project->getValueEncoded("project_notes")?></textarea><br />
 						
 
-						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="client-details-label">Project is Archived?</label>
-						<?php
-						$row = Project::getEnumValues("project_archived");
-						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
-						echo "<select>";
-						foreach($enumList as $value) { ?>
-							<option name="project-archived" value="<?php echo $project->getValueEncoded('project_archived')?>"><?php echo $value ?></option>";
-						<?php }
-						echo "</select>";
-?>
 <br />
 				</ul>
 			</fieldset>
 		</section>
-						<input id="contact-save-btn" name="project-save-btn" class="contact-save-btn" type="submit" value="+ Save Project" tabindex="11" /> or
-						<a class="" href="#" tabindex="11">Cancel</a>
-						<!--END FORM-->
-</form><?php } ?>
+		
+		
+<?php //BEGIN TASKS 
+			//obviously this is just the beginning of how this should ultimately work.
+		?>
+		<section class="client-detail l-col-80">
+        	<fieldset class="client-details-entry">
+				<legend class="client-details-title">Enter Task details:</legend>
+				<header class="client-details-header">
+					<h1 class="client-details-title">Enter Task details:</h1>
+					<h4 class="required">= Required</h4>
+				</header>
+				<li class="client-details-item phoneNum">
+					<label for="client-phone" <?php validateField("task_id", $missingFields)?> class="client-details-label">Tasks associated with this project:</label>
+					<input id="client-phone" name="task_id" class="client-phone-input" type="text" tabindex="2" value="" />
+				</li>
+				<ul class="details-list client-details-list">
+				<?php 
+						//get the taskss out to populate the drop down.
+						list($tasks) = Task::getTasks();
+					?>
+					<li class="client-details-item currency">
+						<label for="client-currency" class="client-details-label">Please choose a task:</label>
+                        <select name="task_ids" id="client_currency_index" size="1">    
+						<?php foreach ($tasks as $task) { ?>
+   							<option value="<?php echo $task->getValue("task_id") ?>"><?php echo $task->getValue("task_name")?></option>
+    					<?php } ?>
+    			 </select><br />
+					</li>
+				</ul>
+        	</fieldset>
+		</section>
+		<?php //BEGIN PEOPLE
+		//obviously this is just the beginning of how this should ultimately work.
+		?>
+		<section class="client-detail l-col-80">
+        	<fieldset class="client-details-entry">
+				<legend class="client-details-title">Enter Person details:</legend>
+				<header class="client-details-header">
+					<h1 class="client-details-title">Enter Person details:</h1>
+					<h4 class="required">= Required</h4>
+				</header>
+				<li class="client-details-item phoneNum">
+					<label for="client-phone" <?php validateField("person_id", $missingFields)?> class="client-details-label">People assigned to this project:</label>
+					<input id="client-phone" name="person_id" class="client-phone-input" type="text" tabindex="2" value="" />
+				</li>
+				<ul class="details-list client-details-list">
+				<?php 
+						//get the people out to populate the drop down.
+						list($people) = Person::getPeople();
+					?>
+					<li class="client-details-item currency">
+						<label for="client-currency" class="client-details-label">Please choose a person:</label>
+                        <select name="person_ids" id="client_currency_index" size="1">    
+						<?php foreach ($people as $person) { ?>
+   							<option value="<?php echo $person->getValue("person_id") ?>"><?php echo $person->getValue("person_first_name");echo " " . $person->getValue("person_last_name")?></option>
+    					<?php } ?>
+    			 </select><br />
+					</li>
+				</ul>
+        	</fieldset>
+		</section>
+				<fieldset class="client-details-entry">
+				<ul class="details-list client-details-submit">
+					<li class="client-details-item submit-client">
+						<label for="client-add-btn" class="client-details-label">All done?</label>
+                        <input id="client-add-btn" name="project-add-btn" class="client-add-btn" type="submit" value="+ Add Project" tabindex="11"/> 
+						 or <a class="" href="#" tabindex="11">Cancel</a>
+					</li>
+				</ul>
+			</fieldset>
+			</section>
+
+</form>
+<footer id="site-footer" class="site-footer">
+
+</footer>
+<script src="client-controls.js" type="text/javascript"></script>
+</body>
+</html><?php } ?>
 		
 
-<!--PROJECT PROCESSING FUNCTIONS (editProjects();)
-	1. Set up the required fields.
-	2. Create the object based on the values that were submitted the last time the user submitted the form.
-	3. Set up the required fields in the $requiredFields array.
-	4. Compare the existence of the fields in the objects (based on the $_POST values) with the fields in the $requiredFields array. If
-	any are missing, put the fields into the $missingFields[] array.
-	5. If the $missingFields array exists, loop through them and call the error message. If there are NO missing fields, still call the error message for the NON missing field errors (email, phone, etc).
-	6. If there are error messages, call displayProjectEditForm with the error messages, the missing fields, and all the data for the object and the whole thing starts over again.
-	7. If there are no errors, update the database with the new project information.
-	8. If all went well, display the project details page.
-	-->
-<?php function editProject() {
+<?php 
+function editProject() {
+	//PROJECT PROCESSING FUNCTIONS (editProjects();)
+	//1. Set up the required fields.
+	//2. Create the object based on the values that were submitted the last time the user submitted the form.
+	//3. Set up the required fields in the $requiredFields array.
+	//4. Compare the existence of the fields in the objects (based on the $_POST values) with the fields in the $requiredFields array. If
+	//any are missing, put the fields into the $missingFields[] array.
+	//5. If the $missingFields array exists, loop through them and call the error message. If there are NO missing fields, still call the error message for the NON missing field errors (email, phone, etc).
+	//6. If there are error messages, call displayProjectEditForm with the error messages, the missing fields, and all the data for the object and the whole thing starts over again.
+	//7. If there are no errors, update the database with the new project information.
+	//8. If all went well, display the project details page.
+
 	$requiredFields = array("project_name");
 	$missingFields = array();
 	$errorMessages = array();
@@ -220,15 +291,13 @@
 		error_log("All of the required fields are there...Updating database...");
 		$project_id=$project->getValue("project_id");
 		$project->updateProject($project_id);		
-		displayProjectPage();	
+		//displayProjectPage();	
+		//take out the re-call of this page, there is an easier way!					
+		header("Location: projects.php");
+
 	}
 }
 
 ?>
 
-<footer id="site-footer" class="site-footer">
 
-</footer>
-<script src="client-controls.js" type="text/javascript"></script>
-</body>
-</html>
