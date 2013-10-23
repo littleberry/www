@@ -14,7 +14,7 @@ class Task extends DataObject {
 		"task_common"=>""
 	);
 	
-	//display all information about a task. returned as an array. This function returns all clients, archived and not.
+	//display all information about a task. returned as an array. This function returns all tasks, archived and not.
 	public static function getTasks() {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_TASK;
@@ -32,7 +32,7 @@ class Task extends DataObject {
 		}
 	}
 		
-	//return all data for a specific client based on the client_id.
+	//return all data for a task client based on the task_id.
 	public static function getTask($task_id) {
 		$conn=parent::connect();
 		$sql = "SELECT * FROM " . TBL_CLIENT . " WHERE task.task_id = :task_id";
@@ -49,11 +49,10 @@ class Task extends DataObject {
 		}
 	}
 	
-	//function returns the individual person types
+	//function returns the individual common tasks.
 	public static function getCommonTasks() {
 		$conn=parent::connect();
 		$sql = "SELECT distinct(task_name) FROM " . TBL_TASK . " WHERE task_common = 1";
-	
 	
 		try {
 			$st = $conn->prepare($sql);
@@ -66,9 +65,56 @@ class Task extends DataObject {
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
-		}	}
-
+		}	
+	}
 	
+	//function inserts new task into db. 
+	
+	public function insertTask() {
+		$conn=parent::connect();
+		$sql = "INSERT INTO " . TBL_TASK . " (
+			task_name,
+			task_hourly_rate,
+			task_bill_by_default,
+			task_common
+			) VALUES (
+			:task_name,
+			:task_hourly_rate,
+			:task_bill_by_default,
+			:task_common
+			)";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":task_name", $this->data["task_name"], PDO::PARAM_STR);
+			$st->bindValue(":task_hourly_rate", $this->data["task_hourly_rate"], PDO::PARAM_STR);
+			$st->bindValue(":task_bill_by_default", $this->data["task_bill_by_default"], PDO::PARAM_INT);
+			$st->bindValue(":task_common", $this->data["task_common"], PDO::PARAM_INT);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on insert, sql is $sql " . $e->getMessage());
+		}	
+	}
+
+
+
+	public function getTaskId($task_name) {
+		$conn=parent::connect();
+		$sql = "SELECT task_id FROM " . TBL_TASK . " WHERE task_name = :task_name";			
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":task_name", $task_name, PDO::PARAM_STR);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed getting the task id, sql is $sql " . $e->getMessage());
+		}
+	}
+}
 	
 /*OTHER FUNCTIONS BELOW THIS LINE
 	//return the clients name based on the client_id.
@@ -89,22 +135,7 @@ class Task extends DataObject {
 		}
 	}
 	
-	public function getClientId($client_name) {
-		$conn=parent::connect();
-		$sql = "SELECT client_id FROM " . TBL_CLIENT . " WHERE client_name = '" . $client_name . "'";			
-		try {
-			$st = $conn->prepare($sql);
-			$st->bindValue(":client_name", $client_name, PDO::PARAM_STR);
-			$st->execute();
-			$row=$st->fetch();
-			parent::disconnect($conn);
-			if ($row) return $row;
-		} catch (PDOException $e) {
-			parent::disconnect($conn);
-			die("Query failed getting the client id, sql is $sql " . $e->getMessage());
-		}
-	}
-	
+		
 	//get the available currencies out of the currency table
 	//9/4: Client only needs US here, so this only returns USD at this point, but this is built to handle others.
 	public function getCurrency() {
@@ -144,54 +175,7 @@ class Task extends DataObject {
 			die("Query failed on you: " . $e->getMessage());
 		}
 	}
-	
-	//function inserts new client into db. If ADDRESS_CONFIG value is 0, insert the address as a large varchar field, not as individual fields in the database.
-	//it also gets the key for the record being inserted and inserts
-	//a row in the address table if the information was sent.
-	
-	public function insertClient($client_email) {
-		//FORGET THE CONFIG, delete this comment and the else.
-		//if (ADDRESS_CONFIG == 1) {	
-		//insert the client into the client table. Insert the address components into the client_address table..
-			$conn=parent::connect();
-			$sql = "INSERT INTO " . TBL_CLIENT . " (
-				client_name,
-				client_email,
-				client_phone,
-				client_fax,
-				client_currency_index,
-				client_logo_link,
-				client_archived
-				) VALUES (
-				:client_name,
-				:client_email,
-				:client_phone,
-				:client_fax,
-				:client_currency_index,
-				:client_logo_link,
-				:client_archived
-				)";
-			try {
-				$st = $conn->prepare($sql);
-				$st->bindValue(":client_name", $this->data["client_name"], PDO::PARAM_STR);
-				$st->bindValue(":client_email", $this->data["client_email"], PDO::PARAM_STR);
-				$st->bindValue(":client_phone", $this->data["client_phone"], PDO::PARAM_INT);
-				$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
-				$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
-				$st->bindValue(":client_archived", $this->data["client_archived"], PDO::PARAM_INT);
-				//NO NO NO THIS IS TOO HARDCODED!!
-				if ($this->data["client_logo_link"]) {
-					$st->bindValue(":client_logo_link", "images/" . $this->data["client_logo_link"], PDO::PARAM_STR);
-				} else {
-					$st->bindValue(":client_logo_link", "images/default.jpg", PDO::PARAM_STR);
-				}
-				$st->execute();
-				parent::disconnect($conn);
-			} catch (PDOException $e) {
-				parent::disconnect($conn);
-				die("Query failed on insert, sql is $sql " . $e->getMessage());
-			}	
-			
+
 			//get the client ID out of the client table based on the email address we just inserted. It must use the same key (auto increment) created when the record
 			//was inserted into the client table.
 			$conn=parent::connect();
@@ -488,5 +472,4 @@ class Task extends DataObject {
 			die("query failed: " . $e->getMessage() );
 		}
 	}*/
-}
 ?>
