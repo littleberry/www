@@ -46,16 +46,15 @@ class Person extends DataObject {
 	//data is out.
 	public static function getPeople() {
 		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_PERSON ;
+		$sql = "SELECT * FROM " . TBL_PERSON;
 		try {
 			$st = $conn->prepare($sql);
 			$st->execute();
-			$person=array();
 			foreach ($st->fetchAll() as $row) {
-				$person[] = new Person($row);
+				$people[] = new Person($row);
 			}
 			parent::disconnect($conn);
-			return array($person);
+			return array($people);
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
