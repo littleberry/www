@@ -3,30 +3,40 @@
 	require_once("../common/common.inc.php");
 	require_once("../common/errorMessages.php");
 	require_once("../classes/Person.class.php");
+	
+		//this is now being started in common because of the auth.
+		//session_start();
+		
+	//get the person off the URL if they came in from EDIT and $_GET
+	//if they came in from add, use the session variable, since they come in from $_POST.
+	if (isset($_GET['person'])) {
+		$person = unserialize(urldecode($_GET['person']));
+	} elseif (isset($_SESSION['person'])) {
+		$person = unserialize($_SESSION['person']);
+		//what if we get rid of this here?
+		unset($_SESSION['person']);	}
+	
+		//print_r($person);
 		//removed auth via userCake re:keith 10/17
 		//if(!isUserLoggedIn()){
 		//redirect if user is not logged in.
 		//$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
 		//header( 'Location: ../usercake/login.php' ) ;
 	//}
-	include('header.php'); //add header.php to page
+	
+	//OVERALL CONTROL
+	//I need this code to be first so I can redirect the page. We may need to do this for others			
+		if (isset($_POST["action"]) and $_POST["action"] == "person-basic-info") {
+				processPerson();
+		} else {
+				displayPersonInsertForm(array(), array(), $person);
+		} 
 ?>
-<section id="page-content" class="page-content">
-	<header class="page-header">
-		<h1 class="page-title">Add Person</h1>
-		<nav class="page-controls-nav">
-			<ul class="page-controls-list project">
-				<!--
-<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
-				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
--->
-				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
-			</ul>
-		</nav>
-	</header>
 
-<!--DISPLAY PROJECT INSERT WEB FORM--->
+
+<!--DISPLAY PERSON INSERT WEB FORM--->
 <?php function displayPersonInsertForm($errorMessages, $missingFields, $person) { 
+
 	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
@@ -39,21 +49,20 @@ include('header.php'); //add header.php to page
 ?>
 <section id="page-content" class="page-content">
 	<header class="page-header">
-		<h1 class="page-title">Add Person</h1>
+		<h1 class="page-title"><?php echo $person->getValueEncoded("person_first_name")?>'s Basic Info</h1>
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
-				<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.php">+ Add Person</a></li>
+				<!--li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.php">+ Add Person</a></li-->
 				<!--<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>-->
-				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.php">View Archives</a></li>
+				<!--li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.php">View Archives</a></li-->
 			</ul>
 		</nav>
 	</header>
-			<p>We'll email this person instructions on how to sign in to Time Tracker.</p>
 	<section class="content">
     <!--added because we need the information to be submitted in a form-->
-      <form action="person-add.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
-      <input type="hidden" name="action" value="person-add"/>
-	<!--end add-->
+      <form action="person-basic-info.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="person-basic-info"/>
+    <!--end add-->
 		<!--<figure class="client-logo l-col-20">
 			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
 			<fieldset class="client-logo-upload">
@@ -65,13 +74,21 @@ include('header.php'); //add header.php to page
 				<input id="client-logo-upload-btn" name="client-logo-upload-btn" class="client-logo-upload-btn" type="button" value="Upload" /> or <a class="" href="#">Cancel</a>
 			</fieldset>
 		</figure>-->
+		<figure class="person-logo l-col-20">
+		<?php
+		//get the image out of the db. it is the default if the user hasn't udpated it yet, this would be the case if
+		//they came from the add screen.
+		//$image = Person::getImage($person->getValue("person_email"));
+		//echo "wklhj";
+		//echo ($person->getValue("person_email"));
+		//print_r($image);
+		?>
+			<img class="person-logo-img small" src="<?php echo "images/" . basename($person->getValue("person_logo_link"))?>" style="height:100px; width:100px;" title="Person Image" alt="Person image" />
+			
+		</figure>
+
 		<section class="client-detail l-col-80">
         	<fieldset class="client-details-entry">
-				<legend class="client-details-title">Enter person details:</legend>
-				<header class="client-details-header">
-					<h1 class="client-details-title">Enter person details:</h1>
-					<h4 class="required">= Required</h4>
-				</header>
 				<ul class="details-list client-details-list">
 		   			<li class="client-details-item name">
 		   			This person is a: 
@@ -113,13 +130,22 @@ include('header.php'); //add header.php to page
 						</select>
 						<p>This person can track time and expenses.</p>
 					</li>
+					<fieldset class="person-logo-upload">
+				<!--legend class="person-logo-title">Upload Person Image</legend-->
+				<header class="person-logo-header">
+					<h1 class="person-logo-title">Upload Person Image</h1>
+				</header>
+				<?//hack the image by using a hidden field.?>
+				<input type="hidden" name="person-logo-file" value="<?php echo $person->getValue("person_logo_link")?>">
+				<input id="person-logo-file" name="person-logo-file" class="person-logo-file" type="file" value="browse" tabindex="21" />
+			</fieldset>
 				</ul>
 				<fieldset class="client-details-entry">
 				<ul class="details-list client-details-submit">
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label">All done?</label>
 						<!--modified field to be of type submit instead of button-->
-                        <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="+ Add Person" tabindex="11"/> 
+                        <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Save" tabindex="11"/> 
 						 or <a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
@@ -135,6 +161,24 @@ include('header.php'); //add header.php to page
 	$missingFields = array();
 	$errorMessages = array();
 	
+	//this is for the photo upload, and it is in the wrong place.
+		//this is also really hacky. We use a hidden field to get the value back into the post variable
+		//and then spit it back into the database. EW!!
+	if (isset($_FILES["person-logo-file"]) and $_FILES["person-logo-file"]["error"] == UPLOAD_ERR_OK) {
+		if ( $_FILES["person-logo-file"]["type"] != "image/jpeg") {
+			
+			//I'm hardcoding the client_currency_index, because it's in the wrong place. This should be with the rest of the validation.
+			$errorMessages[] = "<li>" . getErrorMessage("1","person_logo_link", "invalid_file") . "</li>";
+		} elseif ( !move_uploaded_file($_FILES["person-logo-file"]["tmp_name"], "images/" . basename($_FILES["person-logo-file"]["name"]))) {
+			$errorMessages[] = "<li>" . getErrorMessage("1","person_logo_link", "upload_problem") . "</li>";
+		} else {
+			//if the user is posting back, add the directory to the post array.
+			$_POST["person_logo_link"] = "images/" . $_FILES["person-logo-file"]["name"];
+		}
+	} else {
+		$_POST["person_logo_link"] = "images/" . (basename($_POST["person-logo-file"]));
+	}
+
 	
 	//create the project object ($project)
 	$person = new Person( array(
@@ -146,9 +190,8 @@ include('header.php'); //add header.php to page
 		"person_hourly_rate" => isset($_POST["person-hourly-rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-hourly-rate"]) : "",
 		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
 		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
-		//hard code the default image here, it's not on this page but we need it for the next page and we need it in the right place.
-		"person_logo_link" => "images/default.jpg",
-//		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
+		"person_logo_link" => isset($_POST["person_logo_link"]) ? preg_replace("/[^ \/\\-\_a-zA-Z0-9^.]/", "", $_POST["person_logo_link"]) :$_FILES["person_logo_link"],
+		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
 //		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
 //		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
@@ -175,6 +218,7 @@ include('header.php'); //add header.php to page
 		}
 	} //else {
 	/*take these out for people until a little later
+	//EMAIL ADDRESS MUST BE UNIQUE HERE!
 		$email = $client->getValue("client_email");
 		$phone = $client->getValue("client_phone");
 		$zip = $client->getValue("client_zip");
@@ -200,24 +244,13 @@ include('header.php'); //add header.php to page
 	} else {
 		//lets put this into a try/catch for added security.
 		try {
-			//update the person
-			$person->insertPerson();
-			//send the person an email that they have been added
-			include("newUserEmail.php");
-			//I don't think we need this anymore since the session is started in common for auth.
-			//session_start();
-			$_SESSION['person'] = serialize($person);
-			header("Location: person-basic-info.php");
+			$person->updatePerson($person->getValueEncoded('person_email'));
+			displayPersonInsertForm($errorMessages, $missingFields, $person);
 		} catch (Exception $e) {
 			echo "something went wrong inserting this person into our database.";
 			error_log($e);
 			return;
 		}
-		
-		echo "You have successfully added a person. You may add an additional person now. ";		
-		echo"<a href=\"people.php\">View the full person list</a>";
-		//headers already sent, call the page back with blank attributes.
-		//displayPersonInsertForm(array(), array(), new Person(array()));
 	}
 } 
 
@@ -225,5 +258,6 @@ include('header.php'); //add header.php to page
 <footer id="site-footer" class="site-footer">
 
 </footer>
+<script src="client-controls.js" type="text/javascript"></script>
 </body>
 </html>

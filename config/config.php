@@ -22,6 +22,11 @@ define ("TBL_PROJECT", "project");
 //table definitions for people path
 define ("TBL_PERSON", "person");
 define ("TBL_PERSON_PERMISSIONS", "person_permissions");
+//table definitions for task path
+define ("TBL_TASK", "task");
+//table definitions for join tables
+define("TBL_PROJECT_PERSON", "project_person");
+define("TBL_PROJECT_TASK", "project_task");
 
 //This is a security risk! Login and PW should be stored outside of the file in a prod env.
 ?>

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <?php
-	function displayProjectPage() {
-		//this probably isn't right, but I'll use it for now. won't work if JavaScript is off.
-		printf("<script>location.href='projects.php'</script>");
-	}
+	//this shouldn't be necessary. headers are NOT sent yet if this is coded correctly.
+	//function displayProjectPage() {
+	//	//this probably isn't right, but I'll use it for now. won't work if JavaScript is off.
+	//	printf("<script>location.href='projects.php'</script>");
+	//}
 	
 	require_once("../common/common.inc.php");
 	require_once("../classes/Project.class.php");
@@ -96,12 +97,13 @@
 
 						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="entity-details-label">Project is Archived?</label>
 						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="entity-details-label">						<input id="client-city" name="project-archived" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_archived")?>" /><br />
+
 				</ul>
 			</fieldset>
 		</section>
 						<input id="contact-save-btn" name="project-save-btn" class="contact-save-btn" type="submit" value="+ Save Project" tabindex="11" /> or
 						<a class="" href="#" tabindex="11">Cancel</a>
-<!--END FORM-->
+						<!--END FORM-->
 </form><?php } ?>
 		
 
@@ -129,12 +131,15 @@
 		"project_code" => isset($_POST["project_code"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_code"]) : "",
 		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
 		"client_id" => isset($_POST["client-id"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-id"]) : "",
-		"project_invoice_method" => isset($_POST["project_invoice_method"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project_invoice_method"]) : "",
-		"project_invoice_rate" => isset($_POST["project_invoice_rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_invoice_rate"]) : "",
-		"project_budget_type" => isset($_POST["project_budget_type"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_type"]) : "",
-		"project_budget_hours" => isset($_POST["project_budget_hours"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project_budget_hours"]) : "",
-		"project_show_budget" => isset($_POST["project_show_budget"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_show_budget"]) : "",
-		"project_send_email" => isset($_POST["project_send_email"])? preg_replace("/[^0-9]/", "", $_POST["project_send_email"]) : "",
+		"project_billable" => isset($_POST["project-billable"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project-billable"]) : "",
+		"project_invoice_by" => isset($_POST["project-invoice-by"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-invoice-by"]) : "",
+		"project_hourly_rate" => isset($_POST["project-hourly_rate"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-hourly_rate"]) : "",
+		"project_budget_by" => isset($_POST["project-budget-by"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-budget-by"]) : "",
+		"project_budget_total_fees" => isset($_POST["project-budget-total-fees"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-total-fees"]) : "",
+		"project_budget_total_hours" => isset($_POST["project-budget-total-hours"])? preg_replace("/[^0-9]/", "", $_POST["project-budget-total-hours"]) : "",
+		"project_send_email" => isset($_POST["project-send-email"])? preg_replace("/[^0-9]/", "", $_POST["project-send-email"]) : "",
+		"project_show_budget" => isset($_POST["project-show-budget"])? preg_replace("/[^0-9]/", "", $_POST["project-show-budget"]) : "",
+		"project_budget_includes_expenses" => isset($_POST["project-budget-includes-expenses"])? preg_replace("/[^0-9]/", "", $_POST["project-budget-includes-expenses"]) : "",
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-notes"]) : "",
 		"project_archived" => isset($_POST["project-archived"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-archived"]) : "",
 	));

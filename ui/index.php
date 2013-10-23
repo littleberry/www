@@ -1,9 +1,8 @@
 <?php
 	//put this in a general place, htdocs.
 	//change this if it is on muppetlabs or on localhost...
-	//require_once("common/common.inc.php");
 	//require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
-	//require_once("common/common.inc.php");
+	require_once("../common/common.inc.php");
 	require_once("../classes/Person.class.php");
 
 //if(!isUserLoggedIn()){
@@ -12,12 +11,13 @@
 
 //}	
 
-
 //if(isset($_POST["action"]) and $_POST["action"] == "login") {
 //	processForm();
 //}else{
 //	displayForm(array(), array(), new Person(array()));
-//}
+if (isset($_GET["data"])) {
+	$_SESSION['person'] = $_GET["data"];
+}
 ?>
 <!DOCTYPE html>
 	<?php	include('header.php'); //add header.php to page ?>

@@ -18,13 +18,15 @@ class Person extends DataObject {
 		"person_hourly_rate"=>"",
 		"person_perm_id"=>"",
 		"person_type"=>"",
+		"person_logo_link" =>"",
 	);
 	
 //just starting to work on authentication here... not sure this is where we want to ultimately put this, but for now I'm putting it in the person class.
 
 	public function authenticate() {
 		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_username = :person_username AND person_password = password(:person_password)";
+		//we're using the user's email address as the login right now. 
+		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_email = :person_username AND person_password = password(:person_password)";
 		
 		try {
 			$st = $conn->prepare($sql);
@@ -33,7 +35,7 @@ class Person extends DataObject {
 			$st->execute();
 			$row=$st->fetch();
 			parent::disconnect( $conn );
-			if ($row) return new Person($row);
+			if ($row)  return new Person($row);
 		} catch (PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed: " . $e->getMessage() );
@@ -44,16 +46,15 @@ class Person extends DataObject {
 	//data is out.
 	public static function getPeople() {
 		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_PERSON ;
+		$sql = "SELECT * FROM " . TBL_PERSON;
 		try {
 			$st = $conn->prepare($sql);
 			$st->execute();
-			$person=array();
 			foreach ($st->fetchAll() as $row) {
-				$person[] = new Person($row);
+				$people[] = new Person($row);
 			}
 			parent::disconnect($conn);
-			return array($person);
+			return array($people);
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
@@ -73,14 +74,18 @@ class Person extends DataObject {
 			person_email,
 			person_department,
 			person_hourly_rate,
-			person_perm_id
+			person_perm_id,
+			person_type,
+			person_logo_link
 			) VALUES (
 			:person_first_name,
 			:person_last_name,
 			:person_email,
 			:person_department,
 			:person_hourly_rate,
-			:person_perm_id
+			:person_perm_id,
+			:person_type,
+			:person_logo_link
 			)";
 			
 		try {
@@ -91,6 +96,8 @@ class Person extends DataObject {
 			$st->bindValue(":person_department", $this->data["person_department"], PDO::PARAM_STR);
 			$st->bindValue(":person_hourly_rate", $this->data["person_hourly_rate"], PDO::PARAM_INT);
 			$st->bindValue(":person_perm_id", $this->data["person_perm_id"], PDO::PARAM_STR);
+			$st->bindValue(":person_type", $this->data["person_type"], PDO::PARAM_STR);
+			$st->bindValue(":person_logo_link", $this->data["person_logo_link"], PDO::PARAM_STR);
 			$st->execute();
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
@@ -174,7 +181,87 @@ public static function getByUserName($person_username) {
 			parent::disconnect($conn);
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
 		}	}
+		
+	//this is a general function that people can use to get any enum value.
+	public static function getEnumValues($colName) {
+		$conn=parent::connect();
+		$sql = "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" . TBL_PERSON . "' AND COLUMN_NAME = :colName";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":colName", $colName, PDO::PARAM_STR);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage() . " sql is " . $sql);
+		}
+	}
+	
+	//update the person's information. WE MUST HAVE A UNIQUE EMAIL ADDRESS FOR THE PERSON!	
+	public function updatePerson($person_email) {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_PERSON . " SET
+				person_first_name = :person_first_name,
+				person_last_name = :person_last_name,
+				person_email = :person_email,
+				person_department = :person_department,
+				person_hourly_rate = :person_hourly_rate,
+				person_perm_id = :person_perm_id,
+				person_logo_link = :person_logo_link
+				WHERE person_email = :person_email";
+			try {
+				$st = $conn->prepare($sql);
+				$st->bindValue(":person_first_name", $this->data["person_first_name"], PDO::PARAM_STR);
+				$st->bindValue(":person_last_name", $this->data["person_last_name"], PDO::PARAM_STR);
+				$st->bindValue(":person_email", $this->data["person_email"], PDO::PARAM_STR);
+				$st->bindValue(":person_department", $this->data["person_department"], PDO::PARAM_STR);
+				$st->bindValue(":person_hourly_rate", $this->data["person_hourly_rate"], PDO::PARAM_INT);
+				$st->bindValue(":person_perm_id", $this->data["person_perm_id"], PDO::PARAM_INT);
+				$st->bindValue(":person_logo_link", basename($this->data["person_logo_link"]), PDO::PARAM_STR);
+				$st->execute();	
+				parent::disconnect($conn);
+			} catch (PDOException $e) {
+				parent::disconnect($conn);
+				die("Query failed on update: " . $e->getMessage() . " sql is " . $sql);
+			}
+	}
+	
+	public static function getImage($person_email) {
+		$conn=parent::connect();
+		$sql = "SELECT person_logo_link FROM " . TBL_PERSON . " WHERE person_email = :person_email";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_email", $person_email, PDO::PARAM_STR);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage() . " sql is " . $sql);
+		}
+	}
+	
+	public function setUserPassword($person_email, $person_password) {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_PERSON . " SET 
+		person_password = password(:person_password) 
+		WHERE person_email = :person_email";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_email", $person_email, PDO::PARAM_STR);
+			$st->bindValue(":person_password", $person_password, PDO::PARAM_STR);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage() . " sql is " . $sql);
+		}
+	}
 	
 }
+	
 
 ?>

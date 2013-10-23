@@ -11,12 +11,15 @@ class Project extends DataObject {
 		"project_code"=>"",
 		"project_name"=>"",
 		"client_id" =>"",
-		"project_invoice_method"=>"",
-		"project_invoice_rate"=>"",
-		"project_budget_type"=>"",
-		"project_budget_hours"=>"",
-		"project_show_budget"=>"",
+		"project_billable"=>"",
+		"project_invoice_by"=>"",
+		"project_hourly_rate"=>"",
+		"project_budget_by"=>"",
+		"project_budget_total_fees"=>"",
+		"project_budget_total_hours"=>"",
 		"project_send_email"=>"",
+		"project_show_budget"=>"",
+		"project_budget_includes_expenses"=>"",
 		"project_notes"=>"",
 		"project_archived"=>"",
 	);
@@ -176,7 +179,16 @@ public static function getProjectByProjectId($project_id) {
 				project_code = :project_code,
 				client_id = :client_id,
 				project_notes = :project_notes,
-				project_archived = :project_archived
+				project_archived = :project_archived,
+				project_billable = :project_billable,
+				project_invoice_by = :project_invoice_by,
+				project_hourly_rate = :project_hourly_rate,
+				project_budget_by = :project_budget_by,
+				project_budget_total_fees = :project_budget_total_fees,
+				project_budget_total_hours = :project_budget_total_hours,
+				project_send_email = :project_send_email,
+				project_show_budget = :project_show_budget,
+				project_budget_includes_expenses = :project_budget_includes_expenses
 				WHERE project_id = :project_id";
 			try {
 				$st = $conn->prepare($sql);
@@ -185,14 +197,40 @@ public static function getProjectByProjectId($project_id) {
 				$st->bindValue(":client_id", $this->data["client_id"], PDO::PARAM_INT);
 				$st->bindValue(":project_notes", $this->data["project_notes"], PDO::PARAM_INT);
 				$st->bindValue(":project_archived", $this->data["project_archived"], PDO::PARAM_INT);
+				$st->bindValue(":project_billable", $this->data["project_billable"], PDO::PARAM_STR);
+				$st->bindValue(":project_invoice_by", $this->data["project_invoice_by"], PDO::PARAM_STR);
+				$st->bindValue(":project_hourly_rate", $this->data["project_hourly_rate"], PDO::PARAM_INT);
+				$st->bindValue(":project_budget_by", $this->data["project_budget_by"], PDO::PARAM_STR);
+				$st->bindValue(":project_budget_total_fees", $this->data["project_budget_total_fees"], PDO::PARAM_INT);
+				$st->bindValue(":project_budget_total_hours", $this->data["project_budget_total_hours"], PDO::PARAM_INT);
+				$st->bindValue(":project_send_email", $this->data["project_send_email"], PDO::PARAM_STR);
+				$st->bindValue(":project_show_budget", $this->data["project_show_budget"], PDO::PARAM_STR);
+				$st->bindValue(":project_budget_includes_expenses", $this->data["project_budget_includes_expenses"], PDO::PARAM_STR);
 				$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
 				$st->execute();	
 				parent::disconnect($conn);
 			} catch (PDOException $e) {
 				parent::disconnect($conn);
-				die("Query failed on project update: " . $e->getMessage());
+				die("Query failed on project update: " . $e->getMessage() . " sql is " . $sql);
 			}
 	}	
+	
+	public static function getEnumValues($colName) {
+		$conn=parent::connect();
+		$sql = "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" . TBL_PROJECT . "' AND COLUMN_NAME = :colName";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":colName", $colName, PDO::PARAM_STR);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage() . " sql is " . $sql);
+		}
+	}
+
 	
 	//return the clients name based on the client_id.
 	//I'll keep this here as a utility function in case we need it.

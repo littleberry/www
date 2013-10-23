@@ -1,0 +1,38 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    font-family: Arial;
+    color: #000;
+}
+form{
+    margin: 0 auto;
+    width: 200px;
+}
+form label{
+    font-size: 12px;
+    margin: 0 0 3px 0;
+}
+form input{
+    border: 1px solid #ccc;
+    padding: 5px;
+    width: 188px;
+    margin: 0 0 10px 0;
+}
+form .submit{
+    background: #ff4f01;
+    color: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 18px;
+    margin: 0 10px 5px 0;
+    border: none;
+    width: 100px;
+}
+form .submit:hover{
+    background: #2b2b2b;
+}
