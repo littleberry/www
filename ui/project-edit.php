@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <?php
-	function displayProjectPage() {
-		//this probably isn't right, but I'll use it for now. won't work if JavaScript is off.
-		printf("<script>location.href='projects.php'</script>");
-	}
+	//this shouldn't be necessary. headers are NOT sent yet if this is coded correctly.
+	//function displayProjectPage() {
+	//	//this probably isn't right, but I'll use it for now. won't work if JavaScript is off.
+	//	printf("<script>location.href='projects.php'</script>");
+	//}
 	
 	require_once("../common/common.inc.php");
 	require_once("../classes/Project.class.php");
