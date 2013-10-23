@@ -2,6 +2,8 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Project.class.php");
+	require_once("../classes/Task.class.php");
+	require_once("../classes/Person.class.php");
 	require_once("../common/errorMessages.php");
 	include('header.php'); //add header.php to page
 ?>
@@ -38,22 +40,10 @@
 	}
 	
 ?>
-	<section class="content">
-    <!--added because we need the information to be submitted in a form-->
-      <form action="project-add.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+	<form action="project-add.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+      <section class="content">
       <input type="hidden" name="action" value="project-add"/>
-    <!--end add-->
-		<!--<figure class="client-logo l-col-20">
-			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
-			<fieldset class="client-logo-upload">
-				<legend class="client-logo-title">Upload Client Logo</legend>
-				<header class="client-logo-header">
-					<h1 class="client-logo-title">Upload Client Logo</h1>
-				</header>
-				<input id="client-logo-file" name="client-logo-file" class="client-logo-file" type="file" value="Browse" />
-				<input id="client-logo-upload-btn" name="client-logo-upload-btn" class="client-logo-upload-btn" type="button" value="Upload" /> or <a class="" href="#">Cancel</a>
-			</fieldset>
-		</figure>-->
+		<?php //BEGIN PROJECT ?>
 		<section class="client-detail l-col-80">
         	<fieldset class="client-details-entry">
 				<legend class="client-details-title">Enter project details:</legend>
@@ -82,9 +72,10 @@
 						<label for="client-phone" <?php validateField("project_code", $missingFields)?> class="client-details-label">Project Code (optional):</label>
 						<input id="client-phone" name="project-code" class="client-phone-input" type="text" tabindex="2" value="<?php echo $project->getValueEncoded("project_code")?>" />
 					</li>
+					<?php //took these out for now. Do not expose them in the UI!?>
 					<!--<li class="client-details-item email">
 						<label for="client-email" <?php validateField("client_invoice_method", $missingFields)?> class="client-details-label">Invoice Method:</label>
-						<input id="client-email" name="invoice-method" class="client-email-input" type="text" tabindex="3" value="<?php echo $project->getValueEncoded("project_invoice_method")?>" />
+						<input id="client-email" name="invoice-method" class="client-email-input" type="text" tabindex="3" value="<?php echo $project->getValueEncoded("project_invoice_by")?>" />
 					</li>
 					<li class="client-details-item fax">
 						<label for="client-fax" class="client-details-label">Invoice Rate:</label>
@@ -94,30 +85,81 @@
 						<label for="client-streetAddress" <?php validateField("project_notes", $missingFields)?> class="client-details-label">Project Notes:</label>
 						<textarea id="client-streetAddress" name="project_notes" class="client-streetAddress-input" tabindex="5"><?php echo $project->getValueEncoded("project_notes")?></textarea><br />
 					<!--	<label for="client-city" <?php validateField("project_budget_type", $missingFields)?> class="client-details-label">Project Budget Type:</label>
-						<input id="client-city" name="project-budget-type" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_budget_type")?>" /><br />
+						<input id="client-city" name="project-budget-type" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_budget_by")?>" /><br />
 						<label for="client-zip" <?php validateField("project_budget_hours", $missingFields)?> class="client-details-label">Project Budget Hours:</label>
-						<input id="client-zip" name="project-budget-hours" class="client-zip-input" type="text" tabindex="8" value="<?php echo $project->getValueEncoded("project_budget_hours")?>" /><br />
+						<input id="client-zip" name="project-budget-hours" class="client-zip-input" type="text" tabindex="8" value="<?php echo $project->getValueEncoded("project_budget_total_hours")?>" /><br />
 						<select id="client-country" name="client-country" class="client-country-select" tabindex="9">
 							<option value="">Show project budget?</option>
 							<option selected="selected" value="1">Yes</option>
 							<option selected="selected" value="0">No</option>
-						</select>
-					</li>-->
+						</select-->
+					</li>
 				</ul>
+        	</fieldset>
+		</section>		
+		<?php //BEGIN TASKS 
+			//obviously this is just the beginning of how this should ultimately work.
+		?>
+		<section class="client-detail l-col-80">
+        	<fieldset class="client-details-entry">
+				<legend class="client-details-title">Enter Task details:</legend>
+				<header class="client-details-header">
+					<h1 class="client-details-title">Enter Task details:</h1>
+					<h4 class="required">= Required</h4>
+				</header>
+				<ul class="details-list client-details-list">
+				<?php 
+						//get the taskss out to populate the drop down.
+						list($tasks) = Task::getTasks();
+					?>
+					<li class="client-details-item currency">
+						<label for="client-currency" class="client-details-label">Please choose a task:</label>
+                        <select name="client_id" id="client_currency_index" size="1">    
+						<?php foreach ($tasks as $task) { ?>
+   							<option value="<?php echo $task->getValue("task_id") ?>"><?php echo $task->getValue("task_name")?></option>
+    					<?php } ?>
+    			 </select><br />
+					</li>
+				</ul>
+        	</fieldset>
+		</section>
+		<?php //BEGIN PEOPLE
+		//obviously this is just the beginning of how this should ultimately work.
+		?>
+		<section class="client-detail l-col-80">
+        	<fieldset class="client-details-entry">
+				<legend class="client-details-title">Enter Person details:</legend>
+				<header class="client-details-header">
+					<h1 class="client-details-title">Enter Person details:</h1>
+					<h4 class="required">= Required</h4>
+				</header>
+				<ul class="details-list client-details-list">
+				<?php 
+						//get the people out to populate the drop down.
+						list($people) = Person::getPeople();
+					?>
+					<li class="client-details-item currency">
+						<label for="client-currency" class="client-details-label">Please choose a person:</label>
+                        <select name="person_id" id="client_currency_index" size="1">    
+						<?php foreach ($people as $person) { ?>
+   							<option value="<?php echo $person->getValue("person_id") ?>"><?php echo $person->getValue("person_first_name");echo " " . $person->getValue("person_last_name")?></option>
+    					<?php } ?>
+    			 </select><br />
+					</li>
+				</ul>
+        	</fieldset>
+		</section>
 				<fieldset class="client-details-entry">
 				<ul class="details-list client-details-submit">
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label">All done?</label>
-						<!--modified field to be of type submit instead of button-->
                         <input id="client-add-btn" name="project-add-btn" class="client-add-btn" type="submit" value="+ Add Project" tabindex="11"/> 
-						<!--input id="client-add-btn" name="client-add-btn" class="client-add-btn" type="button" value="+Add Client" tabindex="11" /-->
-						<!--end change--> 
 						 or <a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 			</fieldset>
-</section>
-</form>
+			</section>
+	</form>
 <?php } ?>
 
 <!--PROCESS THE CLIENT & THE CONTACT THAT WERE SUBMITTED--->
