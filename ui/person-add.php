@@ -1,5 +1,4 @@
 <?php
-	require_once("../common/common.inc.php");
 	//require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
 	require_once("../common/common.inc.php");
 	require_once("../common/errorMessages.php");
