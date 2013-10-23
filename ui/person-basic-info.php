@@ -7,13 +7,13 @@
 		//this is now being started in common because of the auth.
 		//session_start();
 		
-	//get the person off the URL if they came in from EDIT and $_GET
+	//get the person off the URL if they came in from EDIT and $_GET.
 	//if they came in from add, use the session variable, since they come in from $_POST.
 	if (isset($_GET['person'])) {
 		$person = unserialize(urldecode($_GET['person']));
 	} elseif (isset($_SESSION['person'])) {
 		$person = unserialize($_SESSION['person']);
-		//what if we get rid of this here?
+		//what if we get rid of the session right here?
 		unset($_SESSION['person']);	}
 	
 		//print_r($person);
@@ -78,10 +78,6 @@ include('header.php'); //add header.php to page
 		<?php
 		//get the image out of the db. it is the default if the user hasn't udpated it yet, this would be the case if
 		//they came from the add screen.
-		//$image = Person::getImage($person->getValue("person_email"));
-		//echo "wklhj";
-		//echo ($person->getValue("person_email"));
-		//print_r($image);
 		?>
 			<img class="person-logo-img small" src="<?php echo "images/" . basename($person->getValue("person_logo_link"))?>" style="height:100px; width:100px;" title="Person Image" alt="Person image" />
 			
@@ -161,9 +157,7 @@ include('header.php'); //add header.php to page
 	$missingFields = array();
 	$errorMessages = array();
 	
-	//this is for the photo upload, and it is in the wrong place.
-		//this is also really hacky. We use a hidden field to get the value back into the post variable
-		//and then spit it back into the database. EW!!
+	//this is for the photo upload.
 	if (isset($_FILES["person-logo-file"]) and $_FILES["person-logo-file"]["error"] == UPLOAD_ERR_OK) {
 		if ( $_FILES["person-logo-file"]["type"] != "image/jpeg") {
 			
@@ -173,6 +167,7 @@ include('header.php'); //add header.php to page
 			$errorMessages[] = "<li>" . getErrorMessage("1","person_logo_link", "upload_problem") . "</li>";
 		} else {
 			//if the user is posting back, add the directory to the post array.
+			//putting the directory here allows us to keep just the filename in the database.
 			$_POST["person_logo_link"] = "images/" . $_FILES["person-logo-file"]["name"];
 		}
 	} else {
@@ -192,8 +187,6 @@ include('header.php'); //add header.php to page
 		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
 		"person_logo_link" => isset($_POST["person_logo_link"]) ? preg_replace("/[^ \/\\-\_a-zA-Z0-9^.]/", "", $_POST["person_logo_link"]) :$_FILES["person_logo_link"],
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
-//		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
-//		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
 	error_log("here is the post<br>");
 	error_log(print_r($_POST, true));
@@ -247,7 +240,7 @@ include('header.php'); //add header.php to page
 			$person->updatePerson($person->getValueEncoded('person_email'));
 			displayPersonInsertForm($errorMessages, $missingFields, $person);
 		} catch (Exception $e) {
-			echo "something went wrong inserting this person into our database.";
+			echo "something went wrong updating this person into our database.";
 			error_log($e);
 			return;
 		}
