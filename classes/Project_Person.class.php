@@ -4,230 +4,51 @@
 //connectivity
 require_once("DataObject.class.php");
 
-class Project extends DataObject {
+class Project_Person extends DataObject {
 	protected $data = array(
-		//these fields are in the project table.
+		//these fields are in the project_person table.
 		"project_id"=>"",
-		"project_code"=>"",
-		"project_name"=>"",
-		"client_id" =>"",
-		"project_billable"=>"",
-		"project_invoice_by"=>"",
-		"project_hourly_rate"=>"",
-		"project_budget_by"=>"",
-		"project_budget_total_fees"=>"",
-		"project_budget_total_hours"=>"",
-		"project_send_email"=>"",
-		"project_show_budget"=>"",
-		"project_budget_includes_expenses"=>"",
-		"project_notes"=>"",
-		"project_archived"=>"",
+		"person_id"=>"",
+		"total_budget_hours"=>"",
 	);
 	
-	//display all information about a project. 
-	//Returned value is an array of project objects. This function returns all projects, archived and not.
-	public static function getProjects() {
-		$conn=parent::connect();
-		$sql="SELECT * FROM " . TBL_PROJECT;
-		try {
-			$st = $conn->prepare($sql);
-			$st->execute();
-			$project=array();
-			foreach ($st->fetchAll() as $row) {
-				$projects[] = new Project($row);
-			}
-			$row=$st->fetch();
-			parent::disconnect($conn);
-			return array($projects);
-		}catch(PDOException $e) {
-			parent::disconnect($conn);
-			die("query failed returning the projects: " . $e->getMessage() . "query is " . $sql);
-		}
-	}
-
-	//return 1 if client has active projects.
-	public static function hasActiveProjects($client_id) {
-		$conn=parent::connect();
-		$sql="SELECT COUNT(*) FROM " . TBL_PROJECT . " WHERE client_id = :client_id";
-		try {
-			$st = $conn->prepare($sql);
-			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
-			$st->execute();
-			$row=$st->fetch();
-			parent::disconnect($conn);
-			return $row;
-		}catch(PDOException $e) {
-			parent::disconnect($conn);
-			die("query failed returning the projects: " . $e->getMessage() . "query is " . $sql);
-		}
-	}
-
-		
-	//return all data for a specific client based on the client_id.
-	//note that in the UI, this will have to be based on the person, not on the client.
-	//returned value is an array of project objects.
-	public static function getProjectByClientId($client_id) {
-		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_PROJECT . " WHERE client_id = '" . $client_id . "'";
-		try {
-			$st = $conn->prepare($sql);
-			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
-			$st->execute();
-			$projects=array();
-			foreach ($st->fetchAll() as $row) {
-				$projects[] = new Project($row);
-			}
-			$row=$st->fetch();
-			parent::disconnect($conn);
-			return $projects;
-		}catch(PDOException $e) {
-			parent::disconnect($conn);
-			die("query failed returning the projects: " . $e->getMessage() . "query is " . $sql);
-		}
-	}
-	//function inserts new client into db. If ADDRESS_CONFIG value is 0, insert the address as a large varchar field, not as individual fields in the database.
-	//it also gets the key for the record being inserted and inserts
-	//a row in the address table if the information was sent.
 	
-	public function insertProject($client_id) {
-		//insert the project into the project table. 	
+	public function insertProjectPerson($person_id, $project_id) {
 		$conn=parent::connect();
-		$sql = "INSERT INTO " . TBL_PROJECT . " (
+		$sql = "INSERT INTO " . TBL_PROJECT_PERSON . " (
 			project_id,
-			project_code,
-			project_name,
-			client_id,
-			project_billable,
-			project_invoice_by,
-			project_hourly_rate,
-			project_budget_by,
-			project_budget_total_fees,
-			project_budget_total_hours,
-			project_send_email,
-			project_show_budget,
-			project_budget_includes_expenses,
-			project_notes,
-			project_archived
+			person_id,
+			total_budget_hours
 			) VALUES (
 			:project_id,
-			:project_code,
-			:project_name,
-			:client_id,
-			:project_billable,
-			:project_invoice_by,
-			:project_hourly_rate,
-			:project_budget_by,
-			:project_budget_total_fees,
-			:project_budget_total_hours,
-			:project_send_email,
-			:project_show_budget,
-			:project_budget_includes_expenses,
-			:project_notes,
-			:project_archived
+			:person_id,
+			:total_budget_hours
 			)";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
-			$st->bindValue(":project_code", $this->data["project_code"], PDO::PARAM_INT);
-			$st->bindValue(":project_name", $this->data["project_name"], PDO::PARAM_STR);
-			$st->bindValue(":client_id", $this->data["client_id"], PDO::PARAM_INT);
-			$st->bindValue(":project_billable", $this->data["project_billable"], PDO::PARAM_STR);
-			$st->bindValue(":project_invoice_by", $this->data["project_invoice_by"], PDO::PARAM_STR);
-			$st->bindValue(":project_hourly_rate", $this->data["project_hourly_rate"], PDO::PARAM_INT);
-			$st->bindValue(":project_budget_by", $this->data["project_budget_by"], PDO::PARAM_STR);
-			$st->bindValue(":project_budget_total_fees", $this->data["project_budget_total_fees"], PDO::PARAM_INT);
-			$st->bindValue(":project_budget_total_hours", $this->data["project_budget_total_hours"], PDO::PARAM_INT);
-			$st->bindValue(":project_send_email", $this->data["project_send_email"], PDO::PARAM_STR);
-			$st->bindValue(":project_show_budget", $this->data["project_show_budget"], PDO::PARAM_STR);
-			$st->bindValue(":project_budget_includes_expenses", $this->data["project_budget_includes_expenses"], PDO::PARAM_STR);
-			$st->bindValue(":project_notes", $this->data["project_notes"], PDO::PARAM_STR);
-			$st->bindValue(":project_archived", $this->data["project_archived"], PDO::PARAM_STR);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->bindValue(":total_budget_hours", $this->data["total_budget_hours"], PDO::PARAM_INT);
 			$st->execute();
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
 			parent::disconnect($conn);
-			die("Query failed on insert of project, sql is $sql " . $e->getMessage());
+			die("Query failed on insert of project_person, sql is $sql " . $e->getMessage());
 		}	
 	}
 	
-	function getClientsProjectsByStatus($ArchiveStatus) {
-		$conn=parent::connect();
-		//$sql = "SELECT distinct(client_id) FROM " . TBL_PROJECT . " WHERE project_archived = '" . $ArchiveStatus . "'";
-		$sql = "SELECT distinct(client.client_name), table_project.client_id FROM " . TBL_CLIENT . " as client JOIN " . TBL_PROJECT . " as table_project on client.client_id = table_project.client_id";
-		
-		try {
-			$st = $conn->prepare($sql);
-			$st->execute();
-			parent::disconnect($conn);
-			//$_clients = array();
-			foreach ($st->fetchAll() as $row) {
-				//return $row;
-				$clients[] = $row;
-			}
-			return $clients;
-		} catch(PDOException $e) {
-			parent::disconnect($conn);
-			die("Query failed on you: " . $e->getMessage());
-		}
-	}
-
-//return the details for the project as an object.
-public static function getProjectByProjectId($project_id) {
-		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_PROJECT . " WHERE project_id = :project_id";
-		try {
-			$st = $conn->prepare($sql);
-			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
-			$st->execute();
-			$row=$st->fetch();
-			parent::disconnect($conn);
-			if ($row) return new Project($row);
-		} catch(PDOException $e) {
-			parent::disconnect($conn);
-			die("Query failed on you: " . $e->getMessage());
-		}
-	}
-
-
-	//update the client record based on the client_id
-	//if we want to break out the address, write the config to do the update later
-	//so that we can update those fields as well.
-	//9/4/13
 	public function updateProject($project_id) {
 		$conn=parent::connect();
-		$sql = "UPDATE " . TBL_PROJECT . " SET
-				project_name = :project_name,
-				project_code = :project_code,
-				client_id = :client_id,
-				project_notes = :project_notes,
-				project_archived = :project_archived,
-				project_billable = :project_billable,
-				project_invoice_by = :project_invoice_by,
-				project_hourly_rate = :project_hourly_rate,
-				project_budget_by = :project_budget_by,
-				project_budget_total_fees = :project_budget_total_fees,
-				project_budget_total_hours = :project_budget_total_hours,
-				project_send_email = :project_send_email,
-				project_show_budget = :project_show_budget,
-				project_budget_includes_expenses = :project_budget_includes_expenses
+		$sql = "UPDATE " . TBL_PROJECT_PERSON . " SET
+				project_id = :project_id,
+				person_id = :person_id,
+				total_budget_hours = :total_budget_hours
 				WHERE project_id = :project_id";
 			try {
 				$st = $conn->prepare($sql);
-				$st->bindValue(":project_name", $this->data["project_name"], PDO::PARAM_STR);
-				$st->bindValue(":project_code", $this->data["project_code"], PDO::PARAM_STR);
-				$st->bindValue(":client_id", $this->data["client_id"], PDO::PARAM_INT);
-				$st->bindValue(":project_notes", $this->data["project_notes"], PDO::PARAM_INT);
-				$st->bindValue(":project_archived", $this->data["project_archived"], PDO::PARAM_INT);
-				$st->bindValue(":project_billable", $this->data["project_billable"], PDO::PARAM_STR);
-				$st->bindValue(":project_invoice_by", $this->data["project_invoice_by"], PDO::PARAM_STR);
-				$st->bindValue(":project_hourly_rate", $this->data["project_hourly_rate"], PDO::PARAM_INT);
-				$st->bindValue(":project_budget_by", $this->data["project_budget_by"], PDO::PARAM_STR);
-				$st->bindValue(":project_budget_total_fees", $this->data["project_budget_total_fees"], PDO::PARAM_INT);
-				$st->bindValue(":project_budget_total_hours", $this->data["project_budget_total_hours"], PDO::PARAM_INT);
-				$st->bindValue(":project_send_email", $this->data["project_send_email"], PDO::PARAM_STR);
-				$st->bindValue(":project_show_budget", $this->data["project_show_budget"], PDO::PARAM_STR);
-				$st->bindValue(":project_budget_includes_expenses", $this->data["project_budget_includes_expenses"], PDO::PARAM_STR);
-				$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
+				$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_STR);
+				$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_STR);
+				$st->bindValue(":total_budget_hours", $this->data["total_budget_hours"], PDO::PARAM_INT);
 				$st->execute();	
 				parent::disconnect($conn);
 			} catch (PDOException $e) {
@@ -235,8 +56,9 @@ public static function getProjectByProjectId($project_id) {
 				die("Query failed on project update: " . $e->getMessage() . " sql is " . $sql);
 			}
 	}	
+}
 	
-	public static function getEnumValues($colName) {
+	/*public static function getEnumValues($colName) {
 		$conn=parent::connect();
 		$sql = "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" . TBL_PROJECT . "' AND COLUMN_NAME = :colName";
 		try {
@@ -253,29 +75,9 @@ public static function getProjectByProjectId($project_id) {
 	}
 
 	
-	
-	//function returns project ID because it is an auto-increment. We need this value
-	//to update the join tables project_person and project_task.
-	public function getProjectId($project_name) {
-		$conn=parent::connect();
-		$sql = "SELECT project_id FROM " . TBL_PROJECT . " WHERE project_name = :project_name";			
-		try {
-			$st = $conn->prepare($sql);
-			$st->bindValue(":project_name", $project_name, PDO::PARAM_STR);
-			$st->execute();
-			$row=$st->fetch();
-			parent::disconnect($conn);
-			if ($row) return $row;
-		} catch (PDOException $e) {
-			parent::disconnect($conn);
-			die("Query failed getting the client id, sql is $sql " . $e->getMessage());
-		}
-	}
-}
-	
 	//return the clients name based on the client_id.
 	//I'll keep this here as a utility function in case we need it.
-	/*public function getClientNameById($client_id) {
+	public function getClientNameById($client_id) {
 		$conn=parent::connect();
 		$sql = "SELECT client_name FROM " . TBL_CLIENT . " WHERE client_id = '" . $client_id . "'";			
 		try {
@@ -291,6 +93,21 @@ public static function getProjectByProjectId($project_id) {
 		}
 	}
 	
+	public function getClientId($client_name) {
+		$conn=parent::connect();
+		$sql = "SELECT client_id FROM " . TBL_CLIENT . " WHERE client_name = '" . $client_name . "'";			
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_name", $client_name, PDO::PARAM_STR);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed getting the client id, sql is $sql " . $e->getMessage());
+		}
+	}
 	
 	//get the available currencies out of the currency table
 	//9/4: Client only needs US here, so this only returns USD at this point, but this is built to handle others.
