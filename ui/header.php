@@ -39,7 +39,7 @@ Edit this file for updating links to pages/screens
 		<ul class="section-menu">
 			<li class="section-menu-item"><a class="section-menu-link" href="projects.php">Projects</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="people.php">Team</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="people.php">People</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="tasks.php">Tasks</a></li>
 		</ul>
 	</nav>
