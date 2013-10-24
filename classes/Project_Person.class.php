@@ -12,6 +12,42 @@ class Project_Person extends DataObject {
 		"total_budget_hours"=>"",
 	);
 	
+	//function returns all of the people associated with a given project (archived and not).
+	public static function getPeopleForProject($project_id) {
+		$conn=parent::connect();
+		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_id IN (SELECT person_id FROM " . TBL_PROJECT_PERSON . " WHERE project_id = :project_id)";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->execute();
+			foreach ($st->fetchAll() as $row) {
+				$people[] = new Person($row);
+			}
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			return array($people);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed returning the people for the project: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	
+	//delete the rows in the table for a given person and a given project.
+	public function deleteProjectPerson($project_id) {
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_PROJECT_PERSON . " WHERE project_id = :project_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on delete of project_person, sql is $sql " . $e->getMessage());
+		}	
+	}
+
+	
 	
 	public function insertProjectPerson($person_id, $project_id) {
 		$conn=parent::connect();
@@ -37,7 +73,7 @@ class Project_Person extends DataObject {
 		}	
 	}
 	
-	public function updateProject($project_id) {
+	public function updateProjectPerson($person_id, $project_id) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_PROJECT_PERSON . " SET
 				project_id = :project_id,
