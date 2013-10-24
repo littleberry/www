@@ -25,7 +25,7 @@
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_project") {
 					editProject();
 				} else {
-					displayProjectEditForm(array(), array(), new Project(array()));
+					displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
 				}
 	
 	/*DISPLAY PROJECT EDIT WEB FORM (displayProjectEditForm)
@@ -40,8 +40,17 @@
 			echo $errorMessage;
 		}
 	}
+	
+	//get  out the project ID, since the user came in from the edit project button.
 	if (isset($_GET["project_id"])) {
-		$project=Project::getProjectByProjectId($_GET["project_id"]);
+		$project_id = $_GET["project_id"];
+		$project=Project::getProjectByProjectId($project_id);
+	} elseif (isset($_POST["project_id"])) {
+		$project_id = $_POST["project_id"];
+		$project=Project::getProjectByProjectId($project_id);
+	} else {
+		echo "You cannot edit a project unless you have provided a project ID.";
+		exit();
 	}
 	
 
@@ -53,7 +62,7 @@ include('header.php'); //add header.php to page
 		<h1 class="page-title">Edit Project Details</h1>
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
-				<li class="page-controls-item link-btn"><a class="add-client-link" href="project-add.php">+ Add Project</a></li>
+				<li class="page-controls-item link-btn"><a class="add-client-link" href="project-add.php">+ Edit Project</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="project-archives.php">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 			</ul>
@@ -63,7 +72,7 @@ include('header.php'); //add header.php to page
 	<!--BEGIN FORM-->
 	<form action="project-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
 	<input type="hidden" name="action" value="edit_project">
-	<input type="hidden" name="project_id" value="<?php echo $_GET["project_id"]?>">
+	<input type="hidden" name="project_id" value="<?php echo $project_id ?>">
 		<section class="client-detail l-col-80">
 			<fieldset class="client-details-entry">
 				<!-- <legend class="client-details-title">Edit client details:</legend> -->
@@ -73,7 +82,7 @@ include('header.php'); //add header.php to page
 				</header>
 				<ul class="details-list client-details-list">
 				<?php 
-						//get the clients out to populate the drop down.
+						//get the clients out to populate the drop down in the edit UI.
 						list($clients) = Client::getClients();
 					?>
 					<li class="client-details-item address">
@@ -88,7 +97,7 @@ include('header.php'); //add header.php to page
    							<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
     					<?php } ?>
     			 </select><br />
-    			 
+  				<?php //took these out for now. Do not expose them in the UI!?>
     			 <!--label for="client-currency" class="project-billable">Invoice Method:</label><br/>
     			 <input id="project-billable" name="project-billable" class="project-billable" value="N" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />This project is not billable<br/>
 						<input id="project-billable" name="project-billable" class="project-billable" value="Y" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />This project is billable and we invoice by<br/-->
@@ -100,10 +109,10 @@ include('header.php'); //add header.php to page
 				</ul>
 			</fieldset>
 		</section>
-		
-		
 <?php //BEGIN TASKS 
 			//obviously this is just the beginning of how this should ultimately work.
+		//retrieve the tasks for this project.
+		
 		?>
 		<section class="client-detail l-col-80">
         	<fieldset class="client-details-entry">
@@ -114,7 +123,15 @@ include('header.php'); //add header.php to page
 				</header>
 				<li class="client-details-item phoneNum">
 					<label for="client-phone" <?php validateField("task_id", $missingFields)?> class="client-details-label">Tasks associated with this project:</label>
-					<input id="client-phone" name="task_id" class="client-phone-input" type="text" tabindex="2" value="" />
+					<?php
+					//get out all of the tasks associated with this project.
+						list($tasksForProject) = Project_Task::getTasksForProject($project_id);
+						$taskList = "";
+						foreach ($tasksForProject as $projectTask) {
+							$taskList = $taskList . $projectTask->getValue("task_id") . ", ";
+						}
+					?>
+					<input id="client-phone" name="task_id" class="client-phone-input" type="text" tabindex="2" value="<?php echo $taskList ?>" />
 				</li>
 				<ul class="details-list client-details-list">
 				<?php 
@@ -144,7 +161,15 @@ include('header.php'); //add header.php to page
 				</header>
 				<li class="client-details-item phoneNum">
 					<label for="client-phone" <?php validateField("person_id", $missingFields)?> class="client-details-label">People assigned to this project:</label>
-					<input id="client-phone" name="person_id" class="client-phone-input" type="text" tabindex="2" value="" />
+					<?php
+					//get out all of the people associated with this project.
+						list($peopleForProject) = Project_Person::getPeopleForProject($project_id);
+						$peopleList = "";
+						foreach ($peopleForProject as $projectPerson) {
+							$peopleList = $peopleList . $projectPerson->getValue("person_id") . ", ";
+						}
+					?>
+					<input id="client-phone" name="person_id" class="client-phone-input" type="text" tabindex="2" value="<?php echo $peopleList ?>" />
 				</li>
 				<ul class="details-list client-details-list">
 				<?php 
@@ -166,7 +191,7 @@ include('header.php'); //add header.php to page
 				<ul class="details-list client-details-submit">
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label">All done?</label>
-                        <input id="client-add-btn" name="project-add-btn" class="client-add-btn" type="submit" value="+ Add Project" tabindex="11"/> 
+                        <input id="client-add-btn" name="project-add-btn" class="client-add-btn" type="submit" value="+ Update Project" tabindex="11"/> 
 						 or <a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
@@ -199,7 +224,7 @@ function editProject() {
 	$missingFields = array();
 	$errorMessages = array();
 		
-	//CREATE THE PROJECT OBJECT ($PROJECT)
+	//EDIT THE PROJECT OBJECT ($PROJECT)
 	$project = new Project( array(
 		//CHECK REG SUBS!!
 		"project_id" => isset($_POST["project_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_id"]) : "",
@@ -219,6 +244,17 @@ function editProject() {
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-notes"]) : "",
 		"project_archived" => isset($_POST["project-archived"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-archived"]) : "",
 	));
+	//edit the project_person object ($project_person)
+	$project_person = new Project_Person( array(
+		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : "",
+		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
+	));
+	//edit the project_task object ($project_task)
+	$project_task = new Project_Task( array(
+		"task_id" => isset($_POST["task_id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["task_id"]) : "",
+		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
+	));
+
 	
 	error_log("here are the values in the POST array");
 	error_log(print_r($_POST,true));
@@ -284,18 +320,34 @@ function editProject() {
 		
 	if ($errorMessages) {
 		error_log("There were errors in the input (errorMessages was not blank. Redisplaying the edit form with missing fields.");
-		//error_log($contact[0]);
-		//error_log(gettype($contact));
 		displayClientAndContactsEditForm($errorMessages, $missingFields, $project);
 	} else {
-		error_log("All of the required fields are there...Updating database...");
-		$project_id=$project->getValue("project_id");
-		$project->updateProject($project_id);		
-		//displayProjectPage();	
-		//take out the re-call of this page, there is an easier way!					
-		header("Location: projects.php");
+		try {
+			$client_id = $project->getValue("client_id");
+			//insert the project into the project table.
+			$project->updateProject($client_id);
+			//insert the project and the associated people into the project_people table.
+			$project_id = Project::getProjectId($project->getValue("project_name"));
+			$person_ids = explode(',', $project_person->getValue("person_id"));
+			//try deleting all of the rows in the table and then adding the new ones, since we don't know how many people will be deleted.
+			Project_Person::deleteProjectPerson($project_id[0]);
+			foreach ($person_ids as $person_id) {			
+				$project_person->insertProjectPerson($person_id, $project_id[0]);
+			}
+			$task_ids = explode(',', $project_task->getValue("task_id"));
+			//try deleting all of the rows in the table and then adding the new ones, since we don't know how many tasks will be deleted.
+			Project_Task::deleteProjectTask($project_id[0]);
+			foreach ($task_ids as $task_id) {				
+				$project_task->insertProjectTask($task_id, $project_id[0]);
+			}
 
+			displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Person(array()));
+		} catch (Error $e) {
+			die("could not insert a project. " . $e->getMessage());
+			
+		}
 	}
+
 }
 
 ?>
