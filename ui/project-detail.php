@@ -44,7 +44,15 @@
 			</ul>
 		</nav>
 	</header>
-	<div class="content">
+	<div class="content tabs">
+		<ul>
+			<li><a href="#overview">Overview</a></li>
+			<li><a href="#tasks">Tasks</a></li>
+			<li><a href="#milestones">Milestones</a></li>
+			<li><a href="#timesheets">Timesheets</a></li>
+			<li><a href="#team">Team</a></li>
+			<li><a href="#settings">Settings</a></li>
+		</ul>
 		<article id="overview" class="entity-detail overview">
 			<header class="entity-details-header">
 				<h1 class="entity-details-title">Overview</h1>
@@ -155,6 +163,6 @@
 <footer id="site-footer" class="site-footer">
 
 </footer>
-
+<script src="project-controls.js" type="text/javascript"></script>
 </body>
 </html>

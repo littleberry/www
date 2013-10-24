@@ -21,11 +21,18 @@
 		<table id="project-list" class="entity-table projects tablesorter">
 			<thead>
 				<tr>
-					<!-- <td><input id="select-all" name="select-all" type="checkbox" value="all" title="Select all projects" /></td> -->
+					<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
+					<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Project(<span></span> filter-match )</th>
+					<th data-placeholder="Try <d">Client</th>
+					<th data-placeholder="Try >=33">Hours/Budget</th><!-- add class="filter-false" to disable the filter in this column -->
+				</tr>
+				<!--
+<tr>
 					<td>Project</td>
 					<td>Client</td>
 					<td>Hours/Budget</td>
 				</tr>
+-->
 			</thead>
 			<tbody>
 			<?php $clientList = Project::getClientsProjectsByStatus(0);
