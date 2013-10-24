@@ -115,16 +115,17 @@
 			<section id="project-info" class="entity-detail">
 				<h2 class="entity-sub-title">Project Info</h2>
 				<ul class="entity-list entity-details-list">
-					<li class="entity-details-item">Name: <?php echo $project_details->getValue("project_name")?></li>
-					<li class="entity-details-item">Client: <a href="#" class="" title="View client's details">Client</a></li>
+					<li class="entity-details-item name">Name: <?php echo $project_details->getValue("project_name")?></li>
+					<li class="entity-details-item client">Client: <a href="#" class="" title="View client's details">Client</a></li>
+					<li class="entity-details-item project-code">Project code: <?php echo $project_details->getValue("project_code")?></li>
 					<?php if ($project_details->getValue("project_archived")) { ?>
-						<li class="entity-details-item">This project is currently archived.</li>
+						<li class="entity-details-item archive-project">This project is currently archived.</li>
 					<?php } else { ?>
-						<li class="entity-details-item">This project is currently active.</li>	
+						<li class="entity-details-item archive-project">This project is currently active.</li>	
 					<?php } ?>
 				</ul>
 				<ul class="page-controls-list team">
-					<li class="page-controls-item link-btn"><a class="" href="#">Edit Project Info</a></li>
+					<li class="page-controls-item link-btn"><a id="edit-project-btn" class="" href="#">Edit Project Info</a></li>
 				</ul>
 			</section>
 			<section id="project-notes" class="entity-detail">
