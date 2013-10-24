@@ -28,7 +28,7 @@
 <?php 			if (isset($_POST["action"]) and $_POST["action"] == "project-add") {
 					processProject();
 				} else {
-					displayProjectInsertForm(array(), array(), new Project(array()), new Project_Person(array()));
+					displayProjectInsertForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
 				} 
 ?>
 <!--DISPLAY PROJECT INSERT WEB FORM--->
@@ -260,23 +260,20 @@
 	} else {
 		try {
 			$client_id = $project->getValue("client_id");
-			error_log("HERE YOU GO!!!" . $client_id);
 			//insert the project into the project table.
 			$project->insertProject($client_id);
 			//insert the project and the associated people into the project_people table.
 			$project_id = Project::getProjectId($project->getValue("project_name"));
 			$person_ids = explode(',', $project_person->getValue("person_id"));
 			foreach ($person_ids as $person_id) {			
-				error_log("NEED TO INSERT THESE VALUES INTO THE PROJECT_PERSON TABLE:" . $person_id . " and " . $project_id[0]);
 				$project_person->insertProjectPerson($person_id, $project_id[0]);
 			}
 			$task_ids = explode(',', $project_task->getValue("task_id"));
 			foreach ($task_ids as $task_id) {				
-				error_log("NEED TO INSERT THESE VALUES INTO THE TASK_PERSON TABLE:" . $task_id . " and " . $project_id[0]);
 				$project_task->insertProjectTask($task_id, $project_id[0]);
 			}
 
-			displayProjectInsertForm(array(), array(), new Project(array()), new Project_Person(array()));
+			displayProjectInsertForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
 		} catch (Error $e) {
 			die("could not insert a project. " . $e->getMessage());
 			
