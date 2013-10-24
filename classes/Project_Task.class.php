@@ -12,6 +12,41 @@ class Project_Task extends DataObject {
 		"total_budget_hours"=>"",
 	);
 	
+	//function returns all of the tasks associated with a given project (archived and not).
+	public static function getTasksForProject($project_id) {
+		$conn=parent::connect();
+		$sql = "SELECT * FROM " . TBL_TASK . " WHERE task_id IN (SELECT task_id FROM " . TBL_PROJECT_TASK . " WHERE project_id = :project_id)";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->execute();
+			foreach ($st->fetchAll() as $row) {
+				$tasks[] = new Task($row);
+			}
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			return array($tasks);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed returning the tasks for the project: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	
+	//delete the rows in the table for a given project.
+	public function deleteProjectTask($project_id) {
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_PROJECT_TASK . " WHERE project_id = :project_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on delete of project_task, sql is $sql " . $e->getMessage());
+		}	
+	}
+
 	
 	public function insertProjectTask($task_id, $project_id) {
 		$conn=parent::connect();
@@ -37,7 +72,7 @@ class Project_Task extends DataObject {
 		}	
 	}
 	
-	public function updateProject($project_id) {
+	public function updateProjectTask($task_id, $project_id) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_PROJECT_TASK . " SET
 				project_id = :project_id,
