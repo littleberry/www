@@ -510,7 +510,7 @@ legend.entity-details-title {
 	margin: .325em 0;
 }
 .entity-details-block {
-	margin-left: 1.5em;
+	margin: .325em 0 .325em 1.5em;
 }
 .entity-details-item.address {
 	margin: 1.125em 0;

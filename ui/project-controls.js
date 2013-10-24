@@ -1,6 +1,30 @@
 ;
 $(document).ready( function() {
-	$(function(){
+	var $projectInfoEdit = $( '#project-info' ).clone( true );
+	$projectInfoEdit.filter( '.entity-sub-title' )
+		.html( 'Edit Project Info' )
+		.filter( '.name' )
+		.html( '<label for="project-name" <?php //validateField("project_name", $missingFields)?> class="entity-details-label">Project Name:</label><input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="8" value="<?php //echo $project->getValueEncoded("project_name")?>" />' )
+		.end()
+		.filter( '.client' )
+		.html( '<label for="client-id" class="entity-details-label">Select the client:</label><input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="8" value="<?php //echo $project->getValueEncoded("project_name")?>" />' )
+		.end()
+		.filter( '.project-code' )
+		.html( '<label for="project-code" <?php validateField("project_code", $missingFields)?> class="entity-details-label">Project code</label><input id="project-code" name="project_code" class="project-code-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_code")?>" />' )
+		.end()
+		.filter( '.link-btn a' )
+		.replaceWith( '<a id="save-project-btn" class="" href="#">Save Project Info</a>' );
+		
+	$( '#edit-project-btn' ).click( function( evt ) {
+		$( '#project-info' ).before( $projectInfoEdit );
+		console.log($projectInfoEdit);
+	});
+
+	$(function() { //tabs interface for project-detail.php
+		$( ".tabs" ).tabs();
+	});
+
+	$(function(){ //table display/sorter with filter/search for projects.php
 		$( "#project-list" ).tablesorter({
 			sortList: [[0,0], [1,0]],
 			widgets: ["filter"],
@@ -61,10 +85,6 @@ $(document).ready( function() {
 				
 			}
 		});
-	});
-	
-	$(function() {
-		$( ".tabs" ).tabs();
 	});
 	
 	
