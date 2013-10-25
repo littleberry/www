@@ -12,6 +12,9 @@
 	$person->authenticate();
 	
 	if ($person->authenticate()) {
+		error_log("SETTING THE SESSION VARIABLE RIGHT HERE!");
+		session_start();
+		$_SESSION['person'] = $person->getValue("person_username");
 		echo 1;
 	} else {
 		echo 2;
