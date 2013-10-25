@@ -9,6 +9,8 @@
 		//$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
 		//header( 'Location: ../usercake/login.php' ) ;
 	//}
+	checkLogin();
+
 	
 	//OVERALL CONTROL
 	//I need this code to be first so I can redirect the page. We may need to do this for others			
@@ -202,12 +204,9 @@ include('header.php'); //add header.php to page
 				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)));			
 			} else {
 				$person->insertPerson();
-				//send the person an email that they have been added
 				include("newUserEmail.php");
-				//I don't think we need this anymore since the session is started in common for auth.
-				//session_start();
-				//$_SESSION['person'] = serialize($person);
-				header("Location: person-basic-info.php");
+				$_SESSION['person'] = serialize($person);
+				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)));
 			}
 		} catch (Exception $e) {
 			echo "something went wrong inserting this person into our database.";
