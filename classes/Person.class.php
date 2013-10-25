@@ -41,6 +41,23 @@ class Person extends DataObject {
 			die("query failed: " . $e->getMessage() );
 		}
 	}
+	//see if this person has set up their password yet.
+	public static function isPasswordSet($person_email) {
+		$conn=parent::connect();
+		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_email = :person_email AND person_password IS NOT NULL";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_email", $person_email, PDO::PARAM_STR);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return 1;
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+
 	
 	//gets people out of the client table. We'll return this as an array and put it in a list once the
 	//data is out.
@@ -255,6 +272,23 @@ public static function getByUserName($person_username) {
 			$st->bindValue(":person_password", $person_password, PDO::PARAM_STR);
 			$st->execute();
 			parent::disconnect($conn);
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage() . " sql is " . $sql);
+		}
+	}
+	
+	//We may find this useful later, but probably not.
+	public static function getPassword($person_email) {
+		$conn=parent::connect();
+		$sql = "SELECT person_password FROM " . TBL_PERSON . " WHERE person_email = :person_email";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_email", $person_email, PDO::PARAM_STR);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
 		} catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("Query failed on you: " . $e->getMessage() . " sql is " . $sql);
