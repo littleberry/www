@@ -32,13 +32,49 @@ class Project_Person extends DataObject {
 		}
 	}
 	
-	//delete the rows in the table for a given person and a given project.
+	//function returns all of the projects associated with a given person (archived and not)
+	public static function getProjectsForPerson($person_id) {
+		$conn=parent::connect();
+		$sql = "SELECT * FROM " . TBL_PROJECT . " WHERE project_id IN (SELECT project_id FROM " . TBL_PROJECT_PERSON . " WHERE person_id = :person_id)";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->execute();
+			//initialize this here, person may have NO projects.
+			$project=array();
+			foreach ($st->fetchAll() as $row) {
+				$project[] = new Project($row);
+			}
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			return array($project);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed returning the project for the person: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	
+	//delete the rows in the table for a person with a given project.
 	public function deleteProjectPerson($project_id) {
 		$conn=parent::connect();
 		$sql = "DELETE FROM " . TBL_PROJECT_PERSON . " WHERE project_id = :project_id";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on delete of project_person, sql is $sql " . $e->getMessage());
+		}	
+	}
+	
+	public function deletePersonProject($person_id) {
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_PROJECT_PERSON . " WHERE person_id = :person_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->execute();
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
