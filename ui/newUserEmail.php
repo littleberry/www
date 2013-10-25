@@ -10,6 +10,7 @@ error_log($message);
 
 require_once("../classes/class.phpmailer.php");
 
+error_log("ATTEMPTING TO SEND MAIL");
 error_log(print_r($_POST,true));
 
 $mail = new PHPMailer();
