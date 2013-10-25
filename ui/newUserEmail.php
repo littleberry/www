@@ -1,6 +1,6 @@
 <?php
 
-//this is breaking, probably has something to do with the host name. Don't bother with it, hard code.
+//the URL here is breaking, probably has something to do with the host name including the port number. Don't bother with it, hard code.
 //$message = "Hello, " . $_POST["person-first-name"] . "! Welcome to Time Tracker! To set up your login, please click this link: <a href=\"" . $_SERVER['HTTP_HOST'] . "/time_tracker/ui/login.php\">Time Tracker</a>";
 $message_part1 = "Hello, " . $_POST["person-first-name"] . "! Welcome to Time Tracker! To set up your login, please go to this link in your browser:";
 $message_part2 = " localhost:8888/time_tracker/ui/change_password.php?emailAddress=" . $_POST["person-email"];
