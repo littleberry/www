@@ -9,7 +9,7 @@
 	//	//header( 'Location: http://strawberry.dev/MBTimeTtracker/usercake/login.php' ) ;
 	//}
 	//I am taking this out temporarily until we come back to it.
-	//checkLogin();
+	checkLogin();
 	//$person = unserialize($_SESSION['person']);
 
 	include('header.php'); //add header.php to page
