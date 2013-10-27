@@ -9,27 +9,16 @@
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Client.class.php");
 
+
 	include('header.php'); //add header.php to page
 ?>
-
-<section id="page-content" class="page-content">
-	<header class="page-header">
-		<h1 class="page-title">Edit Project Details</h1>
-		<nav class="page-controls-nav">
-			<ul class="page-controls-list project">
-				<li class="page-controls-item link-btn"><a class="add-client-link" href="project-add.php">+ Add Project</a></li>
-				<li class="page-controls-item"><a class="view-client-archive-link" href="project-archives.php">View Archives</a></li>
-				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
-			</ul>
-		</nav>
-	</header>
-	<!--OVERALL CONTROL
+<?php	/*OVERALL CONTROL
 		1. first time user comes in, call the displayClientAndContactsEditForm function.
 		2. Set the client and contact objects to the value pulled from the database.
 		3. User clicks on a button to submit the form, call the editClientAndContacts function.
 		4. If required fields are missing in the form, re-display the form with error messages.
-		5. If there are no missing required fields, call Project::updateProject-->	
-<?php 			
+		5. If there are no missing required fields, call Project::updateProject*/	
+ 			
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_project") {
 					editProject();
 				} else {
@@ -53,58 +42,132 @@
 	}
 	
 ?>
+<div id="page-content" class="page-content">
+	<header class="page-header">
+		<h1 class="page-title">Edit Project: Project Name<?php //echo $project_details->getValue("project_name")?></h1>
+		<h2 class="page-sub-title"><a href="#" class="" title="View client's details">Client</a></h2>
+		<nav class="page-controls-nav">
+			<ul class="page-controls-list project">
+				<li class="page-controls-item link-btn">
+				<a class="view-all-link" href="#">Save Project</a></li>
+				<!-- <a class="view-all-link" href="project-edit.php?project_id=<?php //echo $project_id?>">Save Project</a> --></li>
+				<li class="page-controls-item"><a class="view-archive-link" href="project-archives.php">View Archives</a></li>
+				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
+			</ul>
+		</nav>
+	</header>
 
-	<section class="content">
-	<!--BEGIN FORM-->
-	<form action="project-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
-	<input type="hidden" name="action" value="edit_project">
-	<input type="hidden" name="project_id" value="<?php echo $_GET["project_id"]?>">
-		<section class="client-detail l-col-80">
-			<fieldset class="project-details-entry">
-				<header class="entity-details-header client">
-					<h1 class="entity-details-title">Edit project details:</h1>
-					<h4 class="required">= Required</h4>
-				</header>
-				<ul class="details-list entity-details-list project">
-				<?php 
-						//get the clients out to populate the drop down.
-						list($clients) = Client::getClients();
-					?>
-					<li class="entity-details-item name project">
-						<label for="project-name" <?php validateField("project_name", $missingFields)?> class="entity-details-label">Project Name:</label>
-						<input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="8" value="<?php echo $project->getValueEncoded("project_name")?>" />
-					</li>
-					<li class="entity-details-item project-code project">
-						<label for="project-code" <?php validateField("project_code", $missingFields)?> class="entity-details-label">Project Code</label>
-						<input id="project-code" name="project_code" class="project-code-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_code")?>" />
-					</li>
-					<li class="entity-details-item project-client project">
-						<label for="client-id" class="entity-details-label">Select the client:</label>
-                  <select name="client-id" id="project-client-select" size="1">    
-							<?php foreach ($clients as $client) { ?>
-								<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
-							<?php } ?>
-						</select>
-					</li>
-					<li class="entity-details-item invoice-method project">
-						<label for="client-currency" class="entity-details-label">Invoice Method</label>
-						<input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> />
-						<input id="project-billable" name="project-billable1" class="project-billable" type="radio" <?php //setChecked($contacts, "contact_primary", "1") ?> /><br/>
-						<label for="client-streetAddress" <?php validateField("project_notes", $missingFields)?> class="entity-details-label">Project Notes:</label>
-						<textarea id="client-streetAddress" name="project-notes" class="client-streetAddress-input" tabindex="5"><?php echo $project->getValueEncoded("project_notes")?></textarea><br />
-						
 
-						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="entity-details-label">Project is Archived?</label>
-						<label for="client-city" <?php validateField("project_archived", $missingFields)?> class="entity-details-label">						<input id="client-city" name="project-archived" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_archived")?>" /><br />
+	<div class="content">
+		<!--BEGIN FORM-->
+		<form action="project-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+			<input type="hidden" name="action" value="edit_project">
+			<input type="hidden" name="project_id" value="<?php echo $_GET["project_id"]?>">
+			<article class="entity-detail">
+				<fieldset class="entity-details-entry">
+					<header class="entity-details-header project">
+						<h1 class="entity-details-title">Project Settings:</h1>
+						<h4 class="required">= Required</h4>
+					</header>
+					<section id="project-info" class="entity-detail">
+						<h2 class="entity-sub-title">Project Info</h2>
+						<ul class="details-list entity-details-list project">
+							<li class="entity-details-item name project">
+								<label for="project-name" <?php validateField("project_name", $missingFields)?> class="entity-details-label">Project Name:</label>
+								<input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="1" value="<?php echo $project->getValueEncoded("project_name")?>" />
+							</li>
+							<li class="entity-details-item project-code project">
+								<label for="project-code" <?php validateField("project_code", $missingFields)?> class="entity-details-label">Project Code</label>
+								<input id="project-code" name="project_code" class="project-code-input" type="text" tabindex="2" value="<?php echo $project->getValueEncoded("project_code")?>" />
+							</li>
+							<li class="entity-details-item project-client project">
+								<label for="client-id" class="entity-details-label">Select the client:</label>
+		                  <select name="client-id" id="project-client-select" size="1">    
+									<?php 
+										//get the clients out to populate the drop down.
+										list($clients) = Client::getClients();
+										foreach ($clients as $client) { ?>
+										<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
+									<?php } ?>
+								</select>
+							</li>
+							<li class="entity-details-item project-archive project">
+								<label for="project-archived" <?php validateField("project_archived", $missingFields)?> class="entity-details-label">Archived project?</label>
+								<input id="project-archived" name="project-archived" class="project-archive-input" type="text" tabindex="3" value="<?php echo $project->getValueEncoded("project_archived")?>" />
+							</li>
+						</ul>
+					</section>
+					<section id="project-info" class="entity-detail">
+						<h2 class="entity-sub-title">Project Notes</h2>
+						<ul class="details-list entity-details-list project">
+							<li class="entity-details-item project-notes project"><label for="project-notes" <?php validateField("project_notes", $missingFields)?> class="entity-details-label">Project Notes:</label>
+							<textarea id="project-notes" name="project-notes" class="entity-details-block" tabindex="4"><?php echo $project->getValueEncoded("project_notes")?></textarea></li>
+						</ul>
+					</section>
+					<section id="project-info" class="entity-detail">
+						<h2 class="entity-sub-title">Invoicing Method</h2>
+						<ul class="details-list entity-details-list project">
+							<li class="entity-details-item invoicing project">
+								<label for="project-billable" class="entity-details-label">Is this project billable?</label>
+								<input id="project-billable" name="project-billable" class="project-billable" type="radio" tabindex="5"/> Yes.
+								<input id="project-billable" name="project-billable" class="project-billable" type="radio" checked="checked" tabindex="6" /> No.
+							</li>
+							<li class="entity-details-item invoicing project">
+								<label for="invoice-method" class="entity-details-label" tabindex="7">Invoice project by:</label>
+								<select id="invoice-method" name="invoice-method" class="">
+									<option value="task-hourly">Task hourly rate</option>
+									<option value="person-hourly">Person hourly rate</option>
+									<option value="project-hourly">Project hourly rate</option>
+									<option value="no-rate" selected="selected">No hourly rate applied</option>
+								</select>
+							</li>
+							<li class="entity-details-item invoicing project">
+								<label for="project-hourly-rate" class="entity-details-label">Project hourly rate is:</label>
+								<input id="project-hourly-rate" name="project-hourly-rate" class="project-hourly-rate" type="text" tabindex="8"/>
+							</li>
+						</ul>
+					</section>
+					<section id="project-budget" class="entity-detail">
+						<h2 class="entity-sub-title">Budget</h2>
+						<ul class="entity-list entity-details-list">
+							<li class="entity-details-item">
+								<label for="project-budget" class="entity-details-label">Project budget uses:</label>
+								<select id="budget-method" name="budget-method" class="" tabindex="9">
+									<option value="total-hours">Total project hours</option>
+									<option value="total-fees">Total project fees</option>
+									<option value="task-hours">Hours per task</option>
+									<option value="person-hours">Hours per person</option>
+									<option value="no-budget" selected="selected">No budget</option>
+								</select>
+							</li>
+							<li class="entity-details-item">
+								<label for="project-budget-view-permissions" class="entity-details-label">Who can view project?</label>
+								<input id="project-budget-view-permissions" name="project-budget-view-permissions" class="project-budget" type="radio" value="employees" tabindex="10"/> Employees
+								<input id="project-budget-view-permissions" name="project-budget-view-permissions" class="project-budget" type="radio" value="contractors" tabindex="11" /> Contractors
+								<input id="project-budget-view-permissions" name="project-budget-view-permissions" class="project-budget" type="radio" checked="checked" value="all" tabindex="11" /> Both
+							</li>
+							<li class="entity-details-item">
+								<label for="project-budget-email" class="entity-details-label">Send email?</label>
+							</li>
+						</ul>
+					</section>
+					<ul class="page-controls-list team">
+						<li class="entity-details-item submit-btn client">
+							<label for="project-save-btn" class="entity-details-label project">All done?</label>
+							<input id="project-save-btn" name="project-save-btn" class="save-btn" type="submit" value="+ Save Changes" tabindex="12" /> or <a class="" href="#" tabindex="13"><a href="projects.php">Cancel</a>
+					</li>
+					</ul>
+				</fieldset>
+			</article>
+		</form><?php } ?><!--END FORM-->
+	</div>
+	
+<footer id="site-footer" class="site-footer">
 
-				</ul>
-			</fieldset>
-		</section>
-						<input id="contact-save-btn" name="project-save-btn" class="contact-save-btn" type="submit" value="+ Save Project" tabindex="11" /> or
-						<a class="" href="#" tabindex="11">Cancel</a>
-						<!--END FORM-->
-</form><?php } ?>
-		
+</footer>
+<script src="client-controls.js" type="text/javascript"></script>
+</body>
+</html>
 
 <!--PROJECT PROCESSING FUNCTIONS (editProjects();)
 	1. Set up the required fields.
@@ -219,10 +282,3 @@
 }
 
 ?>
-
-<footer id="site-footer" class="site-footer">
-
-</footer>
-<script src="client-controls.js" type="text/javascript"></script>
-</body>
-</html>

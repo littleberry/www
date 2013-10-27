@@ -483,7 +483,7 @@ input[type=button].delete-btn:hover {
 	margin: 0em;
 	padding: 0em;
 }
-.entity-details-header {
+.entity-details-sub-header {
 	position: relative;
 	margin: 0 0 1em 0;
 	border-bottom: 1px solid #A9BFF5;
@@ -511,6 +511,12 @@ legend.entity-details-title {
 }
 .entity-details-block {
 	margin: .325em 0 .325em 1.5em;
+}
+textarea.entity-details-block {
+	vertical-align: text-top;
+	margin: .5em 0;
+	width: 60%;
+
 }
 .entity-details-item.address {
 	margin: 1.125em 0;
