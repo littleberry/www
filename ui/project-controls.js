@@ -1,24 +1,48 @@
 ;
 $(document).ready( function() {
-	var $projectInfoEdit = $( '#project-info' ).clone( true );
-	$projectInfoEdit.filter( '.entity-sub-title' )
-		.html( 'Edit Project Info' )
-		.filter( '.name' )
-		.html( '<label for="project-name" <?php //validateField("project_name", $missingFields)?> class="entity-details-label">Project Name:</label><input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="8" value="<?php //echo $project->getValueEncoded("project_name")?>" />' )
-		.end()
-		.filter( '.client' )
-		.html( '<label for="client-id" class="entity-details-label">Select the client:</label><input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="8" value="<?php //echo $project->getValueEncoded("project_name")?>" />' )
-		.end()
-		.filter( '.project-code' )
-		.html( '<label for="project-code" <?php validateField("project_code", $missingFields)?> class="entity-details-label">Project code</label><input id="project-code" name="project_code" class="project-code-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_code")?>" />' )
-		.end()
-		.filter( '.link-btn a' )
-		.replaceWith( '<a id="save-project-btn" class="" href="#">Save Project Info</a>' );
-		
-	$( '#edit-project-btn' ).click( function( evt ) {
-		$( '#project-info' ).before( $projectInfoEdit );
-		console.log($projectInfoEdit);
+	var $saveBtn = $( '<a id="save-info-btn" class="" href="#">Save Changes</a>' );
+	var $cancelLink = $( '<a id="cancel-link" class="" href="#">Cancel</a>' );
+	var $label = $( '<label class="entity-details-label"></label>' )
+	var $inputText = $( '<input type="text" />' );
+	//var $selectMenu = $( '<select>' );
+	//var $selectOption = $( '<option>' );
+	
+	/*
+$( '#edit-project-btn' ).click( function( evt ) {
+		$( '#project-info .edit' )
+			.each( function( index, elem ) {
+				var useName = $( elem ).attr( 'class' ).split(' ')[1];
+				//console.log(useName);
+				$( this ).replaceWith( function() {
+					return $inputText.clone() 
+						.val( $( this ).text() )
+						.attr( 'name', useName );
+					})
+					
+					.prev().replaceWith( function () {
+						return $label.clone() 
+							.text( $( this ).text() );
+						
+					});
+				//console.log(index);
+			});
+		$( '#project-info .select' )
+			.each( function( index, elem ) {
+				var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
+				var $test = "";
+				$.get( "returnClientMenu.php",
+					{ func: "returnClientMenu" },
+					function(data) {
+						console.log(data)
+						$test = data;
+						
+						return $( this ).replaceWith( $test );
+					});
+			});
+		//console.log($projectInfoEdit);
+		evt.preventDefault();
 	});
+*/
 
 	$(function() { //tabs interface for project-detail.php
 		$( ".tabs" ).tabs();

@@ -8,7 +8,7 @@
 	//	header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
 	//}
 	
-	//RETRIEVE THE CLIENT ID FROM GET OR POST.
+	//RETRIEVE THE PROJECT ID FROM GET OR POST.
 	if (isset ($_GET["project_id"])) {
 		$project_id = $_GET["project_id"];
 	} elseif (isset ($_POST["project_id"])) {
@@ -20,7 +20,7 @@
 	
 	//RETRIEVE THE PROJECT DETAILS TO DISPLAY IN THE UI.
 	$project_details = Project::getProjectByProjectId($project_id);
-	error_log("HERE ARE THE PROJECT DETAILS IN CLIENT DETAILS PAGE:");
+	error_log("HERE ARE THE PROJECT DETAILS IN Project DETAILS PAGE:");
 	error_log(print_r($project_details,true));
 	if (!isset($project_details)) {
     	error_log("The detailed data for this project is not available. Please investigate why this happened, project_details.php, line 20");
@@ -54,7 +54,7 @@
 			<li><a href="#settings">Settings</a></li>
 		</ul>
 		<article id="overview" class="entity-detail overview">
-			<header class="entity-details-header">
+			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Overview</h1>
 			</header>
 			<ul class="entity-list entity-details-list">
@@ -62,15 +62,15 @@
 			</ul>
 		</article>
 		<article id="tasks" class="entity-detail tasks">
-			<header class="entity-details-header">
+			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Tasks</h1>
 			</header>
-			<ul class="entity-list entity-details-list">
+			<ul class="entity-list entity-sub-details-list">
 				<li class="entity-details-item"></li>
 			</ul>
 		</article>
 		<article id="milestones" class="entity-detail milestones">
-			<header class="entity-details-header">
+			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Milestones</h1>
 			</header>
 			<ul class="entity-list entity-details-list">
@@ -78,7 +78,7 @@
 			</ul>
 		</article>
 		<article id="timesheets" class="entity-detail timesheets">
-			<header class="entity-details-header">
+			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Timesheets</h1>
 			</header>
 			<ul class="entity-list entity-details-list">
@@ -86,7 +86,7 @@
 			</ul>
 		</article>
 		<article id="team" class="entity-detail team">
-			<header class="entity-details-header">
+			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Team</h1>
 			</header>
 			<section id="assigned-people" class="entity-detail">
@@ -109,15 +109,15 @@
 			</section>
 		</article>
 		<article id="settings" class="entity-detail settings">
-			<header class="entity-details-header">
+			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Settings</h1>
 			</header>
 			<section id="project-info" class="entity-detail">
 				<h2 class="entity-sub-title">Project Info</h2>
 				<ul class="entity-list entity-details-list">
-					<li class="entity-details-item name">Name: <?php echo $project_details->getValue("project_name")?></li>
-					<li class="entity-details-item client">Client: <a href="#" class="" title="View client's details">Client</a></li>
-					<li class="entity-details-item project-code">Project code: <?php echo $project_details->getValue("project_code")?></li>
+					<li class="entity-details-item">Name: <span class="edit project-name"><?php echo $project_details->getValue("project_name")?></span></li>
+					<li class="entity-details-item">Client: <span class="select client-id"><a href="#" class="" title="View client's details">Client</a></span></li>
+					<li class="entity-details-item">Project code: <span class="edit project-code"><?php echo $project_details->getValue("project_code")?></span></li>
 					<?php if ($project_details->getValue("project_archived")) { ?>
 						<li class="entity-details-item archive-project">This project is currently archived.</li>
 					<?php } else { ?>
