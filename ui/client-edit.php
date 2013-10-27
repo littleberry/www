@@ -250,8 +250,15 @@
 				$contact = new Contact(array());
 				}
 				$i = 0;
+				//there aren't any contacts here. Technically, you shouldn't be able to do this but better safe than sorry.
+				if(!count($contact)) {
+					echo("Huh? You don't have any contacts??");
+				}	
 				foreach ($contact as $contacts) {
+					error_log("LKJDHKLJHLKJHLKJHLKJHLKJHL");
+					error_log(print_r($contact, true));
 					?>
+					
 			<fieldset id="contact-details" class="contact-details-entry">
 				<!-- <legend class="contact-details-title">Edit contact details:</legend> -->
 				<header class="contact-details-header">
