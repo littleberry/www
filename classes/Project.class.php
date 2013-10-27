@@ -151,20 +151,22 @@ class Project extends DataObject {
 	}
 	
 	function getClientsProjectsByStatus($ArchiveStatus) {
+		error_log("ARCHIVE STATUS IS " . $ArchiveStatus);
 		$conn=parent::connect();
-		//$sql = "SELECT distinct(client_id) FROM " . TBL_PROJECT . " WHERE project_archived = '" . $ArchiveStatus . "'";
-		$sql = "SELECT distinct(client.client_name), table_project.client_id FROM " . TBL_CLIENT . " as client JOIN " . TBL_PROJECT . " as table_project on client.client_id = table_project.client_id";
+		//$sql = "SELECT project_name FROM " . TBL_PROJECT . " WHERE project_archived = '" . $ArchiveStatus . "'";
+		$sql = "SELECT distinct(client.client_id), table_project.project_archived, client.client_name, table_project.project_name, table_project.project_id FROM " . TBL_CLIENT . " as client JOIN " . TBL_PROJECT . " as table_project on client.client_id = table_project.client_id WHERE table_project.project_archived = :ArchiveStatus";
 		
 		try {
 			$st = $conn->prepare($sql);
+			$st->bindValue(":ArchiveStatus", $ArchiveStatus, PDO::PARAM_STR);
 			$st->execute();
 			parent::disconnect($conn);
-			//$_clients = array();
+			$projects = array();
 			foreach ($st->fetchAll() as $row) {
 				//return $row;
-				$clients[] = $row;
+				$projects[] = new Project($row);
 			}
-			return $clients;
+			return $projects;
 		} catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("Query failed on you: " . $e->getMessage());
@@ -271,7 +273,29 @@ public static function getProjectByProjectId($project_id) {
 			die("Query failed getting the client id, sql is $sql " . $e->getMessage());
 		}
 	}
+	
+	//update the project archive. This must be called in project!
+	public function setArchiveFlag($flag, $project_id) {
+	error_log("SETTING FLAG TO " . $flag . " AND PROJECT ID TO " . $project_id );
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_PROJECT . " SET
+			project_archived = :project_archived
+			WHERE project_id = :project_id";
+	try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->bindValue(":project_archived", $flag, PDO::PARAM_INT);
+			$st->execute();	
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on update: " . $e->getMessage());
+		}
+
+	}
+
 }
+
 	
 	//return the clients name based on the client_id.
 	//I'll keep this here as a utility function in case we need it.
