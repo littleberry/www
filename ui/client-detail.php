@@ -14,6 +14,7 @@
 	}
 	
 	//RETRIEVE ALL OF THE CONTACTS FOR THIS CLIENT. NOTE THIS IS ALL CLIENTS, ACTIVE AND ARCHIVED.
+	$contacts = "";
 	$contacts = Contact::getContacts($client_id);
 	//RETRIEVE THE CLIENT DETAILS TO DISPLAY IN THE UI.
 	$client_details = Client::getClient($client_id);
@@ -68,6 +69,7 @@
 			</header>
            <?php 
            //DISPLAY THE CONTACT DETAILS FOR THIS CLIENT.
+           $contact = "";
            foreach ($contacts as $contact) { ?>
 			<ul class="details-list contact-details-list">
 				<li class="contact-details-item name"><?php echo $contact->getValue("contact_name")?></li>
