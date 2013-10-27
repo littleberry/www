@@ -13,6 +13,7 @@
 	//I need this code to be first so I can redirect the page. We may need to do this for others
 	//in this page, display is integrated with the add feature (no beeg)
 		
+		$processType = "A";
 		if (isset($_GET["task_id"]) && $_GET["task_id"] == "") {
 			$processType = "A";
 		} elseif (isset($_GET["task_id"])) {
@@ -59,6 +60,7 @@ include('header.php'); //add header.php to page
 						<label for="client-name" <?php validateField("task_name", $missingFields)?> class="client-details-label">Task Name:</label>
 						<?php 
 						//DOCUMENT THIS, IT'S TERRIBLE.
+						$tasker = "";
 						if ($processType == 'A') {
 							$taskName = $task->getValueEncoded("task_name");
 						} else {
