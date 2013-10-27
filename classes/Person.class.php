@@ -41,7 +41,7 @@ class Person extends DataObject {
 			die("query failed: " . $e->getMessage() );
 		}
 	}
-	//see if this person has set up their password yet.
+	//see if this person has set up their password yet. this drives if we resend them an invitation or have them change the password.
 	public static function isPasswordSet($person_email) {
 		$conn=parent::connect();
 		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_email = :person_email AND person_password IS NOT NULL";
