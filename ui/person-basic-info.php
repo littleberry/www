@@ -3,19 +3,30 @@
 	require_once("../common/common.inc.php");
 	require_once("../common/errorMessages.php");
 	require_once("../classes/Person.class.php");
-	
-		//this is now being started in common because of the auth.
-		//session_start();
+	require_once("../classes/Project.class.php");
+	require_once("../classes/Project_Person.class.php");
+				
+	checkLogin();
+
 		
-	//get the person off the URL if they came in from EDIT and $_GET
-	//if they came in from add, use the session variable, since they come in from $_POST.
+	//get the person off the URL if they came in from the add page.
+	//if they came in from the login page, use the session variable since it has already been set.
 	if (isset($_GET['person'])) {
+		error_log("AUTH: User came in from GET and the EDIT SCREEN.");
 		$person = unserialize(urldecode($_GET['person']));
+		error_log("AUTH: PERSON VALUE IS " . print_r($person,true));
+		//set project to null because it's blank.
+		$project = "";
 	} elseif (isset($_SESSION['person'])) {
-		$person = unserialize($_SESSION['person']);
-		//what if we get rid of this here?
-		unset($_SESSION['person']);	}
-	
+		error_log("AUTH: User's session var is set because they logged in.");
+		//we're not going to set this here.
+		//$person = $_SESSION['person'];
+		$project = "";
+		//what if we get rid of the session right here?
+	} else {
+		echo "something is terribly wrong, we have no information about this user!!";
+		exit;
+	}	
 		//print_r($person);
 		//removed auth via userCake re:keith 10/17
 		//if(!isUserLoggedIn()){
@@ -27,16 +38,24 @@
 	//OVERALL CONTROL
 	//I need this code to be first so I can redirect the page. We may need to do this for others			
 		if (isset($_POST["action"]) and $_POST["action"] == "person-basic-info") {
-				processPerson();
+				if (isset($_POST["person-add-btn"]) and $_POST["person-add-btn"] == "Save Person") {
+					processPerson(0);
+				} elseif (isset($_POST["person-add-btn"]) and $_POST["person-add-btn"] == "Save Projects") {
+					processPerson(1);
+				} elseif (isset($_POST["person-add-btn"]) and $_POST["person-add-btn"] == "Change Password") {
+					processPerson(2);
+				} elseif (isset($_POST["person-add-btn"]) and $_POST["person-add-btn"] == "Resend Invitation") {
+					processPerson(3);
+				}
 		} else {
-				displayPersonInsertForm(array(), array(), $person);
+				displayPersonInsertForm(array(), array(), $person, $project);
 		} 
 ?>
 
 
 <!--DISPLAY PERSON INSERT WEB FORM--->
-<?php function displayPersonInsertForm($errorMessages, $missingFields, $person) { 
-
+<?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $project) { 
+	
 	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
@@ -47,8 +66,25 @@
 	
 include('header.php'); //add header.php to page
 ?>
+<script type="text/javascript">
+function FillBilling(f) {
+    //window.alert(f);
+    f.projectidselect.value = f.projectidselect.value + f.projectid.value + ",";
+    //f.shippingname.value;
+    //f.billingcity.value = f.shippingcity.value;
+    //return false;
+}
+</script>
 <section id="page-content" class="page-content">
 	<header class="page-header">
+	<figure class="person-logo l-col-20">
+		<?php
+		//get the image out of the db. it is the default if the user hasn't udpated it yet, this would be the case if
+		//they came from the add screen.
+		?>
+			<img class="person-logo-img small" src="<?php echo "images/" . basename($person->getValue("person_logo_link"))?>" style="height:100px; width:100px;" title="Person Image" alt="Person image" />
+			
+		</figure>
 		<h1 class="page-title"><?php echo $person->getValueEncoded("person_first_name")?>'s Basic Info</h1>
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
@@ -60,6 +96,11 @@ include('header.php'); //add header.php to page
 	</header>
 	<section class="content">
     <!--added because we need the information to be submitted in a form-->
+    <?php
+    /*OK, NOT SURE HOW THIS UI IS GOING TO END UP.*/
+    /*SO, I'M GOING TO LEAVE THIS AS ONE FORM */
+    /*AND PUT IT INTO TWO FORMS IF THE UI REQUIRES THAT.*/
+    ?>
       <form action="person-basic-info.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
       <input type="hidden" name="action" value="person-basic-info"/>
     <!--end add-->
@@ -74,18 +115,6 @@ include('header.php'); //add header.php to page
 				<input id="client-logo-upload-btn" name="client-logo-upload-btn" class="client-logo-upload-btn" type="button" value="Upload" /> or <a class="" href="#">Cancel</a>
 			</fieldset>
 		</figure>-->
-		<figure class="person-logo l-col-20">
-		<?php
-		//get the image out of the db. it is the default if the user hasn't udpated it yet, this would be the case if
-		//they came from the add screen.
-		//$image = Person::getImage($person->getValue("person_email"));
-		//echo "wklhj";
-		//echo ($person->getValue("person_email"));
-		//print_r($image);
-		?>
-			<img class="person-logo-img small" src="<?php echo "images/" . basename($person->getValue("person_logo_link"))?>" style="height:100px; width:100px;" title="Person Image" alt="Person image" />
-			
-		</figure>
 
 		<section class="client-detail l-col-80">
         	<fieldset class="client-details-entry">
@@ -139,31 +168,119 @@ include('header.php'); //add header.php to page
 				<input type="hidden" name="person-logo-file" value="<?php echo $person->getValue("person_logo_link")?>">
 				<input id="person-logo-file" name="person-logo-file" class="person-logo-file" type="file" value="browse" tabindex="21" />
 			</fieldset>
-				</ul>
+			
 				<fieldset class="client-details-entry">
 				<ul class="details-list client-details-submit">
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label">All done?</label>
 						<!--modified field to be of type submit instead of button-->
-                        <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Save" tabindex="11"/> 
+                        <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Save Person" tabindex="11"/> 
+						 or <a class="" href="#" tabindex="11">Cancel</a>
+					</li>
+				</ul>
+			</fieldset>
+			
+	<section class="content">
+		<fieldset class="client-details-entry">
+				<legend class="client-details-title"><?php echo $person->getValueEncoded("person_first_name")?>'s Projects</legend>
+				<header class="client-details-header">
+					<h1 class="client-details-title"><?php echo $person->getValueEncoded("person_first_name")?>'s Projects</h1>
+				</header>
+				
+        	</fieldset>
+
+
+		<form action="person-basic-info.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+		<label for="client-zip" class="client-details-label"></label>
+		<input id="projectidselect" name="projectidselect" class="projectidselect" type="text" tabindex="8" value=""><button name="Assign Project" onclick="FillBilling(this.form); return false;" >Assign Projects</button>
+		<br />
+		<?php
+					list($projects) = Project::getProjects();?>
+					<select name="projectid" id="projectid" size="1">    
+						<?php foreach ($projects as $project) { ?>
+   							<option value="<?php echo $project->getValue("project_id") ?>"><?php echo $project->getValue("project_name")?></option>
+    					<?php } ?>
+    			 </select><br />
+
+					<ul>
+					<?php //THURS: write the sql query to get all of this person's assigned projects and display them.
+					//also, update the project_person table with new assignments.
+					//get out all of the people associated with this project.
+					list($projectForPerson) = Project_Person::getProjectsForPerson($person->getValue("person_id"));
+					if ($projectForPerson) {
+						echo("<br/>" . $person->getValue("person_first_name") . " has the following assigned projects:<br/>");
+						foreach ($projectForPerson as $projectPerson) {?>
+							<li class="client-details-item phoneNum"><?php echo $projectPerson->getValue("project_name")?></li>
+						<?php } ?>
+					<?php } else {
+							echo("<br/>" . $person->getValue("person_first_name") . " doesn't have any projects assigned yet.");
+						}
+					?>
+					</ul>
+				<fieldset class="client-details-entry">
+				<ul class="details-list client-details-submit">
+					<li class="client-details-item submit-client">
+						<label for="client-add-btn" class="client-details-label">All done?</label>
+						<!--modified field to be of type submit instead of button-->
+                        <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Save Projects" tabindex="11"/> 
 						 or <a class="" href="#" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 			</fieldset>
 </section>
+<header class="page-header">
+<?php
+	//if the password is not set up, resend the invitation. Otherwise, change the password.
+	//use the email here, since it is unique.
+	$password_is_set = Person::isPasswordSet($person->getValue("person_email"));
+	if (!$password_is_set) {
+	?>
+			<h1 class="page-title">Resend <?php echo $person->getValueEncoded("person_first_name")?>'s Invitation</h1>
+			<ul class="details-list client-details-submit">
+					<li class="client-details-item submit-client">
+						<label for="client-add-btn" class="client-details-label"></label>
+                        <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Resend Invitation" tabindex="11"/> 
+						 or <a class="" href="#" tabindex="11">Cancel</a>
+					</li>
+				</ul>
+	<?php } else {?>
+			<h1 class="page-title">Change Your Password</h1>
+	<input type="hidden" name="emailAddress" value="<?php echo $person->getValue("person_email")?>"/>
+	<div style="width:30em;">
+    <label for="password1" class="required">Choose a password</label>
+    <input type="password" name="password1" id="password1" value="" /><br/>
+    <label for="password2" class="required">Retype password</label>
+    <input type="password" name="password2" id="password2" value="" /><br/>
+    <div style="clear:both">
+    </div>
+    </div>
+			<ul class="details-list client-details-submit">
+					<li class="client-details-item submit-client">
+						<label for="client-add-btn" class="client-details-label"></label>
+                        <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Change Password" tabindex="11"/> 
+						 or <a class="" href="#" tabindex="11">Cancel</a>
+					</li>
+				</ul>
+	<?php } ?>	
+	</header>
+
 </form>
 <?php } ?>
 
 <!--PROCESS THE CLIENT & THE CONTACT THAT WERE SUBMITTED--->
-<?php function processPerson() {
+<?php function processPerson($var) {
  	//these are the required project fields in this form
-	$requiredFields = array("person_first_name","person_last_name","person_email");
-	$missingFields = array();
-	$errorMessages = array();
+	if ($var == 0) {
+		$requiredFields = array("person_first_name","person_last_name","person_email");
+		$missingFields = array();
+		$errorMessages = array();
+	} elseif ($var >= 1) {
+		$requiredFields = array();
+		$missingFields = array();
+		$errorMessages = array();
+	}
 	
-	//this is for the photo upload, and it is in the wrong place.
-		//this is also really hacky. We use a hidden field to get the value back into the post variable
-		//and then spit it back into the database. EW!!
+	//this is for the photo upload.
 	if (isset($_FILES["person-logo-file"]) and $_FILES["person-logo-file"]["error"] == UPLOAD_ERR_OK) {
 		if ( $_FILES["person-logo-file"]["type"] != "image/jpeg") {
 			
@@ -173,6 +290,7 @@ include('header.php'); //add header.php to page
 			$errorMessages[] = "<li>" . getErrorMessage("1","person_logo_link", "upload_problem") . "</li>";
 		} else {
 			//if the user is posting back, add the directory to the post array.
+			//putting the directory here allows us to keep just the filename in the database.
 			$_POST["person_logo_link"] = "images/" . $_FILES["person-logo-file"]["name"];
 		}
 	} else {
@@ -180,6 +298,7 @@ include('header.php'); //add header.php to page
 	}
 
 	
+/* KEEP THINGS IN ONE FORM FOR NOW*/
 	//create the project object ($project)
 	$person = new Person( array(
 		//CHECK REG SUBS!!
@@ -192,13 +311,43 @@ include('header.php'); //add header.php to page
 		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
 		"person_logo_link" => isset($_POST["person_logo_link"]) ? preg_replace("/[^ \/\\-\_a-zA-Z0-9^.]/", "", $_POST["person_logo_link"]) :$_FILES["person_logo_link"],
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
-//		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
-//		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
+	
+	//use this for the project section, since this is all one page and part of the page is displaying the person's project information.
+	$project = new Project( array(
+		//CHECK REG SUBS!!
+		/*PLEASE NOTE THAT PROJECTIDSELECT VALUE HERE IS JUST TEMPORARY SO I CAN GET THINGS DONE WITH JAVASCRIPT TEMPORARY HACK***/
+		"project_id" => isset($_POST["projectidselect"]) ? preg_replace("/[^ \,0-9]/", "", $_POST["projectidselect"]) : "",
+		//not available for edit.
+		"project_code" => isset($_POST["project_code"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_code"]) : "",
+		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
+		"client_id" => isset($_POST["client-id"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-id"]) : "",
+		"project_billable" => isset($_POST["project-billable"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project-billable"]) : "",
+		"project_invoice_by" => isset($_POST["project-invoice-by"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-invoice-by"]) : "",
+		"project_hourly_rate" => isset($_POST["project-hourly_rate"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-hourly_rate"]) : "",
+		"project_budget_by" => isset($_POST["project-budget-by"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-budget-by"]) : "",
+		"project_budget_total_fees" => isset($_POST["project-budget-total-fees"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-total-fees"]) : "",
+		"project_budget_total_hours" => isset($_POST["project-budget-total-hours"])? preg_replace("/[^0-9]/", "", $_POST["project-budget-total-hours"]) : "",
+		"project_send_email" => isset($_POST["project-send-email"])? preg_replace("/[^0-9]/", "", $_POST["project-send-email"]) : "",
+		"project_show_budget" => isset($_POST["project-show-budget"])? preg_replace("/[^0-9]/", "", $_POST["project-show-budget"]) : "",
+		"project_budget_includes_expenses" => isset($_POST["project-budget-includes-expenses"])? preg_replace("/[^0-9]/", "", $_POST["project-budget-includes-expenses"]) : "",
+		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-notes"]) : "",
+		"project_archived" => isset($_POST["project-archived"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-archived"]) : "",
+	));
+	
+	//edit the project_person object ($project_person)
+	$project_person = new Project_Person( array(
+		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : "",
+		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
+	));
+	
+	
 	error_log("here is the post<br>");
 	error_log(print_r($_POST, true));
-	error_log("here is the project array.<br>");
+	error_log("here is the person array.<br>");
 	error_log(print_r($person,true));
+	error_log("here is the project array.<br>");
+	error_log(print_r($project,true));
 	
 	
 //error messages and validation script
@@ -240,16 +389,67 @@ include('header.php'); //add header.php to page
 	}*/
 		
 	if ($errorMessages) {
-		displayPersonInsertForm($errorMessages, $missingFields, $person);
+		displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
 	} else {
 		//lets put this into a try/catch for added security.
-		try {
-			$person->updatePerson($person->getValueEncoded('person_email'));
-			displayPersonInsertForm($errorMessages, $missingFields, $person);
-		} catch (Exception $e) {
-			echo "something went wrong inserting this person into our database.";
-			error_log($e);
-			return;
+		if ($var == 0) {
+			try {
+				$person->updatePerson($person->getValueEncoded('person_email'));
+				displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+			} catch (Exception $e) {
+				echo "something went wrong updating this person into our database.";
+				error_log($e);
+				return;
+			}
+		} elseif ($var == 1) {
+			try {
+				//print_r($person);
+				//print_r($project);
+				$person_id = Person::getByEmailAddress($person->getValue("person_email"));
+				$project_ids = explode(',', $project->getValue("project_id"));
+				//echo $person->getValue("person_id");
+				//update the person's projects here, inserting them into the project_person table.
+				Project_Person::deletePersonProject($person_id->getValue("person_id"));
+				foreach ($project_ids as $project_id) {	
+					if (($project_id) && ($person_id)) {
+						error_log("inserting " . $project_id . " and " . $person_id->getValue("person_id"));
+						$project_person->insertProjectPerson($person_id->getValue("person_id"), $project_id);
+					}
+				}
+			} catch (Exception $e) {
+				echo "something went wrong with the project add.";
+			}
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+		} elseif ($var == 2) {
+			//can we just put the password validation check here? HA HA HA HA HA that's funny!!
+			try {
+				if (!$_POST["password1"]) {
+					echo "please enter a password in field 1.";
+					exit;
+				}
+				if (!$_POST["password2"]) {
+					echo "please enter a password in field 2.";
+					exit;
+				}
+				//this is in the clear. BAD, but leave it here for now.
+				$person_password = $_POST["password1"];
+				$person_email = $person->getValue("person_email"); 
+				//$password = Person::getPassword($person_email);
+				//echo $password["person_password"];
+				Person::setUserPassword($person_email, $person_password);
+				//$password = Person::getPassword($person_email);
+				//echo $password["person_password"];
+			} catch (Exception $e) {
+				echo "something went wrong updating the user's password.";
+			}
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+		} elseif ($var == 3) {
+			try {
+				include("newUserEmail.php");		
+			} catch (Exception $e) {
+				echo "could not send the email for some reason.";
+			}
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
 		}
 	}
 } 

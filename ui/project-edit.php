@@ -8,7 +8,10 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Client.class.php");
-
+	require_once("../classes/Project_Person.class.php");
+	require_once("../classes/Project_Task.class.php");
+	require_once("../classes/Project.class.php");
+	require_once("../classes/Task.class.php");
 
 	include('header.php'); //add header.php to page
 ?>
@@ -22,7 +25,7 @@
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_project") {
 					editProject();
 				} else {
-					displayProjectEditForm(array(), array(), new Project(array()));
+					displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
 				}
 	
 	/*DISPLAY PROJECT EDIT WEB FORM (displayProjectEditForm)
@@ -37,10 +40,20 @@
 			echo $errorMessage;
 		}
 	}
+	
+	//get  out the project ID, since the user came in from the edit project button.
 	if (isset($_GET["project_id"])) {
-		$project=Project::getProjectByProjectId($_GET["project_id"]);
+		$project_id = $_GET["project_id"];
+		$project=Project::getProjectByProjectId($project_id);
+	} elseif (isset($_POST["project_id"])) {
+		$project_id = $_POST["project_id"];
+		$project=Project::getProjectByProjectId($project_id);
+	} else {
+		echo "You cannot edit a project unless you have provided a project ID.";
+		exit();
 	}
 	
+
 ?>
 <div id="page-content" class="page-content">
 	<header class="page-header">
@@ -154,38 +167,145 @@
 					<ul class="page-controls-list team">
 						<li class="entity-details-item submit-btn client">
 							<label for="project-save-btn" class="entity-details-label project">All done?</label>
-							<input id="project-save-btn" name="project-save-btn" class="save-btn" type="submit" value="+ Save Changes" tabindex="12" /> or <a class="" href="#" tabindex="13"><a href="projects.php">Cancel</a>
-					</li>
+							<input id="project-save-btn" name="project-save-btn" class="save-btn" type="submit" value="+ Save Changes" tabindex="12" /> or <a class="" href="projects.php" tabindex="13">Cancel</a>
+						</li>
 					</ul>
 				</fieldset>
 			</article>
-		</form><?php } ?><!--END FORM-->
+			<article id="tasks" class="entity-detail tasks">
+				<fieldset class="entity-details-entry">
+					<header class="entity-details-header project">
+						<h1 class="entity-details-title">Project Tasks:</h1>
+						<h4 class="required">= Required</h4>
+					</header>
+					<?php //BEGIN TASKS 
+							//obviously this is just the beginning of how this should ultimately work.
+							//retrieve the tasks for this project.
+					?>
+					<ul class="entity-list entity-sub-details-list">
+						<li class="entity-details-item">
+							<label for="" <?php validateField("task_id", $missingFields)?> class="entity-details-label">Tasks currently assigned to project:</label>
+							<table id="task-list" class="entity-table tasks tablesorter">
+								<thead>
+									<tr>
+										<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
+										<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Task(<span></span> filter-match )</th>
+										<th class="filter-false" data-placeholder="Try <d">Remove From Project</th>
+									</tr>
+								</thead>
+								<tbody>
+								<?php
+									//get out all of the tasks associated with this project.
+									list($tasksForProject) = Project_Task::getTasksForProject($project_id);
+									//$taskList = "";
+								
+									foreach ($tasksForProject as $projectTask) { ?>
+										<tr>
+											<td><?php	echo $projectTask->getValue("task_name"); ?></td>
+											<td><a href="#" class="remove-btn"></a></td>
+										</tr>
+									<?php } ?>
+								</tbody>
+							</table>
+						</li>
+						<li class="entity-details-item">
+							<label for="task_ids" class="entity-details-label">Add additional tasks:</label>
+							<?php 
+								//get the taskss out to populate the drop down.
+								list($tasks) = Task::getTasks();
+							?>
+							<select name="task_ids" id="task_ids" size="1">    
+								<?php foreach ($tasks as $task) { ?>
+		   						<option value="<?php echo $task->getValue("task_id") ?>"><?php echo $task->getValue("task_name")?></option>
+		    					<?php } ?>
+			 				</select>
+						</li>
+					</ul>
+				</fieldset>
+			</article>
+			<article id="people" class="entity-detail tasks">
+				<fieldset class="entity-details-entry">
+					<header class="entity-details-header people">
+						<h1 class="entity-details-title">Project Team:</h1>
+						<h4 class="required">= Required</h4>
+					</header>
+					<ul class="entity-list entity-sub-details-list">
+						<li class="entity-details-item">
+							<label for="" <?php validateField("person_id", $missingFields)?> class="entity-details-label">People currently assigned to project:</label>
+							<?php //BEGIN PEOPLE
+								//obviously this is just the beginning of how this should ultimately work.
+							?>
+							<table id="people-list" class="entity-table people tablesorter">
+								<thead>
+									<tr>
+										<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
+										<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Team Member(<span></span> filter-match )</th>
+										<th class="filter-false" data-placeholder="Try <d">Remove From Project</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php
+										//get out all of the people associated with this project.
+										list($peopleForProject) = Project_Person::getPeopleForProject($project_id);
+										//$peopleList = "";
+										foreach ($peopleForProject as $projectPerson) { ?>
+											<tr>
+												<td><?php echo $projectPerson->getValue("person_id"); ?></td>
+												<td><a href="#" class="remove-btn"></a></td>
+											</tr>
+										<?php } ?>
+								</tbody>
+							</table>
+						</li>
+						<li class="entity-details-item">
+							<label for="person_ids" class="entity-details-label">Add additional people:</label>
+							<?php 
+								//get the people out to populate the drop down.
+								list($people) = Person::getPeople();
+							?>
+							<select name="people_ids" id="people_ids" size="1">    
+								<?php foreach ($people as $person) { ?>
+		   						<option value="<?php echo $person->getValue("person_id") ?>"><?php echo $person->getValue("person_first_name");echo " " . $person->getValue("person_last_name")?></option>
+		    					<?php } ?>
+			 				</select>
+						</li>
+					</ul>
+					<ul class="page-controls-list team">
+						<li class="entity-details-item submit-btn client">
+							<label for="project-save-btn" class="entity-details-label project">All done?</label>
+							<input id="project-save-btn" name="project-save-btn" class="save-btn" type="submit" value="+ Save Changes" tabindex="12" /> or <a class="projects.php" href="#" tabindex="13">Cancel</a>
+						</li>
+					</ul>
+				</fieldset>
+			</article>
+		</form><!--END FORM-->
 	</div>
-	
+</div>
 <footer id="site-footer" class="site-footer">
 
 </footer>
 <script src="client-controls.js" type="text/javascript"></script>
 </body>
-</html>
+</html><?php } ?>
 
-<!--PROJECT PROCESSING FUNCTIONS (editProjects();)
-	1. Set up the required fields.
-	2. Create the object based on the values that were submitted the last time the user submitted the form.
-	3. Set up the required fields in the $requiredFields array.
-	4. Compare the existence of the fields in the objects (based on the $_POST values) with the fields in the $requiredFields array. If
-	any are missing, put the fields into the $missingFields[] array.
-	5. If the $missingFields array exists, loop through them and call the error message. If there are NO missing fields, still call the error message for the NON missing field errors (email, phone, etc).
-	6. If there are error messages, call displayProjectEditForm with the error messages, the missing fields, and all the data for the object and the whole thing starts over again.
-	7. If there are no errors, update the database with the new project information.
-	8. If all went well, display the project details page.
-	-->
-<?php function editProject() {
+<?php 
+function editProject() {
+	//PROJECT PROCESSING FUNCTIONS (editProjects();)
+	//1. Set up the required fields.
+	//2. Create the object based on the values that were submitted the last time the user submitted the form.
+	//3. Set up the required fields in the $requiredFields array.
+	//4. Compare the existence of the fields in the objects (based on the $_POST values) with the fields in the $requiredFields array. If
+	//any are missing, put the fields into the $missingFields[] array.
+	//5. If the $missingFields array exists, loop through them and call the error message. If there are NO missing fields, still call the error message for the NON missing field errors (email, phone, etc).
+	//6. If there are error messages, call displayProjectEditForm with the error messages, the missing fields, and all the data for the object and the whole thing starts over again.
+	//7. If there are no errors, update the database with the new project information.
+	//8. If all went well, display the project details page.
+
 	$requiredFields = array("project_name");
 	$missingFields = array();
 	$errorMessages = array();
 		
-	//CREATE THE PROJECT OBJECT ($PROJECT)
+	//EDIT THE PROJECT OBJECT ($PROJECT)
 	$project = new Project( array(
 		//CHECK REG SUBS!!
 		"project_id" => isset($_POST["project_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_id"]) : "",
@@ -205,6 +325,17 @@
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-notes"]) : "",
 		"project_archived" => isset($_POST["project-archived"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-archived"]) : "",
 	));
+	//edit the project_person object ($project_person)
+	$project_person = new Project_Person( array(
+		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : "",
+		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
+	));
+	//edit the project_task object ($project_task)
+	$project_task = new Project_Task( array(
+		"task_id" => isset($_POST["task_id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["task_id"]) : "",
+		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
+	));
+
 	
 	error_log("here are the values in the POST array");
 	error_log(print_r($_POST,true));
@@ -270,15 +401,39 @@
 		
 	if ($errorMessages) {
 		error_log("There were errors in the input (errorMessages was not blank. Redisplaying the edit form with missing fields.");
-		//error_log($contact[0]);
-		//error_log(gettype($contact));
 		displayClientAndContactsEditForm($errorMessages, $missingFields, $project);
 	} else {
-		error_log("All of the required fields are there...Updating database...");
-		$project_id=$project->getValue("project_id");
-		$project->updateProject($project_id);		
-		displayProjectPage();	
+		try {
+			$client_id = $project->getValue("client_id");
+			//insert the project into the project table.
+			$project->updateProject($client_id);
+			//insert the project and the associated people into the project_people table.
+			$project_id = Project::getProjectId($project->getValue("project_name"));
+			$person_ids = explode(',', $project_person->getValue("person_id"));
+			//try deleting all of the rows in the table and then adding the new ones, since we don't know how many people will be deleted.
+			Project_Person::deleteProjectPerson($project_id[0]);
+			foreach ($person_ids as $person_id) {			
+				$project_person->insertProjectPerson($person_id, $project_id[0]);
+			}
+			$task_ids = explode(',', $project_task->getValue("task_id"));
+			//try deleting all of the rows in the table and then adding the new ones, since we don't know how many tasks will be deleted.
+			Project_Task::deleteProjectTask($project_id[0]);
+			foreach ($task_ids as $task_id) {				
+				$project_task->insertProjectTask($task_id, $project_id[0]);
+			}
+
+			displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Person(array()));
+		} catch (Error $e) {
+			die("could not insert a project. " . $e->getMessage());
+			
+		}
 	}
+
 }
 
 ?>
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 3de1060ded11547d1b62058699f864e597413e06

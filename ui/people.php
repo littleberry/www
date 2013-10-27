@@ -36,6 +36,8 @@
 							<ul id="client-list" class="client-list">
 								<li class="client-list-item l-col-33">
 									<ul class="client-info-list">
+									<?php
+									//this is the edit button. Since this is a $_GET, serialize the person object and send it to the page. ?>
 										<li class="client-info-contact"><a class="client-info-contact-link" href="person-basic-info.php?person=<?php echo urlencode(serialize($person)) ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($person->getValue("person_first_name") . " " . $person->getValue("person_last_name")); ?></li>
 										<br/><hr/>
 									</ul>		

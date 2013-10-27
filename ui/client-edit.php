@@ -209,7 +209,7 @@
 						<!-- <select id="client-currency" name="client-currency" class="client-currency-select" tabindex="10">
 							<option value="">Select currency</option>
 							<option selected="selected" value="USD">United States Dollar</option> -->
-						</select><br />
+						</select>
 					</li>
 					<!--leave these alone for now. Keep this UI as a single form, but these values have no errors associated with them
 					so they can be straight updates.-->

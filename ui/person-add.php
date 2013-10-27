@@ -10,6 +10,16 @@
 		//header( 'Location: ../usercake/login.php' ) ;
 	//}
 	include('header.php'); //add header.php to page
+	//checkLogin();
+
+	
+	//OVERALL CONTROL
+	//I need this code to be first so I can redirect the page. We may need to do this for others			
+		if (isset($_POST["action"]) and $_POST["action"] == "person-add") {
+				processPerson();
+		} else {
+				displayPersonInsertForm(array(), array(), new Person(array()));
+		} 
 ?>
 <section id="page-content" class="page-content">
 	<header class="page-header">
@@ -200,22 +210,23 @@ include('header.php'); //add header.php to page
 	} else {
 		//lets put this into a try/catch for added security.
 		try {
-			//update the person
-			$person->insertPerson();
-			//send the person an email that they have been added
-			include("newUserEmail.php");
-			//I don't think we need this anymore since the session is started in common for auth.
-			//session_start();
-			$_SESSION['person'] = serialize($person);
-			header("Location: person-basic-info.php");
+			//update the person, send it off to person-basic-info again if it is there.
+			$person_email = Person::getByEmailAddress($person->getValueEncoded('person_email'));
+			if ($person_email) {
+				//this person is already there, pass the person back to the page.
+				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)));			
+			} else {
+				$person->insertPerson();
+				include("newUserEmail.php");
+				$_SESSION['person'] = serialize($person);
+				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)));
+			}
 		} catch (Exception $e) {
 			echo "something went wrong inserting this person into our database.";
 			error_log($e);
 			return;
 		}
 		
-		echo "You have successfully added a person. You may add an additional person now. ";		
-		echo"<a href=\"people.php\">View the full person list</a>";
 		//headers already sent, call the page back with blank attributes.
 		//displayPersonInsertForm(array(), array(), new Person(array()));
 	}

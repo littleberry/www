@@ -4,6 +4,8 @@
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Task.class.php");
 	require_once("../classes/Person.class.php");
+	require_once("../classes/Project_Person.class.php");
+	require_once("../classes/Project_Task.class.php");
 	require_once("../common/errorMessages.php");
 	include('header.php'); //add header.php to page
 ?>
@@ -26,7 +28,7 @@
 <?php 			if (isset($_POST["action"]) and $_POST["action"] == "project-add") {
 					processProject();
 				} else {
-					displayProjectInsertForm(array(), array(), new Project(array()));
+					displayProjectInsertForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
 				} 
 ?>
 <!--DISPLAY PROJECT INSERT WEB FORM--->
@@ -62,7 +64,7 @@
 						<?php foreach ($clients as $client) { ?>
    							<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
     					<?php } ?>
-    			 </select><br />
+						</select><br />
 					</li>
 		   			<li class="client-details-item name">
 						<label for="client-name" <?php validateField("project_name", $missingFields)?> class="client-details-label">Project Name:</label>
@@ -107,6 +109,10 @@
 					<h1 class="client-details-title">Enter Task details:</h1>
 					<h4 class="required">= Required</h4>
 				</header>
+				<li class="client-details-item phoneNum">
+					<label for="client-phone" <?php validateField("task_id", $missingFields)?> class="client-details-label">Tasks associated with this project:</label>
+					<input id="client-phone" name="task_id" class="client-phone-input" type="text" tabindex="2" value="" />
+				</li>
 				<ul class="details-list client-details-list">
 				<?php 
 						//get the taskss out to populate the drop down.
@@ -114,7 +120,7 @@
 					?>
 					<li class="client-details-item currency">
 						<label for="client-currency" class="client-details-label">Please choose a task:</label>
-                        <select name="client_id" id="client_currency_index" size="1">    
+                        <select name="task_ids" id="client_currency_index" size="1">    
 						<?php foreach ($tasks as $task) { ?>
    							<option value="<?php echo $task->getValue("task_id") ?>"><?php echo $task->getValue("task_name")?></option>
     					<?php } ?>
@@ -133,6 +139,10 @@
 					<h1 class="client-details-title">Enter Person details:</h1>
 					<h4 class="required">= Required</h4>
 				</header>
+				<li class="client-details-item phoneNum">
+					<label for="client-phone" <?php validateField("person_id", $missingFields)?> class="client-details-label">People assigned to this project:</label>
+					<input id="client-phone" name="person_id" class="client-phone-input" type="text" tabindex="2" value="" />
+				</li>
 				<ul class="details-list client-details-list">
 				<?php 
 						//get the people out to populate the drop down.
@@ -140,7 +150,7 @@
 					?>
 					<li class="client-details-item currency">
 						<label for="client-currency" class="client-details-label">Please choose a person:</label>
-                        <select name="person_id" id="client_currency_index" size="1">    
+                        <select name="person_ids" id="client_currency_index" size="1">    
 						<?php foreach ($people as $person) { ?>
    							<option value="<?php echo $person->getValue("person_id") ?>"><?php echo $person->getValue("person_first_name");echo " " . $person->getValue("person_last_name")?></option>
     					<?php } ?>
@@ -172,23 +182,40 @@
 	
 	//create the project object ($project)
 	$project = new Project( array(
-		//CHECK REG SUBS!!
-		"project_code" => isset($_POST["project-code"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["project-code"]) : "",
+		"project_code" => isset($_POST["project-code"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-code"]) : "",
 		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
-		"client_id" => isset($_POST["client_id"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client_id"]) : "",
-		"project_invoice_method" => isset($_POST["project-invoice-method"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project-invoice-method"]) : "",
-		"project_invoice_rate" => isset($_POST["project-invoice-rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-invoice-rate"]) : "",
-		"project_budget_type" => isset($_POST["project-budget-type"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-type"]) : "",
-		"project_budget_hours" => isset($_POST["project-budget-hours"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-budget-hours"]) : "",
+		"client_id" => isset($_POST["client_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client_id"]) : "",
+		"project_billable" => isset($_POST["project_billable"]) ? preg_replace("/[^ A-Z]/", "", $_POST["project_billable"]) : "",
+		"project_invoice_by" => isset($_POST["project-invoice-by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project-invoice-by"]) : "",
+		"project_hourly_rate" => isset($_POST["project_hourly_rate"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_hourly_rate"]) : "",
+		"project_budget_by" => isset($_POST["project-budget-by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project-budget-by"]) : "",
+		"project_budget_total_fees" => isset($_POST["project-budget-total-fees"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-total-fees"]) : "",
+		"project_budget_total_hours" => isset($_POST["project-budget-total-hours"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-total-hours"]) : "",
+		"project_send_email" => isset($_POST["project_send_email"])? preg_replace("/[^ A-Z]/", "", $_POST["project_send_email"]) : "",
+		"project_show_budget" => isset($_POST["project_show_budget"])? preg_replace("/[^ A-Z]/", "", $_POST["project_show_budget"]) : "",
+		"project_budget_includes_expenses" => isset($_POST["project_budget_includes_expenses"])? preg_replace("/[^ A-Z]/", "", $_POST["project_budget_includes_expenses"]) : "",
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
-//		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
-//		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
+		"project_archived" => isset($_POST["project_archived"])? preg_replace("/[^ A-Z]/", "", $_POST["project_archived"]) : "",
 	));
+	//create the project_person object ($project_person)
+	$project_person = new Project_Person( array(
+		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : "",
+		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
+	));
+	//create the project_task object ($project_task)
+	$project_task = new Project_Task( array(
+		"task_id" => isset($_POST["task_id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["task_id"]) : "",
+		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
+	));
+	
 	error_log("here is the post<br>");
 	error_log(print_r($_POST, true));
 	error_log("here is the project array.<br>");
 	error_log(print_r($project,true));
-	
+	error_log("here is the project_person array.<br>");
+	error_log(print_r($project_person,true));
+	error_log("here is the project_task array.<br>");
+	error_log(print_r($project_task,true));	
 	
 //error messages and validation script
 	foreach($requiredFields as $requiredField) {
@@ -201,6 +228,7 @@
 	if ($missingFields) {
 		$i = 0;
 		$errorType = "required";
+		//THIS NEEDS TO BE UDPATED WITH PREG_MATCH TO MAKE SURE EACH OBJECT IS PROPERLY VALIDATED, SEE CLIENT-EDIT FOR REFERENCE.
 		foreach ($missingFields as $missingField) {
 			$errorMessages[] = "<li>" . getErrorMessage("1",$missingField, $errorType) . "</li>";
 			$i++;
@@ -228,14 +256,28 @@
 	}*/
 		
 	if ($errorMessages) {
-		displayProjectInsertForm($errorMessages, $missingFields, $project);
+		displayProjectInsertForm($errorMessages, $missingFields, $project, $project_person);
 	} else {
-		$client_id = $project->getValue("client_id");
-		$project->insertProject($client_id);
-		echo "You have successfully added a project for client id " . $client_id[0] . ". You may add an additional project now. ";		
-		echo"<a href=\"projects.php\">View the full project list</a>";
-		//headers already sent, call the page back with blank attributes.
-		displayProjectInsertForm(array(), array(), new Project(array()));
+		try {
+			$client_id = $project->getValue("client_id");
+			//insert the project into the project table.
+			$project->insertProject($client_id);
+			//insert the project and the associated people into the project_people table.
+			$project_id = Project::getProjectId($project->getValue("project_name"));
+			$person_ids = explode(',', $project_person->getValue("person_id"));
+			foreach ($person_ids as $person_id) {			
+				$project_person->insertProjectPerson($person_id, $project_id[0]);
+			}
+			$task_ids = explode(',', $project_task->getValue("task_id"));
+			foreach ($task_ids as $task_id) {				
+				$project_task->insertProjectTask($task_id, $project_id[0]);
+			}
+
+			displayProjectInsertForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
+		} catch (Error $e) {
+			die("could not insert a project. " . $e->getMessage());
+			
+		}
 	}
 } 
 

@@ -1,10 +1,9 @@
 <?php
-	//put this in a general place, htdocs.
-	//change this if it is on muppetlabs or on localhost...
 	//require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
 	require_once("../common/common.inc.php");
 	require_once("../classes/Person.class.php");
 
+//usercake stuff, take out for now.
 //if(!isUserLoggedIn()){
 //	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
 //	header( 'Location: usercake/login.php' ) ;

@@ -11,20 +11,30 @@
 	
 	//OVERALL CONTROL
 	//I need this code to be first so I can redirect the page. We may need to do this for others
-	//in this page, display is integrated with the add feature (no beeg)			
-		if (isset($_POST["action"]) and $_POST["action"] == "task-add") {
-				processTask();
-		} else {
-				displayTaskInsertForm(array(), array(), new Task(array()));
+	//in this page, display is integrated with the add feature (no beeg)
+		
+		if (isset($_GET["task_id"]) && $_GET["task_id"] == "") {
+			$processType = "A";
+		} elseif (isset($_GET["task_id"])) {
+			$processType = "E";
+		}
+				
+		if (isset($_POST["action"])) {
+			$processType = $_POST["action"];
+			processTask($processType);
+		} else {	
+			displayTaskInsertForm(array(), array(), new Task(array()), $processType);
 		} 
 
-
-function displayTaskInsertForm($errorMessages, $missingFields, $task) {
+function displayTaskInsertForm($errorMessages, $missingFields, $task, $processType) {
 include('header.php'); //add header.php to page
+
 ?>
+
 <section id="page-content" class="page-content">
 	<header class="page-header">
 		<h1 class="page-title">Tasks</h1>
+		
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
 				<li class="page-controls-item add-client-button"><a class="add-client-link" href="task-add.php">+ Add Task</a></li>
@@ -34,9 +44,11 @@ include('header.php'); //add header.php to page
 	</header>
 		<?php 
 		//this is the add task UI (IT IS NOT SEPARATE IN THIS MODULE!!!)?>
+				<a class="client-info-contact-link" href="tasks.php?task_id=" title="View contact details"><button>Add Task</button></a>
+
 		<form action="tasks.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
-      <input type="hidden" name="action" value="task-add"/>
-		<section class="client-detail l-col-80">
+      <input type="hidden" name="action" value="<?php echo $processType ?>"/>
+      	<section class="client-detail l-col-80">
         	<fieldset class="client-details-entry">
 				<legend class="client-details-title">Enter task details:</legend>
 				<header class="client-details-header">
@@ -45,7 +57,21 @@ include('header.php'); //add header.php to page
 				</header>
 				<ul class="details-list client-details-list">
 						<label for="client-name" <?php validateField("task_name", $missingFields)?> class="client-details-label">Task Name:</label>
-						<input id="client-name" name="task-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $task->getValueEncoded("task_name")?>" /><br />
+						<?php 
+						//DOCUMENT THIS, IT'S TERRIBLE.
+						if ($processType == 'A') {
+							$taskName = $task->getValueEncoded("task_name");
+						} else {
+							if (isset($_GET["task_id"])) {
+								$tasker = $_GET["task_id"];
+							} elseif (isset($_POST["task_id"])) {
+								$tasker = $_POST["task_id"];
+							}
+							$thisTask = $task->getTaskById($tasker);
+							$thisTask = $thisTask->getValue("task_name");
+						}
+						?>
+						<input id="client-name" name="task-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $thisTask ?>" /><input type="hidden" name="task_id" value="<?php echo $tasker; ?>"><br />
 					</li>
 					<li class="client-details-item phoneNum">
 						<label for="client-phone" <?php validateField("task_hourly_rate", $missingFields)?> class="client-details-label">Hourly Rate:</label>
@@ -61,7 +87,7 @@ include('header.php'); //add header.php to page
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label"></label>
 						<!--modified field to be of type submit instead of button-->
-                        <input id="client-add-btn" name="task-add-btn" class="client-add-btn" type="submit" value="+ Add Task" tabindex="11"/> 
+                        <input id="client-add-btn" name="task-add-btn" class="client-add-btn" type="submit" value="Save Task" tabindex="11"/> 
 						<label for="client-add-btn" class="client-details-label"></label>
 						<!--modified field to be of type submit instead of button-->
                         <input id="client-add-btn" name="task-add-to-all-btn" class="client-add-btn" type="submit" value="+ Add Task To All Current Projects" tabindex="11"/> 
@@ -84,13 +110,13 @@ include('header.php'); //add header.php to page
 			<?php foreach($tasks as $task) {
 				if ($task->getValue("task_common")) {
 						if ($task->getValue("task_bill_by_default")) {
-							$task_id = Task::getTaskId($task->getValue("task_name"))
+							$task_id = Task::getTaskId($task->getValue("task_name"));
 						?>
 							<section class="content">
 							<ul id="client-list" class="client-list">
 							<li class="client-list-item l-col-33">
 							<ul class="client-info-list">
-							<li class="client-info-contact"><a class="client-info-contact-link" href="task-edit.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
+							<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
 							<br/><hr/>
 							</ul>		
 							</li>
@@ -103,12 +129,14 @@ include('header.php'); //add header.php to page
 				<li style="background-color:lightgray;" class="client-info-contact">Non-billable by default</li>
 			<?php foreach($tasks as $task) {
 				if ($task->getValue("task_common")) {
-						if (!$task->getValue("task_bill_by_default")) {?>
+						if (!$task->getValue("task_bill_by_default")) {
+							$task_id = Task::getTaskId($task->getValue("task_name"));
+						?>
 							<section class="content">
 							<ul id="client-list" class="client-list">
 							<li class="client-list-item l-col-33">
 							<ul class="client-info-list">
-							<li class="client-info-contact"><a class="client-info-contact-link" href="#" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
+							<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
 							<br/><hr/>
 							</ul>		
 							</li>
@@ -124,12 +152,14 @@ include('header.php'); //add header.php to page
 				<li style="background-color:lightgray;" class="client-info-contact">Task billable by default</li>
 			<?php foreach($tasks as $task) {
 				if (!$task->getValue("task_common")) {
-						if ($task->getValue("task_bill_by_default")) {?>
+						if ($task->getValue("task_bill_by_default")) {
+							$task_id = Task::getTaskId($task->getValue("task_name"));
+						?>
 							<section class="content">
 							<ul id="client-list" class="client-list">
 							<li class="client-list-item l-col-33">
 							<ul class="client-info-list">
-							<li class="client-info-contact"><a class="client-info-contact-link" href="#" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
+							<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
 							<br/><hr/>
 							</ul>		
 							</li>
@@ -142,12 +172,14 @@ include('header.php'); //add header.php to page
 				<li style="background-color:lightgray;" class="client-info-contact">Non-billable by default</li>
 			<?php foreach($tasks as $task) {
 				if (!$task->getValue("task_common")) {
-						if (!$task->getValue("task_bill_by_default")) {?>
+						if (!$task->getValue("task_bill_by_default")) {
+						$task_id = Task::getTaskId($task->getValue("task_name"));
+						?>
 							<section class="content">
 							<ul id="client-list" class="client-list">
 							<li class="client-list-item l-col-33">
 							<ul class="client-info-list">
-							<li class="client-info-contact"><a class="client-info-contact-link" href="#" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
+							<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
 							<br/><hr/>
 							</ul>		
 							</li>
@@ -159,7 +191,9 @@ include('header.php'); //add header.php to page
 
 }
 
-function processTask() {
+function processTask($processType) {
+echo "processtype is " . $processType;
+
  	//these are the required task fields in this form
 	$requiredFields = array("task_name");
 	$missingFields = array();
@@ -193,12 +227,12 @@ function processTask() {
 	} 
 		
 	if ($errorMessages) {
-		displayTaskInsertForm($errorMessages, $missingFields, $task);
+		displayTaskInsertForm($errorMessages, $missingFields, $task, $processType);
 	} else {
 		//steal this code for people. 
 		$task_name=$task->getValue("task_name");
 		$task_id = $task->getTaskId($task_name);
-		if ($task_id) {
+		if ($task_id && $processType == "A") {
 			echo "Task " . $task->getValue("task_name") . " is already in the database. Please try again.";
 		} else {
 			error_log("here is the post");
@@ -206,15 +240,22 @@ function processTask() {
 			error_log("here is the task");
 			error_log(print_r($task,true));
 			try	{
-				$task->insertTask();
-				echo("Task " . $task->getValue('task_name') . " has been successfully added to the database.");
+				if ($processType == "A") {
+					error_log("You want to ADD this task.");
+					$task->insertTask();
+					echo("Task " . $task->getValue('task_name') . " has been successfully added to the database.");
+				} elseif ($processType == "E") {
+					error_log("YOU WANT TO UPDATE THIS TASK: " . $_POST["task_id"]);
+					$task->updateTask($_POST["task_id"]);
+					echo("Task " . $task->getValue('task_name') . " has been successfully updated to the database.");
+				}
 			} catch (Error $e) {
 				echo "Something went terribly wrong.";
 			}
 			
 		}
 		//headers already sent, call the page back with blank attributes.
-		displayTaskInsertForm(array(), array(), $task);
+		displayTaskInsertForm(array(), array(), $task, $processType);
 	}
 } 
 
