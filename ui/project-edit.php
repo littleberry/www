@@ -63,7 +63,7 @@ include('header.php'); //add header.php to page
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
 				<li class="page-controls-item link-btn"><a class="add-client-link" href="project-add.php">+ Edit Project</a></li>
-				<li class="page-controls-item"><a class="view-client-archive-link" href="project-archives.php">View Archives</a></li>
+				<li class="page-controls-item"><a class="view-client-archive-link" href="projects.php?archives=1">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 			</ul>
 		</nav>
