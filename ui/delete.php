@@ -1,8 +1,3 @@
-<!-- Include AJAX Framework -->
-<script src="ajax/ajax_framework.js" language="javascript"></script>
-<script type='text/javascript' src='libraries/jquery-1.10.2.min.js'></script>
-<script type='text/javascript' src='ajax-delete.js'></script>
-
 <?php	
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
@@ -42,7 +37,8 @@
 <head>
 	<title>Delete Client</title>
 	<meta charset="utf-8" />
-	<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700,700italic' rel='stylesheet' type='text/css' />
+	<script type='text/javascript' src='libraries/jquery-1.10.2.min.js'></script>
+	<script type='text/javascript' src='ajax-delete.js'></script><link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700,700italic' rel='stylesheet' type='text/css' />
     <link rel='stylesheet' type='text/css' href='ajax_login.css' />
 	<script src="libraries/jquery-1.10.2.min.js" type="text/javascript"></script>
 </head>
