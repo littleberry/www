@@ -9,7 +9,7 @@
 		//$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
 		//header( 'Location: ../usercake/login.php' ) ;
 	//}
-	checkLogin();
+	//checkLogin();
 
 	
 	//OVERALL CONTROL
