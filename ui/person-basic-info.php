@@ -5,6 +5,8 @@
 	require_once("../classes/Person.class.php");
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Project_Person.class.php");
+	require_once("../classes/Person_Permissions.class.php");
+
 				
 	checkLogin();
 
@@ -55,7 +57,8 @@
 
 <!--DISPLAY PERSON INSERT WEB FORM--->
 <?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $project) { 
-	
+	error_log("here is the array coming into displaypersoninsertform linw 58");
+	error_log(print_r($person,true));
 	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
@@ -73,7 +76,24 @@ function FillBilling(f) {
     //f.shippingname.value;
     //f.billingcity.value = f.shippingcity.value;
     //return false;
+    
 }
+function showP(elem){
+   if(elem.value == "Regular User"){
+      document.getElementById('perm_ru').style.display = "block";
+      document.getElementById('perm_pm').style.display = "none";
+      document.getElementById('perm_a').style.display = "none";
+   } else if(elem.value == "Project Manager") {
+      document.getElementById('perm_ru').style.display = "none";
+      document.getElementById('perm_pm').style.display = "block";
+      document.getElementById('perm_a').style.display = "none";
+   } else if(elem.value == "Administrator") {  
+   	 document.getElementById('perm_ru').style.display = "none";
+     document.getElementById('perm_pm').style.display = "none";
+     document.getElementById('perm_a').style.display = "block";
+	}
+}
+
 </script>
 <section id="page-content" class="page-content">
 	<header class="page-header">
@@ -151,13 +171,20 @@ function FillBilling(f) {
 						$row = Person::getEnumValues("person_perm_id");
 						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 						?>
-						<select name="person-perm-id">
+						<?php //yeah, this is super lame. ?>
+						<select name="person-perm-id" onchange="showP(this)">
 						<?php
 						foreach($enumList as $value) { ?>
 							<option name="person-perm-id" value="<?php echo $value?>"><?php echo $value ?></option>
 						<?php } ?>
 						</select>
-						<p>This person can track time and expenses.</p>
+						<p id="perm_ru" style="display: none;">This person can track time and expenses.</p>
+						<div id="perm_pm" style="display: none;">
+						<input type="checkbox" name="create_projects" id="create_projects">Create projects for all clients<br>
+						<input type="checkbox" name="view_notes" id="view_notes">View notes<br>
+						<input type="checkbox" name="create_invoices" id="create_invoices">Create invoices for projects they manage<br>
+						</div>
+						<p id="perm_a" style="display: none;">This person can see all projects, invoices and reports in Time Tracker.</p>
 					</li>
 					<fieldset class="person-logo-upload">
 				<!--legend class="person-logo-title">Upload Person Image</legend-->
@@ -165,7 +192,8 @@ function FillBilling(f) {
 					<h1 class="person-logo-title">Upload Person Image</h1>
 				</header>
 				<?//hack the image by using a hidden field.?>
-				<input type="hidden" name="person-logo-file" value="<?php echo $person->getValue("person_logo_link")?>">
+				<?//this is where we put the image into the post array!?>
+				<input type="hidden" id="person-logo-file" name="person-logo-file" value="<?php echo $person->getValue("person_logo_link")?>">
 				<input id="person-logo-file" name="person-logo-file" class="person-logo-file" type="file" value="browse" tabindex="21" />
 			</fieldset>
 			
@@ -311,8 +339,8 @@ function FillBilling(f) {
 		"person_department" => isset($_POST["person-department"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["person-department"]) : "",
 		"person_hourly_rate" => isset($_POST["person-hourly-rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-hourly-rate"]) : "",
 		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
-		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
-		"person_logo_link" => isset($_POST["person_logo_link"]) ? preg_replace("/[^ \/\\-\_a-zA-Z0-9^.]/", "", $_POST["person_logo_link"]) :$_FILES["person_logo_link"],
+		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \.\-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
+		"person_logo_link" => isset($_POST["person_logo_link"]) ? preg_replace("/[^ \.\/\-\_a-zA-Z0-9]/", "", $_POST["person_logo_link"]) :$_FILES["person_logo_link"],
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
 	));
 	
@@ -345,7 +373,6 @@ function FillBilling(f) {
 	));
 	
 	
-	error_log("here is the post<br>");
 	error_log(print_r($_POST, true));
 	error_log("here is the person array.<br>");
 	error_log(print_r($person,true));
@@ -398,6 +425,14 @@ function FillBilling(f) {
 		if ($var == 0) {
 			try {
 				$person->updatePerson($person->getValueEncoded('person_email'));
+				//put in the code here to put the appropriate permissions in the person_perm id table.
+				if ($person->getValue("person_perm_id") == "Regular User") {
+					echo "You want to insert a regualr user.";
+				} elseif ($person->getValue("person_perm_id") == "Project Manager") {
+					echo "You want to insert a PM.";
+				} elseif ($person->getValue("person_perm_id") == "Administrator") {
+					echo "You want to insert an admin.";
+				}
 				displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
 			} catch (Exception $e) {
 				echo "something went wrong updating this person into our database.";
