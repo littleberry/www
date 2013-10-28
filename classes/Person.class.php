@@ -295,6 +295,23 @@ public static function getByUserName($person_username) {
 		}
 	}
 	
+	//delete this person, assumes they have no active projects.
+	public function deletePerson($person_id) {
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_PERSON . " WHERE person_id = :person_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->execute();	
+			parent::disconnect($conn);
+			return 1;
+		} catch (PDOException $e) {
+			error_log("THERE WAS A PROBLEM HERE " . $e);
+			parent::disconnect($conn);
+			return 0;
+			die("Query failed on delete of person: " . $e->getMessage());
+		}
+	}
 }
 	
 
