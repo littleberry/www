@@ -5,6 +5,23 @@ $(document).ready( function() {
 	var $label = $( '<label class="entity-details-label"></label>' )
 	var $inputText = $( '<input type="text" />' );
 	
+	var projectDetail = {};
+	$.get( "returnJSON.php", {
+			func: "returnProjectJSON" ,
+			projid: 1
+		}).done( function() {
+				console.log("done");
+			})
+			.fail( function( data ) {
+				console.log("fail: " + data);
+			})
+			.success( function( data ) {
+				projectDetail.project = $.parseJSON(data);
+				console.log(projectDetail.project.project_name);
+			});
+
+	//console.log(projectDetail)
+	
 	$saveBtn.click( function( evt ){
 		console.log("save data");
 	});
