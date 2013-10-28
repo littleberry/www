@@ -50,7 +50,7 @@ $( '#edit-project-btn' ).click( function( evt ) {
 
 	$(function(){ //table display/sorter with filter/search for projects.php
 		$( "#project-list" ).tablesorter({
-			sortList: [[0,0], [1,0]],
+			sortList: [[2,0], [3,0]],
 			widgets: ["filter"],
 			widgetOptions : {
 				
