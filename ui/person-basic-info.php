@@ -57,9 +57,6 @@
 
 <!--DISPLAY PERSON INSERT WEB FORM--->
 <?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $project) { 
-	error_log("here is the array coming into displaypersoninsertform linw 58");
-	error_log(print_r($person,true));
-	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
