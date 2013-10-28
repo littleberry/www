@@ -175,7 +175,10 @@ function FillBilling(f) {
 						<label for="client-add-btn" class="client-details-label">All done?</label>
 						<!--modified field to be of type submit instead of button-->
                         <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Save Person" tabindex="11"/> 
-						 or <a class="" href="#" tabindex="11">Cancel</a>
+						 or <a class="" href="#" tabindex="11">Cancel</a></li>
+						 <li>
+						 <?php $person_id=$person->getValue("person_id");?>
+						 <input id="client-delete-btn" name="person-delete-btn" class="client-delete-btn" onclick="window.open('delete_person.php?person_id=<?php echo $person_id ?>','myWindow','width=200,height=200,left=250%,right=250%,scrollbars=no')" type="button" value="- Delete Person" tabindex="11" />	
 					</li>
 				</ul>
 			</fieldset>
