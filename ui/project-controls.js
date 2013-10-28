@@ -7,8 +7,7 @@ $(document).ready( function() {
 	//var $selectMenu = $( '<select>' );
 	//var $selectOption = $( '<option>' );
 	
-	/*
-$( '#edit-project-btn' ).click( function( evt ) {
+	$( '#edit-project-btn' ).click( function( evt ) {
 		$( '#project-info .edit' )
 			.each( function( index, elem ) {
 				var useName = $( elem ).attr( 'class' ).split(' ')[1];
@@ -30,19 +29,19 @@ $( '#edit-project-btn' ).click( function( evt ) {
 			.each( function( index, elem ) {
 				var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
 				var $test = "";
-				$.get( "returnClientMenu.php",
+				$.get( "project-edit.php",
 					{ func: "returnClientMenu" },
 					function(data) {
-						console.log(data)
+						console.log(data);
+						console.log( $(elem));
 						$test = data;
 						
-						return $( this ).replaceWith( $test );
+						return $( elem ).replaceWith( $test );
 					});
 			});
 		//console.log($projectInfoEdit);
 		evt.preventDefault();
 	});
-*/
 
 	$(function() { //tabs interface for project-detail.php
 		$( ".tabs" ).tabs();

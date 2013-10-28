@@ -13,7 +13,7 @@
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Task.class.php");
 
-	include('header.php'); //add header.php to page
+	
 ?>
 <?php	/*OVERALL CONTROL
 		1. first time user comes in, call the displayClientAndContactsEditForm function.
@@ -21,12 +21,17 @@
 		3. User clicks on a button to submit the form, call the editClientAndContacts function.
 		4. If required fields are missing in the form, re-display the form with error messages.
 		5. If there are no missing required fields, call Project::updateProject*/	
- 			
+ 			if (isset($_GET["func"])) {
+				if ($_GET["func"] == "returnClientMenu") {
+					echo returnClientMenu();
+				}
+			} else {
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_project") {
 					editProject();
 				} else {
 					displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
 				}
+			}
 	
 	/*DISPLAY PROJECT EDIT WEB FORM (displayProjectEditForm)
 	note...I think we can remove the PHP validation to update the style in validateField
@@ -34,26 +39,42 @@
 	2. If first time, pull the project object from the database.
 	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.*/
 ?>	
-<?php function displayProjectEditForm($errorMessages, $missingFields, $project) {
-	if ($errorMessages) {
-		foreach($errorMessages as $errorMessage) {
-			echo $errorMessage;
+<?php
+	function returnClientMenu() {
+		//$select = "<strong>test</strong>";
+		$select = "";
+		//get the clients out to populate the drop down.
+		list($clients) = Client::getClients();
+		$select .= '<select name="client-id" id="project-client-select" size="1">';
+		
+		foreach ($clients as $client) {
+			$select .= '<option value="' . $client->getValue("client_id") . '">' . $client->getValue("client_name") .'</option>';
 		}
+		$select .= '</select>';
+		
+		return $select;
 	}
 	
-	//get  out the project ID, since the user came in from the edit project button.
-	if (isset($_GET["project_id"])) {
-		$project_id = $_GET["project_id"];
-		$project=Project::getProjectByProjectId($project_id);
-	} elseif (isset($_POST["project_id"])) {
-		$project_id = $_POST["project_id"];
-		$project=Project::getProjectByProjectId($project_id);
-	} else {
-		echo "You cannot edit a project unless you have provided a project ID.";
-		exit();
+	function displayProjectEditForm($errorMessages, $missingFields, $project) {
+		if ($errorMessages) {
+			foreach($errorMessages as $errorMessage) {
+				echo $errorMessage;
+			}
+		}
+		
+		//get  out the project ID, since the user came in from the edit project button.
+		if (isset($_GET["project_id"])) {
+			$project_id = $_GET["project_id"];
+			$project=Project::getProjectByProjectId($project_id);
+		} elseif (isset($_POST["project_id"])) {
+			$project_id = $_POST["project_id"];
+			$project=Project::getProjectByProjectId($project_id);
+		} else {
+			echo "You cannot edit a project unless you have provided a project ID.";
+			exit();
 	}
 	
-
+	include('header.php'); //add header.php to page
 ?>
 <div id="page-content" class="page-content">
 	<header class="page-header">

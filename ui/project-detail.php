@@ -1,6 +1,11 @@
 <?php
 	require_once("../common/common.inc.php");
 	require_once("../classes/Project.class.php");
+	require_once("../classes/Client.class.php");
+	require_once("../classes/Project_Person.class.php");
+	require_once("../classes/Project_Task.class.php");
+	require_once("../classes/Project.class.php");
+	require_once("../classes/Task.class.php");
 	
 	//	if(!isUserLoggedIn()){
 	//	//redirect if user is not logged in.
@@ -27,6 +32,7 @@
 		exit;
 	}
 	
+	$client_details = Client::getClient($project_details->getValue("client_id"));
 	
 	
 	include('header.php'); //add header.php to page
@@ -36,7 +42,7 @@
 <div id="page-content" class="page-content">
 	<header class="page-header">
 		<h1 class="page-title">Project: <?php echo $project_details->getValue("project_name")?></h1>
-		<h2 class="page-sub-title"><a href="#" class="" title="View client's details">Client</a></h2>
+		<h2 class="page-sub-title"><a href="<?php echo "client-detail.php?client_id=" . $project_details->getValue("client_id")?>" class="" title="View client's details"><?php echo $client_details->getValue("client_name")?></a></h2>
 		<nav class="page-controls-nav">
 			<ul class="page-controls-list project">
 				<li class="page-controls-item link-btn"><a class="view-all-link" href="project-edit.php?project_id=<?php echo $project_id?>">Edit Project</a></li>
@@ -116,7 +122,7 @@
 				<h2 class="entity-sub-title">Project Info</h2>
 				<ul class="entity-list entity-details-list">
 					<li class="entity-details-item">Name: <span class="edit project-name"><?php echo $project_details->getValue("project_name")?></span></li>
-					<li class="entity-details-item">Client: <span class="select client-id"><a href="#" class="" title="View client's details">Client</a></span></li>
+					<li class="entity-details-item">Client: <span class="select client-id"><a href="<?php echo "client-detail.php?client_id=" . $project_details->getValue("client_id")?>" class="" title="View client's details"><?php echo $client_details->getValue("client_name")?></a></span></li>
 					<li class="entity-details-item">Project code: <span class="edit project-code"><?php echo $project_details->getValue("project_code")?></span></li>
 					<?php if ($project_details->getValue("project_archived")) { ?>
 						<li class="entity-details-item archive-project">This project is currently archived.</li>

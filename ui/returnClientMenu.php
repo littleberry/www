@@ -12,18 +12,17 @@
 	//include('header.php'); //add header.php to page
 	
 	function returnClientMenu() {
-		$select = "<strong>test</strong>";
+		//$select = "<strong>test</strong>";
+		$select = "";
 		//get the clients out to populate the drop down.
 		list($clients) = Client::getClients();
-		//$select .= '<select name="client-id" id="project-client-select" size="1">';
+		$select .= '<select name="client-id" id="project-client-select" size="1">';
 		
-		/*
-foreach ($clients as $client) {
+		foreach ($clients as $client) {
 			$select .= '<option value="' . $client->getValue("client_id") . '">' . $client->getValue("client_name") .'</option>';
 		}
 		$select .= '</select>';
-*/
-		//return $select;
+		
 		return $select;
 	}
 	
