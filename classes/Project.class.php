@@ -61,6 +61,25 @@ class Project extends DataObject {
 			die("query failed returning the projects: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+	
+	//return 1 if person has projects
+	//do we want to make these active projects only?
+	public static function personHasActiveProjects($person_id) {
+		$conn=parent::connect();
+		$sql="SELECT COUNT(*) FROM " . TBL_PROJECT_PERSON . " WHERE person_id = :person_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			return $row;
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed returning the projects for the person: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+
 
 		
 	//return all data for a specific client based on the client_id.
