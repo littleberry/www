@@ -354,8 +354,8 @@ class Client extends DataObject {
 			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
 			$st->execute();
 			parent::disconnect($conn);
+			return 1;
 		} catch(PDOException $e) {
-			error_log("THERE WAS A PROBLEM HERE " . $e);
 			parent::disconnect($conn);
 			return 0;
 			die("Query failed on delete of client: " . $e->getMessage());
