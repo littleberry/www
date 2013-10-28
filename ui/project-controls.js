@@ -4,8 +4,10 @@ $(document).ready( function() {
 	var $cancelLink = $( '<a id="cancel-link" class="" href="#">Cancel</a>' );
 	var $label = $( '<label class="entity-details-label"></label>' )
 	var $inputText = $( '<input type="text" />' );
-	//var $selectMenu = $( '<select>' );
-	//var $selectOption = $( '<option>' );
+	
+	$saveBtn.click( function( evt ){
+		console.log("save data");
+	});
 	
 	$( '#edit-project-btn' ).click( function( evt ) {
 		$( '#project-info .edit' )
@@ -39,6 +41,7 @@ $(document).ready( function() {
 						return $( elem ).replaceWith( $test );
 					});
 			});
+		$( this ).replaceWith( $saveBtn );
 		//console.log($projectInfoEdit);
 		evt.preventDefault();
 	});

@@ -40,6 +40,7 @@
 	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.*/
 ?>	
 <?php
+	//Returns a select menu of clients with ids. Meant to be called via ajax.
 	function returnClientMenu() {
 		//$select = "<strong>test</strong>";
 		$select = "";
@@ -453,8 +454,3 @@ function editProject() {
 }
 
 ?>
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 3de1060ded11547d1b62058699f864e597413e06
