@@ -19,9 +19,9 @@
 			$activeProjects = Project::personHasActiveProjects($person_id);
 			if ($activeProjects[0] > 0) {
 				error_log("you can't delete that person, they have " . $activeProjects[0] . " active projects.");
-				echo "You may not delete a client with active projects.";
+				echo "You may not delete a person with active projects.";
 			} else {
-				error_log("now deleting person" . $client_id);
+				error_log("now deleting person" . $person_id);
 				Person::deletePerson($person_id);
 			}
 			echo "<html><body>";
