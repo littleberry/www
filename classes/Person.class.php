@@ -84,6 +84,7 @@ class Person extends DataObject {
 	public function insertPerson() {
 	//first insert the parent row
 		//removed foreign key on person_permissions. Consider what will happen with permissions!
+		//person perms are set in insertPermissions(), in person_permissions.class.sql to keep it separate and consistent.
 		$conn=parent::connect();
 		$sql = "INSERT INTO " . TBL_PERSON . " (
 			person_first_name,
@@ -123,18 +124,15 @@ class Person extends DataObject {
 		}
 	}
 
-//this seems like a duplicate of getByUserName. Can we delete this?
-public static function getPerson($person_username) {
+//returns the data for a person based on the person_id.
+	public static function getPersonById($person_id) {
 		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_username = :person_username";
+		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_id = :person_id";
 		
 		try {
-			//get the PDO object
 			$st = $conn->prepare($sql);
-			//bind the value and set its datatype
-			$st->bindValue(":person_username", $person_username, PDO::PARAM_STR);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_STR);
 			$st->execute();
-			//this is a small return, so fetch() works fine.
 			$row=$st->fetch();
 			parent::disconnect($conn);
 			if ($row) return new Person($row);
@@ -143,8 +141,8 @@ public static function getPerson($person_username) {
 			die("Query failed on you: " . $e->getMessage());
 		}
 	}
-	
-public static function getByUserName($person_username) {
+		
+	public static function getByUserName($person_username) {
 		$conn=parent::connect();
 		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_username = :person_username";
 	
