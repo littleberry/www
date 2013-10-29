@@ -15,7 +15,7 @@ ini_set ('display_errors', 0);
 //if (!securePage($_SERVER['PHP_SELF'])){die();}
 
 
-//is the value in the missing field array? If so, highlight the field using the "error" style..
+//is the value in the missing field array? If so, highlight the field using the "error" style. Only do this for primary key values, handle the rest client-side.
 function validateField($fieldName, $missingFields) {
 	if (in_array($fieldName, $missingFields)) {
 		echo ' class="client-details-label required"';
