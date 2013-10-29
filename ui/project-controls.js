@@ -6,7 +6,8 @@ $(document).ready( function() {
 	var $inputText = $( '<input type="text" />' );
 	
 	var projectDetail = {};
-	$.get( "returnJSON.php", {
+	/*
+$.get( "returnJSON.php", {
 			func: "returnTasksJSON" ,
 			id: "1",
 			collection: "task"
@@ -20,6 +21,7 @@ $(document).ready( function() {
 				projectDetail.project = $.parseJSON(data);
 				console.log(projectDetail.project);
 			});
+*/
 
 	//console.log(projectDetail)
 	
