@@ -9,7 +9,7 @@ class Project_Person extends DataObject {
 		//these fields are in the project_person table.
 		"project_id"=>"",
 		"person_id"=>"",
-		"total_budget_hours"=>"",
+		"total_budget_hours"=>""
 	);
 	
 	//function returns all of the people associated with a given project (archived and not).
@@ -20,6 +20,7 @@ class Project_Person extends DataObject {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
 			$st->execute();
+			$people=array();
 			foreach ($st->fetchAll() as $row) {
 				$people[] = new Person($row);
 			}

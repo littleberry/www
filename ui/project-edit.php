@@ -6,7 +6,6 @@
 	//}
 	
 	require_once("../common/common.inc.php");
-	require_once("../classes/Project.class.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Project_Person.class.php");
 	require_once("../classes/Project_Task.class.php");

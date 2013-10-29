@@ -9,7 +9,7 @@ class Project_Task extends DataObject {
 		//these fields are in the project_person table.
 		"project_id"=>"",
 		"task_id"=>"",
-		"total_budget_hours"=>"",
+		"total_budget_hours"=>""
 	);
 	
 	//function returns all of the tasks associated with a given project (archived and not).

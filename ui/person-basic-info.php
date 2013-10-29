@@ -8,7 +8,7 @@
 	require_once("../classes/Person_Permissions.class.php");
 
 				
-	checkLogin();
+	//checkLogin();
 
 		
 	//get the person off the URL if they came in from the add page.

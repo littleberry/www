@@ -11,7 +11,6 @@
 		//$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
 		//header( 'Location: ../usercake/login.php' ) ;
 	//}
-	include('header.php'); //add header.php to page
 	//checkLogin();
 
 	

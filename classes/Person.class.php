@@ -18,7 +18,7 @@ class Person extends DataObject {
 		"person_hourly_rate"=>"",
 		"person_perm_id"=>"",
 		"person_type"=>"",
-		"person_logo_link" =>"",
+		"person_logo_link" =>""
 	);
 	
 //just starting to work on authentication here... not sure this is where we want to ultimately put this, but for now I'm putting it in the person class.
