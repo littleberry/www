@@ -2,6 +2,7 @@
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
+	require_once("../classes/Project.class.php");
 	
 	//RETRIEVE THE CLIENT ID FROM GET OR POST.
 	if (isset ($_GET["client_id"])) {
@@ -18,8 +19,6 @@
 	$contacts = Contact::getContacts($client_id);
 	//RETRIEVE THE CLIENT DETAILS TO DISPLAY IN THE UI.
 	$client_details = Client::getClient($client_id);
-	error_log("HERE ARE THE CLIENT DETAILS IN CLIENT DETAILS PAGE:");
-	error_log(print_r($client_details,true));
 	if (!isset($client_details)) {
     	error_log("The detailed data for this client is not available. Please investigate why this happened, client_details.php, line 23");
 		exit;
@@ -85,11 +84,29 @@
 			</header>
 			<h1 class="client-projects-title active">Active Projects</h1>
 			<ul class="details-list client-projects-list active">
-				<li class="client-projects-list-item">Atomic Cupcakes</li>
+			<?php 
+				//we'll use an existing function to work this magic. Get all the clients with
+				//projects and then display them (active and archived) by name for a particular client.
+				$clientProjects = Project::getClientsProjectsByStatus(1);
+				foreach($clientProjects as $clientProject) {
+					if ($client_id == $clientProject->getValueEncoded("client_id")) {
+						?> <li class="client-projects-list-item"><?php echo $clientProject->getValueEncoded("project_name") ?></li> <?php
+					}
+				}			
+				?>
 			</ul>
 			<h1 class="client-projects-title archive">Archived Projects</h1>
 			<ul class="details-list client-projects-list archive">
-				<li class="client-projects-list-item">Atomic Cupcakes 'Coming Soon' Campaign</li>
+				<?php 
+				//we'll use an existing function to work this magic. Get all the clients with
+				//projects and then display them (active and archived) by name for a particular client.
+				$clientProjects = Project::getClientsProjectsByStatus(0);
+				foreach($clientProjects as $clientProject) {
+					if ($client_id == $clientProject->getValueEncoded("client_id")) {
+						?> <li class="client-projects-list-item"><?php echo $clientProject->getValueEncoded("project_name") ?></li> <?php
+					}
+				}			
+				?>
 			</ul>
 		</section>
 	</section>
