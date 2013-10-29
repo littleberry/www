@@ -50,13 +50,13 @@
 					processPerson(3);
 				}
 		} else {
-				displayPersonInsertForm(array(), array(), $person, $project);
+				displayPersonInsertForm(array(), array(), $person, $project, $person_perms);
 		} 
 ?>
 
 
 <!--DISPLAY PERSON INSERT WEB FORM--->
-<?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $project) { 
+<?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms) { 
 	//if there are errors in the form display the message
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
@@ -178,7 +178,7 @@ function showP(elem){
 						<p id="perm_ru" style="display: none;">This person can track time and expenses.</p>
 						<div id="perm_pm" style="display: none;">
 						<input type="checkbox" name="create_projects" id="create_projects">Create projects for all clients<br>
-						<input type="checkbox" name="view_notes" id="view_notes">View notes<br>
+						<input type="checkbox" name="view_rates" id="view_notes">View rates<br>
 						<input type="checkbox" name="create_invoices" id="create_invoices">Create invoices for projects they manage<br>
 						</div>
 						<p id="perm_a" style="display: none;">This person can see all projects, invoices and reports in Time Tracker.</p>
@@ -369,12 +369,23 @@ function showP(elem){
 		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
 	));
 	
+	//edit the person_permissions object ($person_perms)
+	$person_perms = new Person_Permissions( array(
+		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
+		"create_projects" => isset($_POST["create_projects"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["create_projects"]) : "",
+		"view_rates" => isset($_POST["view_rates"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["view_rates"]) : "",
+		"create_invoices" => isset($_POST["create_invoices"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["create_invoices"]) : "",
+		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : "",
+	));
+	
 	
 	error_log(print_r($_POST, true));
 	error_log("here is the person array.<br>");
 	error_log(print_r($person,true));
 	error_log("here is the project array.<br>");
 	error_log(print_r($project,true));
+	error_log("here is the person_perm array.<br>");
+	error_log(print_r($person_perms,true));
 	
 	
 //error messages and validation script
@@ -421,16 +432,49 @@ function showP(elem){
 		//lets put this into a try/catch for added security.
 		if ($var == 0) {
 			try {
+				//set up the person id.
+				$person_id = Person::getPersonId($person->getValue("person_email"));
+				$person_perms->setValue("person_id", $person_id["person_id"]);
 				$person->updatePerson($person->getValueEncoded('person_email'));
 				//put in the code here to put the appropriate permissions in the person_perm id table.
+				//we may need other permissions once things flesh out, these are the ones of which I am aware.
 				if ($person->getValue("person_perm_id") == "Regular User") {
-					echo "You want to insert a regualr user.";
+						$person_perms->setValue("create_projects", 0);
+						$person_perms->setValue("view_rates", 0);
+						$person_perms->setValue("create_invoices", 0);
 				} elseif ($person->getValue("person_perm_id") == "Project Manager") {
-					echo "You want to insert a PM.";
+					if (isset($person_perms) && $person_perms->getValue("create_projects") == "on") {
+						$person_perms->setValue("create_projects", 1);					
+					} else {
+						$person_perms->setValue("create_projects",0);
+					}
+					if (isset($person_perms) && $person_perms->getValue("view_rates") == "on") {
+						$person_perms->setValue("view_rates", 1);					
+					} else {
+						$person_perms->setValue("view_rates", 0);
+					}
+					if (isset($person_perms) && $person_perms->getValue("create_invoices") == "on") {
+						$person_perms->setValue("create_invoices", 1);
+					} else {
+						$person_perms->setValue("create_invoices", 0);
+						
+					}
 				} elseif ($person->getValue("person_perm_id") == "Administrator") {
-					echo "You want to insert an admin.";
+						$person_perms->setValue("create_projects", 1);
+						$person_perms->setValue("view_rates", 1);
+						$person_perms->setValue("create_invoices", 1);
 				}
-				displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+				error_log("HERE IS PERSON PERMS");
+				error_log(print_r($person_perms, true));
+				//technically, this should always be an update, since permissions are set when the user is added.
+				//BUT we'll put in a fail case here. If the user doesn't exist, insert. otherwise, update.
+				$person_id = $person_perms->getValue("person_id");
+				if (!$person_perms->getPermissions($person_id)) {
+					$person_perms->insertPermissions();
+				}else{
+					$person_perms->updatePermissions();
+				}
+				displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 			} catch (Exception $e) {
 				echo "something went wrong updating this person into our database.";
 				error_log($e);
@@ -447,14 +491,13 @@ function showP(elem){
 				Project_Person::deletePersonProject($person_id->getValue("person_id"));
 				foreach ($project_ids as $project_id) {	
 					if (($project_id) && ($person_id)) {
-						error_log("inserting " . $project_id . " and " . $person_id->getValue("person_id"));
 						$project_person->insertProjectPerson($person_id->getValue("person_id"), $project_id);
 					}
 				}
 			} catch (Exception $e) {
 				echo "something went wrong with the project add.";
 			}
-			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		} elseif ($var == 2) {
 			//can we just put the password validation check here? HA HA HA HA HA that's funny!!
 			try {
@@ -477,14 +520,14 @@ function showP(elem){
 			} catch (Exception $e) {
 				echo "something went wrong updating the user's password.";
 			}
-			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		} elseif ($var == 3) {
 			try {
 				include("newUserEmail.php");		
 			} catch (Exception $e) {
 				echo "could not send the email for some reason.";
 			}
-			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		}
 	}
 } 
