@@ -21,7 +21,7 @@ class Project extends DataObject {
 		"project_show_budget"=>"",
 		"project_budget_includes_expenses"=>"",
 		"project_notes"=>"",
-		"project_archived"=>"",
+		"project_archived"=>""
 	);
 	
 	//display all information about a project. 
