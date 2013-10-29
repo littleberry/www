@@ -20,6 +20,7 @@ class Project_Person extends DataObject {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
 			$st->execute();
+			$people=array();
 			foreach ($st->fetchAll() as $row) {
 				$people[] = new Person($row);
 			}
