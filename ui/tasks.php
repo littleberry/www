@@ -59,31 +59,43 @@ include('header.php'); //add header.php to page
 				<ul class="details-list client-details-list">
 						<label for="client-name" <?php validateField("task_name", $missingFields)?> class="client-details-label">Task Name:</label>
 						<?php 
-						//DOCUMENT THIS, IT'S TERRIBLE.
 						$tasker = "";
+						//the user wants to add this person, so get the task name off the object that was sent with the post.
 						if ($processType == 'A') {
 							$taskName = $task->getValueEncoded("task_name");
+							$thisTask = $task;
 						} else {
+						//the user came in from edit, so get the task ID off of the get.
 							if (isset($_GET["task_id"])) {
 								$tasker = $_GET["task_id"];
+							//this is just a safety thing.
 							} elseif (isset($_POST["task_id"])) {
 								$tasker = $_POST["task_id"];
 							}
+							//dude, tasker is the task_id, but this is at least funny, reminds me of Disney.
 							$thisTask = $task->getTaskById($tasker);
-							$thisTask = $thisTask->getValue("task_name");
+							//get the task name.
+							$taskName = $thisTask->getValue("task_name");
 						}
+						//so, in the end, we have a list of tasks with thier names and their IDs. All of this so we can put it back in the UI.
 						?>
-						<input id="client-name" name="task-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $thisTask ?>" /><input type="hidden" name="task_id" value="<?php echo $tasker; ?>"><br />
+						<input id="client-name" name="task-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $taskName ?>" /><input type="hidden" name="task_id" value="<?php echo $tasker; ?>"><br />
 					</li>
 					<li class="client-details-item phoneNum">
 						<label for="client-phone" <?php validateField("task_hourly_rate", $missingFields)?> class="client-details-label">Hourly Rate:</label>
-						<input id="client-phone" name="task-hourly-rate" class="client-phone-input" type="text" tabindex="2" value="<?php echo $task->getValueEncoded("task_hourly_rate")?>" />
+						<input id="client-phone" name="task-hourly-rate" class="client-phone-input" type="text" tabindex="2" value="<?php echo $thisTask->getValueEncoded("task_hourly_rate")?>" />
 					</li>
 					<label for="contact-info-sync" class="client-details-label">Billable By Default:</label>
 						<input id="contact-info-sync" name="task-bill-by-default" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" /><br/>
-					<label for="contact-info-sync" class="client-details-label">Common Task (added to all future projects):</label>
-					<input id="contact-info-sync" name="task-common" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" />
-
+					<?php
+					//only show the archive button if we are editing.
+					if ($processType == "E") { ?><br/>
+<button id="client-add-btn" name="task-archived" class="client-add-btn" value="1" tabindex="11"/>Archive Task</button><br/> 					<?php } ?>
+					<?php
+					//this is here to expose when we get there.
+					//<label for="contact-info-sync" class="client-details-label">Common Task (added to all future projects):</label>
+					//<input id="contact-info-sync" name="task-common" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" />
+					?>
 				<fieldset class="client-details-entry">
 				<ul class="details-list client-details-submit">
 					<li class="client-details-item submit-client">
@@ -92,7 +104,10 @@ include('header.php'); //add header.php to page
                         <input id="client-add-btn" name="task-add-btn" class="client-add-btn" type="submit" value="Save Task" tabindex="11"/> 
 						<label for="client-add-btn" class="client-details-label"></label>
 						<!--modified field to be of type submit instead of button-->
-                        <input id="client-add-btn" name="task-add-to-all-btn" class="client-add-btn" type="submit" value="+ Add Task To All Current Projects" tabindex="11"/> 
+                        <?php
+                        //this is here to expose when we get here.
+                        //<input id="client-add-btn" name="task-add-to-all-btn" class="client-add-btn" type="submit" value="+ Add Task To All Current Projects" tabindex="11"/> 
+                        ?>
 					</li>
 				</ul>
 			</fieldset>
@@ -103,7 +118,7 @@ include('header.php'); //add header.php to page
 		<?php
 		//this is the display of all tasks.
 			//1. Get out the task types, this is ugly but it works. Could have called a bunch of functions to get this right but NAAAAAH!!
-			list($tasks) = Task::getTasks(); 
+			list($tasks) = Task::getTasks(0); 
 				//common tasks here 
 				?>
 				<li style="background-color:lightblue;" class="client-info-contact">Tasks common to all projects</li>
@@ -204,10 +219,12 @@ echo "processtype is " . $processType;
 	//create the task object ($task)
 	$task = new Task( array(
 		//CHECK REG SUBS!!
+		"task_id"=>isset($_POST["task_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task_id"]) : "",
 		"task_name" => isset($_POST["task-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task-name"]) : "",
 		"task_hourly_rate" => isset($_POST["task-hourly-rate"]) ? preg_replace("/[^ \$\.\-\_a-zA-Z0-9]/", "", $_POST["task-hourly-rate"]) : "",
 		"task_bill_by_default" => isset($_POST["task-bill-by-default"]) ? preg_replace("/[^ \_0-9]/", "", $_POST["task-bill-by-default"]) : "",
 		"task_common" => isset($_POST["task-common"])? preg_replace("/[^ \_0-9]/", "", $_POST["task-common"]) : "",
+		"task_archived"=>isset($_POST["task-archived"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task-archived"]) : "",
 	));
 	
 	
