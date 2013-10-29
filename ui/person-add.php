@@ -3,6 +3,8 @@
 	require_once("../common/common.inc.php");
 	require_once("../common/errorMessages.php");
 	require_once("../classes/Person.class.php");
+	require_once("../classes/Person_Permissions.class.php");
+
 		//removed auth via userCake re:keith 10/17
 		//if(!isUserLoggedIn()){
 		//redirect if user is not logged in.
@@ -35,7 +37,7 @@
 		</nav>
 	</header>
 
-<!--DISPLAY PROJECT INSERT WEB FORM--->
+<!--DISPLAY PERSON INSERT WEB FORM--->
 <?php function displayPersonInsertForm($errorMessages, $missingFields, $person) { 
 	
 	//if there are errors in the form display the message
@@ -47,6 +49,32 @@
 	
 include('header.php'); //add header.php to page
 ?>
+<script type="text/javascript">
+function FillBilling(f) {
+    //window.alert(f);
+    f.projectidselect.value = f.projectidselect.value + f.projectid.value + ",";
+    //f.shippingname.value;
+    //f.billingcity.value = f.shippingcity.value;
+    //return false;
+    
+}
+function showP(elem){
+   if(elem.value == "Regular User"){
+      document.getElementById('perm_ru').style.display = "block";
+      document.getElementById('perm_pm').style.display = "none";
+      document.getElementById('perm_a').style.display = "none";
+   } else if(elem.value == "Project Manager") {
+      document.getElementById('perm_ru').style.display = "none";
+      document.getElementById('perm_pm').style.display = "block";
+      document.getElementById('perm_a').style.display = "none";
+   } else if(elem.value == "Administrator") {  
+   	 document.getElementById('perm_ru').style.display = "none";
+     document.getElementById('perm_pm').style.display = "none";
+     document.getElementById('perm_a').style.display = "block";
+	}
+}
+
+</script>
 <section id="page-content" class="page-content">
 	<header class="page-header">
 		<h1 class="page-title">Add Person</h1>
@@ -115,13 +143,19 @@ include('header.php'); //add header.php to page
 						$row = Person::getEnumValues("person_perm_id");
 						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 						?>
-						<select name="person-perm-id">
+						<select name="person-perm-id" onchange="showP(this)">
 						<?php
 						foreach($enumList as $value) { ?>
 							<option name="person-perm-id" value="<?php echo $value?>"><?php echo $value ?></option>
 						<?php } ?>
 						</select>
-						<p>This person can track time and expenses.</p>
+						<p id="perm_ru" style="display: none;">This person can track time and expenses.</p>
+						<div id="perm_pm" style="display: none;">
+						<input type="checkbox" name="create_projects" id="create_projects">Create projects for all clients<br>
+						<input type="checkbox" name="view_rates" id="view_notes">View rates<br>
+						<input type="checkbox" name="create_invoices" id="create_invoices">Create invoices for projects they manage<br>
+						</div>
+						<p id="perm_a" style="display: none;">This person can see all projects, invoices and reports in Time Tracker.</p>
 					</li>
 				</ul>
 				<fieldset class="client-details-entry">
@@ -162,10 +196,22 @@ include('header.php'); //add header.php to page
 //		"client_currency_index" => isset($_POST["client_currency_index"])? preg_replace("/[^0-9]/", "", $_POST["client_currency_index"]) : "",
 //		"client_fax" => isset($_POST["client-fax"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-fax"]) : "",
 	));
+	
+	//create the person_permissions object ($person_perms)
+	$person_perms = new Person_Permissions( array(
+		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
+		"create_projects" => isset($_POST["create_projects"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["create_projects"]) : "",
+		"view_rates" => isset($_POST["view_rates"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["view_rates"]) : "",
+		"create_invoices" => isset($_POST["create_invoices"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["create_invoices"]) : "",
+		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : "",
+	));
+	
 	error_log("here is the post<br>");
 	error_log(print_r($_POST, true));
 	error_log("here is the project array.<br>");
 	error_log(print_r($person,true));
+	error_log("here is the person_perm array.<br>");
+	error_log(print_r($person_perms,true));
 	
 	
 //error messages and validation script
@@ -217,6 +263,36 @@ include('header.php'); //add header.php to page
 				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)));			
 			} else {
 				$person->insertPerson();
+				if ($person->getValue("person_perm_id") == "Regular User") {
+						$person_perms->setValue("create_projects", 0);
+						$person_perms->setValue("view_rates", 0);
+						$person_perms->setValue("create_invoices", 0);
+				} elseif ($person->getValue("person_perm_id") == "Project Manager") {
+					if (isset($person_perms) && $person_perms->getValue("create_projects") == "on") {
+						$person_perms->setValue("create_projects", 1);					
+					} else {
+						$person_perms->setValue("create_projects",0);
+					}
+					if (isset($person_perms) && $person_perms->getValue("view_rates") == "on") {
+						$person_perms->setValue("view_rates", 1);					
+					} else {
+						$person_perms->setValue("view_rates", 0);
+					}
+					if (isset($person_perms) && $person_perms->getValue("create_invoices") == "on") {
+						$person_perms->setValue("create_invoices", 1);
+					} else {
+						$person_perms->setValue("create_invoices", 0);
+						
+					}
+				} elseif ($person->getValue("person_perm_id") == "Administrator") {
+						$person_perms->setValue("create_projects", 1);
+						$person_perms->setValue("view_rates", 1);
+						$person_perms->setValue("create_invoices", 1);
+				}
+
+				$person_id = Person::getPersonId($person->getValue("person_email"));
+				$person_perms->setValue("person_id", $person_id["person_id"]);
+				$person_perms->insertPermissions();
 				include("newUserEmail.php");
 				$_SESSION['person'] = serialize($person);
 				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)));
