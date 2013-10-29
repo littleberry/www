@@ -11,15 +11,17 @@ class Task extends DataObject {
 		"task_name"=>"",
 		"task_hourly_rate"=>"",
 		"task_bill_by_default"=>"",
-		"task_common"=>""
+		"task_common"=>"",
+		"task_archived"=>""
 	);
 	
-	//display all information about a task. returned as an array. This function returns all tasks, archived and not.
-	public static function getTasks() {
+	//display all information about a task. returned as an array. This function returns all tasks, archived and not, based on value passed in.
+	public static function getTasks($archive_flag) {
 		$conn=parent::connect();
-		$sql="SELECT * FROM " . TBL_TASK;
+		$sql="SELECT * FROM " . TBL_TASK . " WHERE task_archived = :archive_flag";
 		try {
 			$st = $conn->prepare($sql);
+			$st->bindValue(":archive_flag", $archive_flag, PDO::PARAM_INT);
 			$st->execute();
 			foreach ($st->fetchAll() as $row) {
 				$tasks[] = new Task($row);
@@ -141,7 +143,8 @@ class Task extends DataObject {
 				task_name = :task_name,
 				task_hourly_rate = :task_hourly_rate,
 				task_bill_by_default = :task_bill_by_default,
-				task_common = :task_common
+				task_common = :task_common,
+				task_archived = :task_archived
 				WHERE task_id = :task_id";
 			try {
 				$st = $conn->prepare($sql);
@@ -149,6 +152,7 @@ class Task extends DataObject {
 				$st->bindValue(":task_hourly_rate", $this->data["task_hourly_rate"], PDO::PARAM_STR);
 				$st->bindValue(":task_bill_by_default", $this->data["task_bill_by_default"], PDO::PARAM_STR);
 				$st->bindValue(":task_common", $this->data["task_common"], PDO::PARAM_STR);
+				$st->bindValue(":task_archived", $this->data["task_archived"], PDO::PARAM_STR);
 				$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
 				$st->execute();	
 				parent::disconnect($conn);
@@ -157,6 +161,24 @@ class Task extends DataObject {
 				die("Query failed on update of task: " . $e->getMessage() . " sql is " . $sql);
 			}
 	}
+	
+	//archive this task, you also have to remove it from project_task.	
+	public function archiveTask($archive_flag, $task_id) {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_TASK . " SET
+				task_archived = :archive_flag WHERE task_id = :task_id";
+			try {
+				$st = $conn->prepare($sql);
+				$st->bindValue(":archive_flag", $archive_flag, PDO::PARAM_INT);
+				$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
+				$st->execute();	
+				parent::disconnect($conn);
+			} catch (PDOException $e) {
+				parent::disconnect($conn);
+				die("Query failed on archive of task: " . $e->getMessage() . " sql is " . $sql);
+			}
+	}
+
 
 }
 
