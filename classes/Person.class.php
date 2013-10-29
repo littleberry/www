@@ -295,6 +295,23 @@ public static function getByUserName($person_username) {
 		}
 	}
 	
+	//get the person_id based on the email.
+	public static function getPersonId($person_email) {
+		$conn=parent::connect();
+		$sql = "SELECT person_id FROM " . TBL_PERSON . " WHERE person_email = :person_email";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_email", $person_email, PDO::PARAM_STR);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on you: " . $e->getMessage() . " sql is " . $sql);
+		}
+	}
+	
 	//delete this person, assumes they have no active projects.
 	public function deletePerson($person_id) {
 		$conn=parent::connect();
