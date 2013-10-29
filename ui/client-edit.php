@@ -1,9 +1,4 @@
 <?php
-	function displayClientPage() {
-		//this probably isn't right, but I'll use it for now. won't work if JavaScript is off.
-		printf("<script>location.href='clients.php'</script>");
-	}
-	
 	require_once("../common/common.inc.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
@@ -255,8 +250,6 @@
 					echo("Huh? You don't have any contacts??");
 				}	
 				foreach ($contact as $contacts) {
-					error_log("LKJDHKLJHLKJHLKJHLKJHLKJHL");
-					error_log(print_r($contact, true));
 					?>
 					
 			<fieldset id="contact-details" class="contact-details-entry">
@@ -497,7 +490,7 @@
 			$i++;
 		}
 	} else {
-		//TAKE THIS OUT FOR NOW AND DEAL WITH IT LATER!!
+		//TAKE THIS OUT. We can do this validation in javascript or some other way. 
 		/*$clientEmail = $client->getValue("client_email");
 		$clientPhone = $client->getValue("client_phone");
 		$clientZip = $client->getValue("client_zip");
@@ -559,7 +552,7 @@
 			$contacts->insertContact($client_id);
 		}
 		
-		displayClientPage();	
+		displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact);
 	}
 }
 
