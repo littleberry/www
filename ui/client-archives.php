@@ -78,11 +78,12 @@
 				?>
 
 			<li class="client-list-item l-col-33">
-				<img class="client-logo-thumbnail thumbnail" src="<?php echo $client->getValueEncoded("client_logo_link")?>" title="Client Logo" alt="Client Logo" />
+				<img class="client-logo-thumbnail thumbnail" src="<?php echo "images/" . $client->getValueEncoded("client_logo_link")?>" title="Client Logo" alt="Client Logo" />
 				<ul class="client-info-list">
 					<li class="client-info-name"><a class="client-info-name-link" href="<?php echo "client-detail.php?client_id=" . $client_id[0]?>" title="View client details"><?php echo $client->getValueEncoded("client_name")?></a></li>
 					<li class="client-info-contact">Contact: <a class="client-info-contact-link" href="#" title="View contact details"><?php echo $primary_contact->getValue("contact_name") ?></a></li>
-					<li class="client-info-active-projects">X Active <a class="client-info-active-projects-link" href="#" title="View active projects">Projects</a></li>
+					<?php //take this out of the UI, if the person is archived they have no active projects.?>
+					<!---li class="client-info-active-projects">X Active <a class="client-info-active-projects-link" href="#" title="View active projects">Projects</a></li--->
 					<?php 
 				//just putting this here for now, remove it once the appropriate UI solution is in place.?>
 				<!--so, you want I should archive your client?-->
