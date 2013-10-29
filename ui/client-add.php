@@ -45,6 +45,8 @@
 		}
 	}
 	
+	
+			
 ?>
 	<section class="content">
     <!--added because we need the information to be submitted in a form-->
@@ -52,7 +54,7 @@
       <input type="hidden" name="action" value="client-add"/>
     <!--end add-->
 		<figure class="client-logo l-col-20">
-			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
+			<img class="client-logo-img small" src=" <?php echo "images/default.jpg"?>" title="Client/Company name logo" alt="Client/Company name logo" />
 			<fieldset class="client-logo-upload">
 				<legend class="client-logo-title">Upload Client Logo</legend>
 				<header class="client-logo-header">
