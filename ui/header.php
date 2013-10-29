@@ -44,6 +44,7 @@ Edit this file for updating links to pages/screens
 			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="people.php">People</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="tasks.php">Tasks</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out</a></li>
 		</ul>
 	</nav>
 </header>
