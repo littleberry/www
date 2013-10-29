@@ -330,6 +330,7 @@ input[type=button].delete-btn:hover {
 	padding: 0em 1em;
 	border-left: 1px solid #193E73;
 	border-right: 1px solid #193E73;
+	overflow: auto;
 }
 
 .site-menu {
@@ -337,11 +338,13 @@ input[type=button].delete-btn:hover {
 	list-style: none;
 	margin: 0em;
 	padding: 0em;
+	overflow: auto;
 }
 
 .site-menu-item {
 	position: relative;
 	float: left;
+	overflow: auto;
 	margin: .5em;
 	padding: 0;
 }
@@ -356,6 +359,26 @@ input[type=button].delete-btn:hover {
 	color: #A9BFF5;
 	text-decoration: underline;
 }
+
+.util-nav {
+	position: relative;
+	float: right;
+	color: #FAF9FF;
+	margin: 1em;
+	padding: 0em 1em;
+	border-left: 1px solid #193E73;
+	border-right: 1px solid #193E73;
+	overflow: auto;
+}
+
+.util-menu {
+	position: relative;
+	list-style: none;
+	margin: 0em;
+	padding: 0em;
+	overflow: auto;
+}
+
 
 .section-nav {
 	position: relative;

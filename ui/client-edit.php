@@ -4,43 +4,28 @@
 	require_once("../classes/Contact.class.php");
 	require_once("../common/errorMessages.php");
 	
-	include('header.php'); //add header.php to page
-?>
-
-
-<section id="page-content" class="page-content">
-	<header class="page-header">
-		<h1 class="page-title">Edit Client Details</h1>
-		<nav class="page-controls-nav">
-			<ul class="page-controls-list client">
-				<li class="page-controls-item link-btn"><a class="add-client-link" href="client-add.php">+ Add Client</a></li>
-				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.php">View Archives</a></li>
-				<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
-			</ul>
-		</nav>
-	</header>
-	<?php
-		/*OVERALL CONTROL
-		1. first time user comes in, call the displayClientAndContactsEditForm function.
-		2. Set the client and contact objects to the value pulled from the database.
-		3. User clicks on a button to submit the form, call the editClientAndContacts function.
-		4. If required fields are missing in the form, re-display the form with error messages.
-		5. If there are no missing required fields, call Client::updateClient AND Contact:updateContact	*/
- 			
-				if (isset($_POST["action"]) and $_POST["action"] == "edit_client") {
-					//error_log("user came in from form, calling editClientAndContacts");
-					editClientAndContacts();
-				} else {
-					//error_log("showing the edit form, this is the first time the user has come iin.");
-					displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
-				}
+	/*OVERALL CONTROL
+	1. first time user comes in, call the displayClientAndContactsEditForm function.
+	2. Set the client and contact objects to the value pulled from the database.
+	3. User clicks on a button to submit the form, call the editClientAndContacts function.
+	4. If required fields are missing in the form, re-display the form with error messages.
+	5. If there are no missing required fields, call Client::updateClient AND Contact:updateContact	*/
+			
+	if (isset($_POST["action"]) and $_POST["action"] == "edit_client") {
+		//error_log("user came in from form, calling editClientAndContacts");
+		editClientAndContacts();
+	} else {
+		//error_log("showing the edit form, this is the first time the user has come iin.");
+		displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
+	}
 	
 	/*DISPLAY CLIENT AND CONTACT EDIT WEB FORM (displayClientAndContactEditForm)
 	note...I think we can remove the PHP validation to update the style in validateField
 	1. This is the form displayed to the user, the first time the user comes in it gets the client_id out of the $_GET variable (please encode!!)
 	2. If first time, pull the client and contact objects from the database.
 	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.*/
-?>	
+?>
+
 <?php function displayClientAndContactsEditForm($errorMessages, $missingFields, $client, $contact) {
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
@@ -56,8 +41,21 @@
 		//error_log(gettype($contact));
 	}
 	
+	include('header.php'); //add header.php to page
 	
 ?>
+
+<section id="page-content" class="page-content">
+	<header class="page-header">
+		<h1 class="page-title">Edit Client Details</h1>
+		<nav class="page-controls-nav">
+			<ul class="page-controls-list client">
+				<li class="page-controls-item link-btn"><a class="add-client-link" href="client-add.php">+ Add Client</a></li>
+				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.php">View Archives</a></li>
+				<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
+			</ul>
+		</nav>
+	</header>
 
 	<section class="content">
 		<!--BEGIN FORM-->

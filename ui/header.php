@@ -35,6 +35,12 @@ Edit this file for updating links to pages/screens
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Reports</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Invoices</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="manage.php">Manage</a></li>
+			
+		</ul>
+	</nav>
+	<nav id="util-nav" class="util-nav">
+		<ul id="util-menu" class="util-menu">
+			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out</a></li>
 		</ul>
 	</nav>
 	<nav id="section-nav" class="section-nav manage">
@@ -44,7 +50,6 @@ Edit this file for updating links to pages/screens
 			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="people.php">People</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="tasks.php">Tasks</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out</a></li>
 		</ul>
 	</nav>
 </header>
