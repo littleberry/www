@@ -1,7 +1,6 @@
 <?php
 
 
-//connectivity
 require_once("DataObject.class.php");
 
 class Project extends DataObject {
