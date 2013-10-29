@@ -332,7 +332,7 @@ class Client extends DataObject {
 	}
 	
 	
-	//get the archive flag out of the client table.
+//if you delete a client you delete all of the contacts associated with them as well.
 	public function deleteClient($client_id) {
 		//first delete the contacts.
 		$conn=parent::connect();
@@ -354,8 +354,10 @@ class Client extends DataObject {
 			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
 			$st->execute();
 			parent::disconnect($conn);
+			return 1;
 		} catch(PDOException $e) {
 			parent::disconnect($conn);
+			return 0;
 			die("Query failed on delete of client: " . $e->getMessage());
 		}
 	}

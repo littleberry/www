@@ -20,6 +20,7 @@ define ("TBL_CONTACT", "contact");
 //table definitions for project path
 define ("TBL_PROJECT", "project");
 //table definitions for people path
+//table definition for permissions
 define ("TBL_PERSON", "person");
 define ("TBL_PERSON_PERMISSIONS", "person_permissions");
 //table definitions for task path

@@ -24,13 +24,14 @@
 			</ul>
 		</nav>
 	</header>
-	<!--OVERALL CONTROL
+	<?php
+		/*OVERALL CONTROL
 		1. first time user comes in, call the displayClientAndContactsEditForm function.
 		2. Set the client and contact objects to the value pulled from the database.
 		3. User clicks on a button to submit the form, call the editClientAndContacts function.
 		4. If required fields are missing in the form, re-display the form with error messages.
-		5. If there are no missing required fields, call Client::updateClient AND Contact:updateContact-->	
-<?php 			
+		5. If there are no missing required fields, call Client::updateClient AND Contact:updateContact	*/
+ 			
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_client") {
 					//error_log("user came in from form, calling editClientAndContacts");
 					editClientAndContacts();
@@ -201,14 +202,11 @@
 					?>
 					<li class="entity-details-item currency client">
 						<label for="client-currency" class="entity-details-label client">Preferred currency:</label>
-						<select name="client_currency_index" id="client_currency_index" size="1">    
-						<?php foreach ($currency as $currencies) { ?>
-   							<option value="<?php echo $currencies["client_currency_index"] ?>"<?php setSelected($client, "client_currency_index", $currencies["client_currency_index"]) ?>><?php echo $currencies["client_preferred_currency"]?></option>
-    					<?php } ?>
-<!--only commented this out because currencies are from the DB.--->
-						<!-- <select id="client-currency" name="client-currency" class="client-currency-select" tabindex="10">
-							<option value="">Select currency</option>
-							<option selected="selected" value="USD">United States Dollar</option> -->
+						<select name="client_currency_index" id="client_currency_index" size="1">
+							<option value="">Select currency</option>   
+							<?php foreach ($currency as $currencies) { ?>
+	   							<option value="<?php echo $currencies["client_currency_index"] ?>"<?php setSelected($client, "client_currency_index", $currencies["client_currency_index"]) ?>><?php echo $currencies["client_preferred_currency"]?></option>
+	    					<?php } ?>
 						</select>
 					</li>
 					<!--leave these alone for now. Keep this UI as a single form, but these values have no errors associated with them
@@ -234,7 +232,7 @@
 			<header class="details-header contact-details-header">
 				<h1 class="client-details-title">Contacts</h1>
 			</header>
-		<!--there are multiple contacts. loop through them.--->
+				<!--there are multiple contacts. loop through them.--->
 				<!--this is SO going to break the UI!-->
 				<!--need to figure out how to get these things into an array.-->
 				<!--these values ARE part of the post, but there could be many of them.-->
@@ -250,8 +248,15 @@
 				$contact = new Contact(array());
 				}
 				$i = 0;
+				//there aren't any contacts here. Technically, you shouldn't be able to do this but better safe than sorry.
+				if(!count($contact)) {
+					echo("Huh? You don't have any contacts??");
+				}	
 				foreach ($contact as $contacts) {
+					error_log("LKJDHKLJHLKJHLKJHLKJHLKJHL");
+					error_log(print_r($contact, true));
 					?>
+					
 			<fieldset id="contact-details" class="contact-details-entry">
 				<!-- <legend class="contact-details-title">Edit contact details:</legend> -->
 				<header class="contact-details-header">
@@ -341,7 +346,7 @@
 	</section>
 </section>
 
-<!--CLIENT AND CONTACT PROCESSING FUNCTIONS (editClientAndContacts();)
+<?php /*CLIENT AND CONTACT PROCESSING FUNCTIONS (editClientAndContacts();)
 	1. Set up the required fields in each of the forms.
 	2. Create the objects based on the values that were submitted the last time the user submitted the form.
 	3. Set up the required fields in the $requiredFields array.
@@ -351,7 +356,7 @@
 	6. If there are error messages, call displayClientAndContactsEditForm with the error messages, the missing fields, and all the data for the object and the whole thing starts over again.
 	7. If there are no errors, update the database with the new client and contact information.
 	8. If all went well, display the client details page.
-	-->
+	*/ ?>
 <?php function editClientAndContacts() {
 	$requiredFields = array("client_name","contact_name");
 	$missingFields = array();

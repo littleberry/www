@@ -14,6 +14,7 @@
 	}
 	
 	//RETRIEVE ALL OF THE CONTACTS FOR THIS CLIENT. NOTE THIS IS ALL CLIENTS, ACTIVE AND ARCHIVED.
+	$contacts = "";
 	$contacts = Contact::getContacts($client_id);
 	//RETRIEVE THE CLIENT DETAILS TO DISPLAY IN THE UI.
 	$client_details = Client::getClient($client_id);
@@ -32,14 +33,9 @@
 		<h1 class="page-title">Client Details</h1>
 		<nav class="page-controls-nav">
 			<ul class="page-controls-list client">
-				<!--
-<li class="page-controls-item add-client-button"><a class="add-client-link" href="client-add.html">+ Add Client</a></li>
-				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
--->
-				<!-- I am just putting this here because I need to send the client id into the client-edit php file.-->
 				<li class="page-controls-item link-btn"><a class="view-all-link" href="client-edit.php?client_id=<?php echo $client_id?>">Edit Client</a></li>
-<!--end-->
-<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
+				<li class="page-controls-item"><a class="view-all-link" href="clients.php">View All</a></li>
+				<li class="page-controls-item"><a class="view-client-archive-link" href="client-archives.html">View Archives</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -68,6 +64,7 @@
 			</header>
            <?php 
            //DISPLAY THE CONTACT DETAILS FOR THIS CLIENT.
+           $contact = "";
            foreach ($contacts as $contact) { ?>
 			<ul class="details-list contact-details-list">
 				<li class="contact-details-item name"><?php echo $contact->getValue("contact_name")?></li>

@@ -3,41 +3,95 @@
 
 require_once("DataObject.class.php");
 
-class Contact extends DataObject {
+class Person_Permissions extends DataObject {
 	protected $data = array(
-		"contact_id"=>"",
-		"contact_name"=>"",
-		"contact_email"=>"",
-		"contact_office_number"=>"",
-		"contact_mobile_number"=>"",
-		"contact_fax_number"=>"",
-		"contact_id"=>"",
-		"client_id"=>"",
-		"contact_primary"=>""
+		"person_perm_id"=>"",
+		"create_projects"=>"",
+		"view_rates"=>"",
+		"create_invoices"=>"",
+		"person_id"=>""
 	);
 	
 	//display all contact data for the client
-	public static function getContacts($client_id) {
+	public static function getPermissions($person_id) {
 		$conn=parent::connect();
-		$sql="SELECT * FROM " . TBL_CONTACT . " where client_id = " . $client_id;
+		$sql="SELECT * FROM " . TBL_PERSON_PERMISSIONS . " where person_id = :person_id";
 		
 		try {
 			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->execute();
-			$contact=array();
+			$person_perms=array();
 			foreach ($st->fetchAll() as $row) {
-				$contact[] = new Contact($row);
+				$person_perms[] = new Person_Permissions($row);
 			}
 			$row=$st->fetch();
 			parent::disconnect($conn);
-			return $contact;
+			return $person_perms;
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+	
+	public function insertPermissions() {
+		$conn=parent::connect();
+		$sql = "INSERT INTO " . TBL_PERSON_PERMISSIONS . " (
+			person_perm_id,
+			create_projects,
+			view_rates,
+			create_invoices,
+			person_id
+			) VALUES (
+			:person_perm_id,
+			:create_projects,
+			:view_rates,
+			:create_invoices,
+			:person_id
+			)";
+		
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_perm_id", $this->data["person_perm_id"], PDO::PARAM_INT);
+			$st->bindValue(":create_projects", $this->data["create_projects"], PDO::PARAM_INT);
+			$st->bindValue(":view_rates", $this->data["view_rates"], PDO::PARAM_INT);
+			$st->bindValue(":create_invoices", $this->data["create_invoices"], PDO::PARAM_INT);
+			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_INT);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on insert of person permissions, sql is $sql " . $e->getMessage());
+		}		
+	}
+	
+	public function updatePermissions() {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_PERSON_PERMISSIONS . " SET
+				person_perm_id = :person_perm_id,
+				create_projects = :create_projects,
+				view_rates = :view_rates,
+				create_invoices = :create_invoices
+				WHERE person_id = :person_id";
+			try {
+				$st = $conn->prepare($sql);
+				$st->bindValue(":person_perm_id", $this->data["person_perm_id"], PDO::PARAM_INT);
+				$st->bindValue(":create_projects", $this->data["create_projects"], PDO::PARAM_INT);
+				$st->bindValue(":view_rates", $this->data["view_rates"], PDO::PARAM_INT);
+				$st->bindValue(":create_invoices", $this->data["create_invoices"], PDO::PARAM_INT);
+				$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_INT);
+				$st->execute();	
+				parent::disconnect($conn);
+			} catch (PDOException $e) {
+				parent::disconnect($conn);
+				die("Query failed on update: " . $e->getMessage() . " sql is " . $sql);
+			}
+	}
 
-	//the information for the primary contact only
+}
+
+
+	/*//the information for the primary contact only
 	public static function getPrimaryContact($client_id) {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_CONTACT . " where client_id = :client_id AND contact_primary = " . 1;
@@ -430,5 +484,4 @@ class Contact extends DataObject {
 			die("query failed: " . $e->getMessage() );
 		}
 	}*/
-}
 ?>

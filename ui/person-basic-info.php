@@ -5,6 +5,8 @@
 	require_once("../classes/Person.class.php");
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Project_Person.class.php");
+	require_once("../classes/Person_Permissions.class.php");
+
 				
 	checkLogin();
 
@@ -48,15 +50,13 @@
 					processPerson(3);
 				}
 		} else {
-				displayPersonInsertForm(array(), array(), $person, $project);
+				displayPersonInsertForm(array(), array(), $person, $project, $person_perms);
 		} 
 ?>
 
 
 <!--DISPLAY PERSON INSERT WEB FORM--->
-<?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $project) { 
-	
-	
+<?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms) { 
 	//if there are errors in the form display the message
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
@@ -73,7 +73,24 @@ function FillBilling(f) {
     //f.shippingname.value;
     //f.billingcity.value = f.shippingcity.value;
     //return false;
+    
 }
+function showP(elem){
+   if(elem.value == "Regular User"){
+      document.getElementById('perm_ru').style.display = "block";
+      document.getElementById('perm_pm').style.display = "none";
+      document.getElementById('perm_a').style.display = "none";
+   } else if(elem.value == "Project Manager") {
+      document.getElementById('perm_ru').style.display = "none";
+      document.getElementById('perm_pm').style.display = "block";
+      document.getElementById('perm_a').style.display = "none";
+   } else if(elem.value == "Administrator") {  
+   	 document.getElementById('perm_ru').style.display = "none";
+     document.getElementById('perm_pm').style.display = "none";
+     document.getElementById('perm_a').style.display = "block";
+	}
+}
+
 </script>
 <section id="page-content" class="page-content">
 	<header class="page-header">
@@ -151,13 +168,20 @@ function FillBilling(f) {
 						$row = Person::getEnumValues("person_perm_id");
 						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 						?>
-						<select name="person-perm-id">
+						<?php //yeah, this is super lame. ?>
+						<select name="person-perm-id" onchange="showP(this)">
 						<?php
 						foreach($enumList as $value) { ?>
 							<option name="person-perm-id" value="<?php echo $value?>"><?php echo $value ?></option>
 						<?php } ?>
 						</select>
-						<p>This person can track time and expenses.</p>
+						<p id="perm_ru" style="display: none;">This person can track time and expenses.</p>
+						<div id="perm_pm" style="display: none;">
+						<input type="checkbox" name="create_projects" id="create_projects">Create projects for all clients<br>
+						<input type="checkbox" name="view_rates" id="view_notes">View rates<br>
+						<input type="checkbox" name="create_invoices" id="create_invoices">Create invoices for projects they manage<br>
+						</div>
+						<p id="perm_a" style="display: none;">This person can see all projects, invoices and reports in Time Tracker.</p>
 					</li>
 					<fieldset class="person-logo-upload">
 				<!--legend class="person-logo-title">Upload Person Image</legend-->
@@ -165,7 +189,8 @@ function FillBilling(f) {
 					<h1 class="person-logo-title">Upload Person Image</h1>
 				</header>
 				<?//hack the image by using a hidden field.?>
-				<input type="hidden" name="person-logo-file" value="<?php echo $person->getValue("person_logo_link")?>">
+				<?//this is where we put the image into the post array!?>
+				<input type="hidden" id="person-logo-file" name="person-logo-file" value="<?php echo $person->getValue("person_logo_link")?>">
 				<input id="person-logo-file" name="person-logo-file" class="person-logo-file" type="file" value="browse" tabindex="21" />
 			</fieldset>
 			
@@ -175,7 +200,10 @@ function FillBilling(f) {
 						<label for="client-add-btn" class="client-details-label">All done?</label>
 						<!--modified field to be of type submit instead of button-->
                         <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Save Person" tabindex="11"/> 
-						 or <a class="" href="#" tabindex="11">Cancel</a>
+						 or <a class="" href="#" tabindex="11">Cancel</a></li>
+						 <li>
+						 <?php $person_id=$person->getValue("person_id");?>
+						 <input id="client-delete-btn" name="person-delete-btn" class="client-delete-btn" onclick="window.open('delete_person.php?person_id=<?php echo $person_id ?>','myWindow','width=200,height=200,left=250%,right=250%,scrollbars=no')" type="button" value="- Delete Person" tabindex="11" />	
 					</li>
 				</ul>
 			</fieldset>
@@ -308,8 +336,8 @@ function FillBilling(f) {
 		"person_department" => isset($_POST["person-department"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["person-department"]) : "",
 		"person_hourly_rate" => isset($_POST["person-hourly-rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-hourly-rate"]) : "",
 		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
-		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
-		"person_logo_link" => isset($_POST["person_logo_link"]) ? preg_replace("/[^ \/\\-\_a-zA-Z0-9^.]/", "", $_POST["person_logo_link"]) :$_FILES["person_logo_link"],
+		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \.\-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
+		"person_logo_link" => isset($_POST["person_logo_link"]) ? preg_replace("/[^ \.\/\-\_a-zA-Z0-9]/", "", $_POST["person_logo_link"]) :$_FILES["person_logo_link"],
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
 	));
 	
@@ -341,13 +369,23 @@ function FillBilling(f) {
 		"total_budget_hours" => isset($_POST["total_project_hours"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["total_project_hours"]) : "",
 	));
 	
+	//edit the person_permissions object ($person_perms)
+	$person_perms = new Person_Permissions( array(
+		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
+		"create_projects" => isset($_POST["create_projects"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["create_projects"]) : "",
+		"view_rates" => isset($_POST["view_rates"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["view_rates"]) : "",
+		"create_invoices" => isset($_POST["create_invoices"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["create_invoices"]) : "",
+		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : "",
+	));
 	
-	error_log("here is the post<br>");
+	
 	error_log(print_r($_POST, true));
 	error_log("here is the person array.<br>");
 	error_log(print_r($person,true));
 	error_log("here is the project array.<br>");
 	error_log(print_r($project,true));
+	error_log("here is the person_perm array.<br>");
+	error_log(print_r($person_perms,true));
 	
 	
 //error messages and validation script
@@ -394,8 +432,49 @@ function FillBilling(f) {
 		//lets put this into a try/catch for added security.
 		if ($var == 0) {
 			try {
+				//set up the person id.
+				$person_id = Person::getPersonId($person->getValue("person_email"));
+				$person_perms->setValue("person_id", $person_id["person_id"]);
 				$person->updatePerson($person->getValueEncoded('person_email'));
-				displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+				//put in the code here to put the appropriate permissions in the person_perm id table.
+				//we may need other permissions once things flesh out, these are the ones of which I am aware.
+				if ($person->getValue("person_perm_id") == "Regular User") {
+						$person_perms->setValue("create_projects", 0);
+						$person_perms->setValue("view_rates", 0);
+						$person_perms->setValue("create_invoices", 0);
+				} elseif ($person->getValue("person_perm_id") == "Project Manager") {
+					if (isset($person_perms) && $person_perms->getValue("create_projects") == "on") {
+						$person_perms->setValue("create_projects", 1);					
+					} else {
+						$person_perms->setValue("create_projects",0);
+					}
+					if (isset($person_perms) && $person_perms->getValue("view_rates") == "on") {
+						$person_perms->setValue("view_rates", 1);					
+					} else {
+						$person_perms->setValue("view_rates", 0);
+					}
+					if (isset($person_perms) && $person_perms->getValue("create_invoices") == "on") {
+						$person_perms->setValue("create_invoices", 1);
+					} else {
+						$person_perms->setValue("create_invoices", 0);
+						
+					}
+				} elseif ($person->getValue("person_perm_id") == "Administrator") {
+						$person_perms->setValue("create_projects", 1);
+						$person_perms->setValue("view_rates", 1);
+						$person_perms->setValue("create_invoices", 1);
+				}
+				error_log("HERE IS PERSON PERMS");
+				error_log(print_r($person_perms, true));
+				//technically, this should always be an update, since permissions are set when the user is added.
+				//BUT we'll put in a fail case here. If the user doesn't exist, insert. otherwise, update.
+				$person_id = $person_perms->getValue("person_id");
+				if (!$person_perms->getPermissions($person_id)) {
+					$person_perms->insertPermissions();
+				}else{
+					$person_perms->updatePermissions();
+				}
+				displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 			} catch (Exception $e) {
 				echo "something went wrong updating this person into our database.";
 				error_log($e);
@@ -412,14 +491,13 @@ function FillBilling(f) {
 				Project_Person::deletePersonProject($person_id->getValue("person_id"));
 				foreach ($project_ids as $project_id) {	
 					if (($project_id) && ($person_id)) {
-						error_log("inserting " . $project_id . " and " . $person_id->getValue("person_id"));
 						$project_person->insertProjectPerson($person_id->getValue("person_id"), $project_id);
 					}
 				}
 			} catch (Exception $e) {
 				echo "something went wrong with the project add.";
 			}
-			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		} elseif ($var == 2) {
 			//can we just put the password validation check here? HA HA HA HA HA that's funny!!
 			try {
@@ -442,14 +520,14 @@ function FillBilling(f) {
 			} catch (Exception $e) {
 				echo "something went wrong updating the user's password.";
 			}
-			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		} elseif ($var == 3) {
 			try {
 				include("newUserEmail.php");		
 			} catch (Exception $e) {
 				echo "could not send the email for some reason.";
 			}
-			displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
+			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		}
 	}
 } 
