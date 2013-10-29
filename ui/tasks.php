@@ -12,6 +12,8 @@
 	//OVERALL CONTROL
 	//I need this code to be first so I can redirect the page. We may need to do this for others
 	//in this page, display is integrated with the add feature (no beeg)
+		checkLogin();
+
 		
 		$processType = "A";
 		if (isset($_GET["task_id"]) && $_GET["task_id"] == "") {
