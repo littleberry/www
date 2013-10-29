@@ -17,7 +17,7 @@ class Contact extends DataObject {
 	);
 	
 	//display all contact data for the client
-	public static function getContacts($client_id) {
+	public function getContacts($client_id) {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_CONTACT . " where client_id = " . $client_id;
 		
@@ -38,7 +38,7 @@ class Contact extends DataObject {
 	}
 
 	//the information for the primary contact only
-	public static function getPrimaryContact($client_id) {
+	public function getPrimaryContact($client_id) {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_CONTACT . " where client_id = :client_id AND contact_primary = " . 1;
 		
