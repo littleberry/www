@@ -7,17 +7,18 @@ $(document).ready( function() {
 	
 	var projectDetail = {};
 	$.get( "returnJSON.php", {
-			func: "returnProjectJSON" ,
-			projid: 1
-		}).done( function() {
-				console.log("done");
+			func: "returnTasksJSON" ,
+			id: "1",
+			collection: "task"
+		}).done( function( data ) {
+				console.log("done: " + data);
 			})
 			.fail( function( data ) {
 				console.log("fail: " + data);
 			})
 			.success( function( data ) {
 				projectDetail.project = $.parseJSON(data);
-				console.log(projectDetail.project.project_name);
+				console.log(projectDetail.project);
 			});
 
 	//console.log(projectDetail)
