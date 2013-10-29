@@ -54,7 +54,7 @@
 				if ($archive_flag != 1) {
 				?>
 			<li class="entity-list-item client l-col-33">
-				<img class="client-logo-thumbnail thumbnail" src="<?php echo $client->getValueEncoded("client_logo_link")?>" title="Client Logo" alt="Client Logo" />
+				<img class="client-logo-thumbnail thumbnail" src="<?php echo "images/" . $client->getValueEncoded("client_logo_link")?>" title="Client Logo" alt="Client Logo" />
 				<ul class="entity-info-list client">
 					<li class="entity-info-item client"><a class="client-info-name-link" href="<?php echo "client-detail.php?client_id=" . $client->getValueEncoded("client_id")?>" title="View client details"><?php echo $client->getValueEncoded("client_name")?></a></li>
 					<li class="entity-info-item client">Contact: <a class="client-info-contact-link" href="#" title="View contact details"><?php echo $primary_contact->getValue("contact_name") ?></a></li>
