@@ -7,6 +7,8 @@
 		//$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
 		//header( 'Location: http://localhost:8888/time_tracker/usercake/login.php' ) ;
 	//}
+		checkLogin();
+
 	
 	include('header.php'); //add header.php to page
 	?>
