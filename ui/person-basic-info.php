@@ -238,9 +238,11 @@ function showP(elem){
 		} 
 		//output all of this users current projects in id form, this is what the database needs. :) HIDE THIS!!
 		?>">
+		
 		<input id="projectidselect" name="projectidselect" class="projectidselect" type="text" tabindex="8" value="<?php
 		//output all of this users current projects.
-		list($projectForPerson) = Project_Person::getProjectsForPerson($person->getValue("person_id"));
+		
+		list($projectForPerson) = Project_Person::getProjectsForPerson($person_perms->getValue("person_id"));
 		
 		foreach ($projectForPerson as $projectPerson) {
 				 echo $projectPerson->getValue("project_id") . ",";
@@ -359,7 +361,7 @@ function showP(elem){
 		"person_last_name" => isset($_POST["person-last-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-last-name"]) : "",
 		"person_email" => isset($_POST["person-email"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9^@^.]/", "", $_POST["person-email"]) : "",
 		"person_department" => isset($_POST["person-department"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["person-department"]) : "",
-		"person_hourly_rate" => isset($_POST["person-hourly-rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-hourly-rate"]) : "",
+		"person_hourly_rate" => isset($_POST["person-hourly-rate"])? preg_replace("/[^ \.\-\_a-zA-Z0-9]/", "", $_POST["person-hourly-rate"]) : "",
 		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
 		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \.\-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
 		"person_logo_link" => isset($_POST["person_logo_link"]) ? preg_replace("/[^ \.\/\-\_a-zA-Z0-9]/", "", $_POST["person_logo_link"]) :$_FILES["person_logo_link"],
@@ -455,6 +457,7 @@ function showP(elem){
 		displayPersonInsertForm($errorMessages, $missingFields, $person, $project);
 	} else {
 		//lets put this into a try/catch for added security.
+		
 		if ($var == 0) {
 			try {
 				//set up the person id.
@@ -489,8 +492,6 @@ function showP(elem){
 						$person_perms->setValue("view_rates", 1);
 						$person_perms->setValue("create_invoices", 1);
 				}
-				error_log("HERE IS PERSON PERMS");
-				error_log(print_r($person_perms, true));
 				//technically, this should always be an update, since permissions are set when the user is added.
 				//BUT we'll put in a fail case here. If the user doesn't exist, insert. otherwise, update.
 				$person_id = $person_perms->getValue("person_id");
@@ -507,9 +508,10 @@ function showP(elem){
 			}
 		} elseif ($var == 1) {
 			try {
-				//print_r($person);
-				//print_r($project);
+				//get out the person perms.
 				$person_id = Person::getByEmailAddress($person->getValue("person_email"));
+				$person_perms = $person_perms->getPermissionsAsObject($person_id->getValue("person_id"));
+				//print_r($project);
 				$project_ids = explode(',', $project->getValue("project_id"));
 				//echo $person->getValue("person_id");
 				//update the person's projects here, inserting them into the project_person table.
@@ -524,6 +526,9 @@ function showP(elem){
 			}
 			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		} elseif ($var == 2) {
+						$person_id = Person::getByEmailAddress($person->getValue("person_email"));
+						$person_perms = $person_perms->getPermissionsAsObject($person_id->getValue("person_id"));
+
 			//can we just put the password validation check here? HA HA HA HA HA that's funny!!
 			try {
 				if (!$_POST["password1"]) {
@@ -547,11 +552,15 @@ function showP(elem){
 			}
 			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		} elseif ($var == 3) {
+						$person_id = Person::getByEmailAddress($person->getValue("person_email"));
+						$person_perms = $person_perms->getPermissionsAsObject($person_id->getValue("person_id"));
+
 			try {
 				include("newUserEmail.php");		
 			} catch (Exception $e) {
 				echo "could not send the email for some reason.";
 			}
+			echo "HEre is the person perms " . gettype($person_perms);
 			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		}
 	}
