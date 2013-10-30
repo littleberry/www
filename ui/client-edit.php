@@ -3,6 +3,7 @@
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Contact.class.php");
 	require_once("../common/errorMessages.php");
+	require_once("../classes/Project.class.php");
 	
 	include('header.php'); //add header.php to page
 ?>
@@ -27,10 +28,8 @@
 		5. If there are no missing required fields, call Client::updateClient AND Contact:updateContact-->	
 <?php 			
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_client") {
-					//error_log("user came in from form, calling editClientAndContacts");
 					editClientAndContacts();
 				} else {
-					//error_log("showing the edit form, this is the first time the user has come iin.");
 					displayClientAndContactsEditForm(array(), array(), new Client(array()), new Contact(array()));
 				}
 	
@@ -48,14 +47,8 @@
 	}
 	if (isset($_GET["client_id"])) {
 		$client=Client::getClient($_GET["client_id"]);
-		$contact=Contact::getContacts($_GET["client_id"]);
-	} else {
-		//error_log("this is not the first time the user displayed this form.");
-		//error_log(print_r($contact,true));
-		//error_log(gettype($contact));
-	}
-	
-	
+		$contact=Contact::getContacts($_GET["client_id"]);	
+	}	
 ?>
 
 	<section class="content">
@@ -64,7 +57,6 @@
 			<input type="hidden" name="action" value="edit_client">
 			<?PHP
 			//we need to get the client_id into the $_POST so it is there when the user posts the form.
-			//perhaps in the $_SESSION variable?
 			if (isset($_GET["client_id"])) {
 				$client_id = $_GET["client_id"];
 			?>
@@ -76,7 +68,7 @@
 			<input type="hidden" name="client_id" value="<?php echo $client_id?>">
 		<?php } ?>
 		<figure class="client-logo l-col-20">
-			<img class="client-logo-img small" src="<?php echo $client->getValue("client_logo_link")?>" title="Client/Company name logo" alt="Client/Company name logo" />
+			<img class="client-logo-img small" src="<?php echo "images/" . $client->getValue("client_logo_link")?>" title="Client/Company name logo" alt="Client/Company name logo" />
 			<fieldset class="client-logo-upload">
 				<legend class="client-logo-title">Upload Client Logo</legend>
 				<header class="client-logo-header">
@@ -125,63 +117,64 @@
 						<label for="client-state" <?php validateField("client_state", $missingFields)?> class="entity-details-label client">State:</label>
 						<select id="client-state" name="client-state" class="client-state-select" tabindex="7">
 							<option selected="selected" value="default">Select state</option>
-							<option value="AL">Alabama</option>
-							<option value="AK">Alaska</option>
-							<option value="AZ">Arizona</option>
-							<option value="AR">Arkansas</option>
-							<option value="CA">California</option>
-							<option value="CO">Colorado</option>
-							<option value="CT">Connecticut</option>
-							<option value="DE">Delaware</option>
-							<option value="FL">Florida</option>
-							<option value="GA">Georgia</option>
-							<option value="HI">Hawaii</option>
-							<option value="ID">Idaho</option>
-							<option value="IL">Illinois</option>
-							<option value="IN">Indiana</option>
-							<option value="IA">Iowa</option>
-							<option value="KS">Kansas</option>
-							<option value="KY">Kentucky</option>
-							<option value="LA">Louisiana</option>
-							<option value="ME">Maine</option>
-							<option value="MD">Maryland</option>
-							<option value="MA">Massachusetts</option>
-							<option value="MI">Michigan</option>
-							<option value="MN">Minnesota</option>
-							<option value="MS">Mississippi</option>
-							<option value="MO">Missouri</option>
-							<option value="MT">Montana</option>
-							<option value="NE">Nebraska</option>
-							<option value="NV">Nevada</option>
-							<option value="NH">New Hampshire</option>
-							<option value="NJ">New Jersey</option>
-							<option value="NM">New Mexico</option>
-							<option value="NY">New York</option>
-							<option value="NC">North Carolina</option>
-							<option value="ND">North Dakota</option>
-							<option value="OH">Ohio</option>
-							<option value="OK">Oklahoma</option>
-							<option value="OR">Oregon</option>
-							<option value="PA">Pennsylvania</option>
-							<option value="RI">Rhode Island</option>
-							<option value="SC">South Carolina</option>
-							<option value="SD">South Dakota</option>
-							<option value="TN">Tennessee</option>
-							<option value="TX">Texas</option>
-							<option value="UT">Utah</option>
-							<option value="VT">Vermont</option>
-							<option value="VA">Virginia</option>
-							<option value="WA">Washington</option>
-							<option value="WV">West Virginia</option>
-							<option value="WI">Wisconsin</option>
-							<option value="WY">Wyoming</option>
-							<option value="DC">Washington DC</option>
-							<option value="PR">Puerto Rico</option>
-							<option value="VI">U.S. Virgin Islands</option>
-							<option value="AS">American Samoa</option>
-							<option value="GU">Guam</option>
-							<option value="MP">Northern Mariana Islands</option>
+							<option value="AL" <?php setSelected($client, "client_state", "AL")?>>Alabama</option>
+							<option value="AK" <?php setSelected($client, "client_state", "AK")?>>Alaska</option>
+							<option value="AZ" <?php setSelected($client, "client_state", "AZ")?>>Arizona</option>
+							<option value="AR" <?php setSelected($client, "client_state", "AR")?>>Arkansas</option>
+							<option value="CA" <?php setSelected($client, "client_state", "CA")?>>California</option>
+							<option value="CO" <?php setSelected($client, "client_state", "CO")?>>Colorado</option>
+							<option value="CT" <?php setSelected($client, "client_state", "CT")?>>Connecticut</option>
+							<option value="DE" <?php setSelected($client, "client_state", "DE")?>>Delaware</option>
+							<option value="FL" <?php setSelected($client, "client_state", "FL")?>>Florida</option>
+							<option value="GA" <?php setSelected($client, "client_state", "GA")?>>Georgia</option>
+							<option value="HI" <?php setSelected($client, "client_state", "HI")?>>Hawaii</option>
+							<option value="ID" <?php setSelected($client, "client_state", "ID")?>>Idaho</option>
+							<option value="IL" <?php setSelected($client, "client_state", "IL")?>>Illinois</option>
+							<option value="IN" <?php setSelected($client, "client_state", "IN")?>>Indiana</option>
+							<option value="IA" <?php setSelected($client, "client_state", "IA")?>>Iowa</option>
+							<option value="KS" <?php setSelected($client, "client_state", "KS")?>>Kansas</option>
+							<option value="KY" <?php setSelected($client, "client_state", "KY")?>>Kentucky</option>
+							<option value="LA" <?php setSelected($client, "client_state", "LA")?>>Louisiana</option>
+							<option value="ME" <?php setSelected($client, "client_state", "ME")?>>Maine</option>
+							<option value="MD" <?php setSelected($client, "client_state", "MD")?>>Maryland</option>
+							<option value="MA" <?php setSelected($client, "client_state", "MA")?>>Massachusetts</option>
+							<option value="MI" <?php setSelected($client, "client_state", "MI")?>>Michigan</option>
+							<option value="MN" <?php setSelected($client, "client_state", "MN")?>>Minnesota</option>
+							<option value="MS" <?php setSelected($client, "client_state", "MS")?>>Mississippi</option>
+							<option value="MO" <?php setSelected($client, "client_state", "MO")?>>Missouri</option>
+							<option value="MT" <?php setSelected($client, "client_state", "MT")?>>Montana</option>
+							<option value="NE" <?php setSelected($client, "client_state", "NE")?>>Nebraska</option>
+							<option value="NV" <?php setSelected($client, "client_state", "NV")?>>Nevada</option>
+							<option value="NH" <?php setSelected($client, "client_state", "NH")?>>New Hampshire</option>
+							<option value="NJ" <?php setSelected($client, "client_state", "NJ")?>>New Jersey</option>
+							<option value="NM" <?php setSelected($client, "client_state", "NM")?>>New Mexico</option>
+							<option value="NY" <?php setSelected($client, "client_state", "NY")?>>New York</option>
+							<option value="NC" <?php setSelected($client, "client_state", "NC")?>>North Carolina</option>
+							<option value="ND" <?php setSelected($client, "client_state", "ND")?>>North Dakota</option>
+							<option value="OH" <?php setSelected($client, "client_state", "OH")?>>Ohio</option>
+							<option value="OK" <?php setSelected($client, "client_state", "OK")?>>Oklahoma</option>
+							<option value="OR" <?php setSelected($client, "client_state", "OR")?>>Oregon</option>
+							<option value="PA" <?php setSelected($client, "client_state", "PA")?>>Pennsylvania</option>
+							<option value="RI" <?php setSelected($client, "client_state", "RI")?>>Rhode Island</option>
+							<option value="SC" <?php setSelected($client, "client_state", "SC")?>>South Carolina</option>
+							<option value="SD" <?php setSelected($client, "client_state", "SD")?>>South Dakota</option>
+							<option value="TN" <?php setSelected($client, "client_state", "TN")?>>Tennessee</option>
+							<option value="TX" <?php setSelected($client, "client_state", "TX")?>>Texas</option>
+							<option value="UT" <?php setSelected($client, "client_state", "UT")?>>Utah</option>
+							<option value="VT" <?php setSelected($client, "client_state", "VT")?>>Vermont</option>
+							<option value="VA" <?php setSelected($client, "client_state", "VA")?>>Virginia</option>
+							<option value="WA" <?php setSelected($client, "client_state", "WA")?>>Washington</option>
+							<option value="WV" <?php setSelected($client, "client_state", "WV")?>>West Virginia</option>
+							<option value="WI" <?php setSelected($client, "client_state", "WI")?>>Wisconsin</option>
+							<option value="WY" <?php setSelected($client, "client_state", "WY")?>>Wyoming</option>
+							<option value="DC" <?php setSelected($client, "client_state", "DC")?>>Washington DC</option>
+							<option value="PR" <?php setSelected($client, "client_state", "PR")?>>Puerto Rico</option>
+							<option value="VI" <?php setSelected($client, "client_state", "VI")?>>U.S. Virgin Islands</option>
+							<option value="AS" <?php setSelected($client, "client_state", "AS")?>>American Samoa</option>
+							<option value="GU" <?php setSelected($client, "client_state", "GU")?>>Guam</option>
+							<option value="MP" <?php setSelected($client, "client_state", "MP")?>>Northern Mariana Islands</option>
 						</select><br />
+
 						<label for="client-zip" <?php validateField("client_zip", $missingFields)?> class="entity-details-label client">Zip code:</label>
 						<input id="client-zip" name="client-zip" class="client-zip-input" type="text" tabindex="8" value="<?php echo $client->getValueEncoded("client_zip")?>" /><br />
 						<label for="client-country" class="entity-details-label client">Client's country:</label>
@@ -247,7 +240,7 @@
 				$i = 0;
 				//there aren't any contacts here. Technically, you shouldn't be able to do this but better safe than sorry.
 				if(!count($contact)) {
-					echo("Huh? You don't have any contacts??");
+					$contact = new Contact(Array());
 				}	
 				foreach ($contact as $contacts) {
 					?>
@@ -322,25 +315,44 @@
 				</ul>
 			</fieldset>
 		</section>
-<!--END FORM-->
-</form><?php } ?>
-		
 		<section class="client-projects">
+
 			<header class="details-header client-projects-header">
 				<h1 class="client-details-title">Projects</h1>
 			</header>
 			<h1 class="client-projects-title active">Active Projects</h1>
 			<ul class="details-list client-projects-list active">
-				<li class="client-projects-list-item">Atomic Cupcakes</li>
+			<?php 
+				//we'll use an existing function to work this magic. Get all the clients with
+				//projects and then display them (active and archived) by name for a particular client.
+				$clientProjects = Project::getClientsProjectsByStatus(1);
+				foreach($clientProjects as $clientProject) {
+					if ($client->getValueEncoded("client_id") == $clientProject->getValueEncoded("client_id")) {
+						?> <li class="client-projects-list-item"><?php echo $clientProject->getValueEncoded("project_name") ?></li> <?php
+					}
+				}			
+			?>
 			</ul>
 			<h1 class="client-projects-title archive">Archived Projects</h1>
 			<ul class="details-list client-projects-list archive">
-				<li class="client-projects-list-item">Atomic Cupcakes 'Coming Soon' Campaign</li>
-			</ul>
+<?php 
+				//we'll use an existing function to work this magic. Get all the clients with
+				//projects and then display them (active and archived) by name for a particular client.
+				$clientProjects = Project::getClientsProjectsByStatus(0);
+				foreach($clientProjects as $clientProject) {
+					if ($client_id == $clientProject->getValueEncoded("client_id")) {
+						?> <li class="client-projects-list-item"><?php echo $clientProject->getValueEncoded("project_name") ?></li> <?php
+					}
+				}			
+			?>			</ul>
 		</section>
 	</section>
 </section>
 
+<!--END FORM-->
+</form><?php } ?>
+		
+		
 <!--CLIENT AND CONTACT PROCESSING FUNCTIONS (editClientAndContacts();)
 	1. Set up the required fields in each of the forms.
 	2. Create the objects based on the values that were submitted the last time the user submitted the form.
