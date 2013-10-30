@@ -16,6 +16,7 @@
 	if (isset($_GET['person'])) {
 		error_log("AUTH: User came in from GET and the EDIT SCREEN.");
 		$person = unserialize(urldecode($_GET['person']));
+		$person_perms = unserialize(urldecode($_GET['person_perms']));
 		error_log("AUTH: PERSON VALUE IS " . print_r($person,true));
 		//set project to null because it's blank.
 		$project = "";
@@ -67,9 +68,12 @@
 include('header.php'); //add header.php to page
 ?>
 <script type="text/javascript">
-function FillBilling(f) {
+function FillProjects(f) {
     //window.alert(f);
+    f.projectidselectname.value = f.projectidselectname.value + f.projectid[f.projectid.selectedIndex].text + ",";
     f.projectidselect.value = f.projectidselect.value + f.projectid.value + ",";
+    //USE THIS V FUNCTION TO UPDATE A HIDDEN FIELD
+    //f.projectidselect.value = f.projectidselect.value + f.projectid.value + ",";
     //f.shippingname.value;
     //f.billingcity.value = f.shippingcity.value;
     //return false;
@@ -120,6 +124,7 @@ function showP(elem){
     ?>
       <form action="person-basic-info.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
       <input type="hidden" name="action" value="person-basic-info"/>
+      
     <!--end add-->
 		<!--<figure class="client-logo l-col-20">
 			<img class="client-logo-img small" src="images/default.jpg" title="Client/Company name logo" alt="Client/Company name logo" />
@@ -142,7 +147,11 @@ function showP(elem){
 		   				$row = Person::getEnumValues("person_type");																					  						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 			   			foreach ($enumList as $type) {	?>
 			 				<input type="radio" name="person-type" value="<?php echo $type?>" <?php setChecked($person, "person_type", $type) ?>>   <?php echo $type ?>
-		   				<?php }	?><br/>
+		   				<?php }	
+			   				//need to keep the person_id!
+		   				?><br/>
+		   				 <input type="hidden" name="person_id" value="<?php echo $person->getValueEncoded("person_id")?>"/>
+
 						<label for="client-name" <?php validateField("person_first_name", $missingFields)?> class="client-details-label">First Name:</label>
 						<input id="client-name" name="person-first-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $person->getValueEncoded("person_first_name")?>" /><br />
 					</li>
@@ -173,14 +182,14 @@ function showP(elem){
 						<?php
 						foreach($enumList as $value) { ?>
 							<!--this needs to use person_perms!-->
-							<option id='person-perm-id' name="person-perm-id" value="<?php echo $value?>" <?php //setSelected($person, "person_perm_id", $value) ?>><?php echo $value ?></option>
+							<option id='person-perm-id' name="person-perm-id" value="<?php echo $value?>" <?php setSelected($person, "person_perm_id", $value) ?>><?php echo $value ?></option>
 						<?php } ?>
 						</select>
 						<p id="perm_ru" style="display: none;">This person can track time and expenses.</p>
 						<div id="perm_pm" style="display: none;">
-						<input type="checkbox" name="create_projects" id="create_projects" <?php setChecked($pers, "create_projects", "1") ?>>Create projects for all clients<br>
-						<input type="checkbox" name="view_rates" id="view_notes">View rates<br>
-						<input type="checkbox" name="create_invoices" id="create_invoices">Create invoices for projects they manage<br>
+						<input type="checkbox" name="create_projects" id="create_projects" <?php setChecked($person_perms, "create_projects", 1) ?>>Create projects for all clients<br>
+						<input type="checkbox" name="view_rates" id="view_notes" <?php setChecked($person_perms, "view_rates", 1) ?>>View rates<br>
+						<input type="checkbox" name="create_invoices" id="create_invoices" <?php setChecked($person_perms, "create_invoices", 1) ?>>Create invoices for projects they manage<br>
 						</div>
 						<p id="perm_a" style="display: none;">This person can see all projects, invoices and reports in Time Tracker.</p>
 					</li>
@@ -221,20 +230,34 @@ function showP(elem){
 
 		<form action="person-basic-info.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
 		<label for="client-zip" class="client-details-label"></label>
-		<input id="projectidselect" name="projectidselect" class="projectidselect" type="text" tabindex="8" value=""><button name="Assign Project" onclick="FillBilling(this.form); return false;" >Assign Projects</button>
+		<input id="projectidselectname" name="projectidselectname" class="projectidselectname" type="text" tabindex="8" value="<?php
+		//output all of this users current projects in name form.
+		list($projectForPerson) = Project_Person::getProjectsForPerson($person->getValue("person_id"));
+		foreach ($projectForPerson as $projectPerson) {
+				 echo $projectPerson->getValue("project_name") . ",";
+		} 
+		//output all of this users current projects in id form, this is what the database needs. :) HIDE THIS!!
+		?>">
+		<input id="projectidselect" name="projectidselect" class="projectidselect" type="text" tabindex="8" value="<?php
+		//output all of this users current projects.
+		list($projectForPerson) = Project_Person::getProjectsForPerson($person->getValue("person_id"));
+		
+		foreach ($projectForPerson as $projectPerson) {
+				 echo $projectPerson->getValue("project_id") . ",";
+		} ?>">
+		<button name="Assign New Projects" onclick="FillProjects(this.form); return false;" >Assign New Projects</button>
 		<br />
-		<?php
+		<?php		//this is the select box.
 					list($projects) = Project::getProjects();?>
 					<select name="projectid" id="projectid" size="1">    
 						<?php foreach ($projects as $project) { ?>
-   							<option value="<?php echo $project->getValue("project_id") ?>"><?php echo $project->getValue("project_name")?></option>
+   							<option value="<?php echo $project->getValue("project_id") ?>" text="<?php echo $project->getValue("project_name")?>"><?php echo $project->getValue("project_name")?></option>
     					<?php } ?>
     			 </select><br />
 
 					<ul>
 					<?php 
 					//get out all of the people associated with this project.
-					list($projectForPerson) = Project_Person::getProjectsForPerson($person->getValue("person_id"));
 					if ($projectForPerson) {
 						echo("<br/>" . $person->getValue("person_first_name") . " has the following assigned projects:<br/>");
 						foreach ($projectForPerson as $projectPerson) {?>
@@ -331,6 +354,7 @@ function showP(elem){
 	//create the project object ($project)
 	$person = new Person( array(
 		//CHECK REG SUBS!!
+		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["person_id"]) : "",
 		"person_first_name" => isset($_POST["person-first-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^.]/", "", $_POST["person-first-name"]) : "",
 		"person_last_name" => isset($_POST["person-last-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-last-name"]) : "",
 		"person_email" => isset($_POST["person-email"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9^@^.]/", "", $_POST["person-email"]) : "",
