@@ -37,7 +37,7 @@
 	</header>
 
 <!--DISPLAY PERSON INSERT WEB FORM--->
-<?php function displayPersonInsertForm($errorMessages, $missingFields, $person) { 
+<?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $person_perms) { 
 	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
@@ -186,7 +186,7 @@ function showP(elem){
 		"person_last_name" => isset($_POST["person-last-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-last-name"]) : "",
 		"person_email" => isset($_POST["person-email"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9^@^.]/", "", $_POST["person-email"]) : "",
 		"person_department" => isset($_POST["person-department"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["person-department"]) : "",
-		"person_hourly_rate" => isset($_POST["person-hourly-rate"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-hourly-rate"]) : "",
+		"person_hourly_rate" => isset($_POST["person-hourly-rate"])? preg_replace("/[^ \.\-\_a-zA-Z0-9]/", "", $_POST["person-hourly-rate"]) : "",
 		"person_perm_id" => isset($_POST["person-perm-id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person-perm-id"]) : "",
 		"person_type" => isset($_POST["person-type"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["person-type"]) : "",
 		//hard code the default image here, it's not on this page but we need it for the next page and we need it in the right place.
