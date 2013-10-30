@@ -169,7 +169,7 @@ class Client extends DataObject {
 			$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
 			$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
 			$st->bindValue(":client_archived", $this->data["client_archived"], PDO::PARAM_INT);
-			$st->bindValue(":client_logo_link", $this->data["client_logo_link"], PDO::PARAM_STR);
+			$st->bindValue(":client_logo_link", basename($this->data["client_logo_link"]), PDO::PARAM_STR);
 			$st->execute();
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
@@ -245,7 +245,7 @@ class Client extends DataObject {
 			$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
 			$st->bindValue(":client_archived", $this->data["client_archived"], PDO::PARAM_INT);
 			$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
-			$st->bindValue(":client_logo_link", $this->data["client_logo_link"], PDO::PARAM_STR);
+			$st->bindValue(":client_logo_link", basename($this->data["client_logo_link"]), PDO::PARAM_STR);
 			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
 			$st->execute();	
 			parent::disconnect($conn);
@@ -300,7 +300,7 @@ class Client extends DataObject {
 	
 	//get the archive flag out of the client table.
 	public function getArchiveFlag($client_id) {
-		$conn=parent::connect($client_id);
+		$conn=parent::connect();
 		$sql = "SELECT client_archived FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
 		
 		try {
@@ -331,7 +331,7 @@ class Client extends DataObject {
 			parent::disconnect($conn);
 			die("Query failed on delete of contact rows.: " . $e->getMessage());
 		}
-		$conn=parent::connect($client_id);
+		$conn=parent::connect();
 		$sql = "DELETE FROM " . TBL_CLIENT . " WHERE client_id = :client_id";
 		
 		try {
