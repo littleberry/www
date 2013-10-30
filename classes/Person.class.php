@@ -115,7 +115,7 @@ class Person extends DataObject {
 			$st->bindValue(":person_hourly_rate", $this->data["person_hourly_rate"], PDO::PARAM_INT);
 			$st->bindValue(":person_perm_id", $this->data["person_perm_id"], PDO::PARAM_STR);
 			$st->bindValue(":person_type", $this->data["person_type"], PDO::PARAM_STR);
-			$st->bindValue(":person_logo_link", $this->data["person_logo_link"], PDO::PARAM_STR);
+			$st->bindValue(":person_logo_link", basename($this->data["person_logo_link"]), PDO::PARAM_STR);
 			$st->execute();
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
@@ -224,6 +224,7 @@ class Person extends DataObject {
 				person_department = :person_department,
 				person_hourly_rate = :person_hourly_rate,
 				person_perm_id = :person_perm_id,
+				person_type = :person_type,
 				person_logo_link = :person_logo_link
 				WHERE person_email = :person_email";
 			try {
@@ -234,6 +235,7 @@ class Person extends DataObject {
 				$st->bindValue(":person_department", $this->data["person_department"], PDO::PARAM_STR);
 				$st->bindValue(":person_hourly_rate", $this->data["person_hourly_rate"], PDO::PARAM_INT);
 				$st->bindValue(":person_perm_id", $this->data["person_perm_id"], PDO::PARAM_INT);
+				$st->bindValue(":person_type", $this->data["person_type"], PDO::PARAM_INT);
 				$st->bindValue(":person_logo_link", basename($this->data["person_logo_link"]), PDO::PARAM_STR);
 				$st->execute();	
 				parent::disconnect($conn);
@@ -311,7 +313,21 @@ class Person extends DataObject {
 	}
 	
 	//delete this person, assumes they have no active projects.
+	//first clear out their permissions. Then delete them.
 	public function deletePerson($person_id) {
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_PERSON_PERMISSIONS . " WHERE person_id = :person_id";
+		
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on delete of person permissions: " . $e->getMessage());
+		}
+
 		$conn=parent::connect();
 		$sql = "DELETE FROM " . TBL_PERSON . " WHERE person_id = :person_id";
 		try {
