@@ -324,8 +324,6 @@
 			$client->insertClient($client_email);
 			$client_id = $client->getClientId($client_name);
 			$contact->insertContact($client_id[0]);
-			echo "You have successfully added client " . $client_email . "with client id " . $client_id[0] . ". You may add an additional client now. ";		
-			echo"<a href=\"clients.php\">View the full client list</a>";
 		}
 		//headers already sent, call the page back with blank attributes.
 		displayClientInsertForm(array(), array(), new Client(array()), new Contact(array()));
