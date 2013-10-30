@@ -115,7 +115,7 @@ function showP(elem){
 		   				<?php 
 		   				$row = Person::getEnumValues("person_type");																					  						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 			   			foreach ($enumList as $type) {	?>
-			 				<input type="radio" name="person-type" value="<?php echo $type?>">   <?php echo $type ?>
+			   				<input type="radio" name="person-type" value="<?php echo $type?>" <?php if ($type == "Employee") echo "checked";?>>   <?php echo $type ?>
 		   				<?php }	?><br/>
 						<label for="client-name" <?php validateField("person_first_name", $missingFields)?> class="client-details-label">First Name:</label>
 						<input id="client-name" name="person-first-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $person->getValueEncoded("person_first_name")?>" /><br />
