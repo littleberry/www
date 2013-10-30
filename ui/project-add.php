@@ -116,7 +116,7 @@
 				<ul class="details-list client-details-list">
 				<?php 
 						//get the taskss out to populate the drop down.
-						list($tasks) = Task::getTasks();
+						list($tasks) = Task::getTasks(1);
 					?>
 					<li class="client-details-item currency">
 						<label for="client-currency" class="client-details-label">Please choose a task:</label>
