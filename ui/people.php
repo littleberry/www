@@ -1,6 +1,7 @@
 <?php
 	require_once("../common/common.inc.php");
 	require_once("../classes/Person.class.php");
+	require_once("../classes/Person_Permissions.class.php");
 		//remove auth
 		//if(!isUserLoggedIn()){
 		//redirect if user is not logged in.
@@ -31,6 +32,8 @@
 				<li style="background-color:lightgray;" class="client-info-contact"><?php echo $personType->getValue("person_type") . "s"; ?></li>
 				<?php	
 				foreach($people as $person) {
+						//we need to get the person permissions so we can pass them in with the object.
+						$person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
 						//display the people as employees or contractors
 						if ($personType->getValue("person_type") == $person->getValue("person_type")) {
 						?>
@@ -40,7 +43,7 @@
 									<ul class="client-info-list">
 									<?php
 									//this is the edit button. Since this is a $_GET, serialize the person object and send it to the page. ?>
-										<li class="client-info-contact"><a class="client-info-contact-link" href="person-basic-info.php?person=<?php echo urlencode(serialize($person)) ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($person->getValue("person_first_name") . " " . $person->getValue("person_last_name")); ?></li>
+										<li class="client-info-contact"><a class="client-info-contact-link" href="person-basic-info.php?person=<?php echo urlencode(serialize($person)) ?>&person_perms=<?php echo urlencode(serialize($person_perms))?>" title="View contact details"><button>Edit</button></a>  <?php echo ($person->getValue("person_first_name") . " " . $person->getValue("person_last_name")); ?></li>
 										<br/><hr/>
 									</ul>		
 								</li>
