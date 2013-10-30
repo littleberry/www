@@ -34,6 +34,25 @@ class Person_Permissions extends DataObject {
 		}
 	}
 	
+	//just trying to get the person permissions as an object, not as an array.
+	public static function getPermissionsAsObject($person_id) {
+		$conn=parent::connect();
+		$sql="SELECT * FROM " . TBL_PERSON_PERMISSIONS . " where person_id = :person_id";
+		
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return new Person_Permissions($row);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed getting the person permissions object: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	
+	
 	public function insertPermissions() {
 		$conn=parent::connect();
 		$sql = "INSERT INTO " . TBL_PERSON_PERMISSIONS . " (
