@@ -260,7 +260,7 @@
 								<thead>
 									<tr>
 										<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
-										<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Team Member(<span></span> filter-match )</th>
+										<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Team Member</th>
 										<th class="filter-false" data-placeholder="Try <d">Remove From Project</th>
 									</tr>
 								</thead>

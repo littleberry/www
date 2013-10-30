@@ -33,8 +33,6 @@
 	}
 	
 	$client_details = Client::getClient($project_details->getValue("client_id"));
-	
-	
 	include('header.php'); //add header.php to page
 
 ?>
@@ -54,7 +52,7 @@
 		<ul>
 			<li><a href="#overview">Overview</a></li>
 			<li><a href="#tasks">Tasks</a></li>
-			<li><a href="#milestones">Milestones</a></li>
+			<!-- <li><a href="#milestones">Milestones</a></li> -->
 			<li><a href="#timesheets">Timesheets</a></li>
 			<li><a href="#team">Team</a></li>
 			<li><a href="#settings">Settings</a></li>
@@ -71,10 +69,51 @@
 			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Tasks</h1>
 			</header>
-			<ul class="entity-list entity-sub-details-list">
-				<li class="entity-details-item"></li>
-			</ul>
+			<section id="active-tasks" class="entity-detail">
+				<h2 class="entity-sub-title">Currently Assigned to Project</h2>
+				<ul class="entity-list entity-details-list">
+					<li class="entity-details-item">
+						<label for="" <?php validateField("task_id", $missingFields)?> class="entity-details-label"></label>
+						<table id="task-list" class="entity-table tasks tablesorter">
+							<thead>
+								<tr>
+									<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
+									<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Task</th>
+									<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Billable</th>
+									<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Common</th>
+								</tr>
+							</thead>
+							<tbody>
+							<?php
+								//get out all of the tasks associated with this project.
+								list($tasksForProject) = Project_Task::getTasksForProject($project_id);
+								foreach ($tasksForProject as $projectTask) { ?>
+									<tr>
+										<td><?php echo $projectTask->getValue("task_name"); ?></td>
+										<td><?php 
+											if ($projectTask->getValue("task_bill_by_default")) {
+												echo "Yes";
+											} else {
+												echo "No";
+											}; ?></td>
+										<td><?php 
+											if ($projectTask->getValue("task_common")) {
+												echo "Yes";
+											} else {
+												echo "No";
+											}; ?></td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+					</li>
+				</ul>
+				<ul class="page-controls-list team">
+					<li class="page-controls-item link-btn"><a id="edit-active-tasks-btn" class="" href="#">Edit Tasks</a></li>
+				</ul>
+			</section>
 		</article>
+		<!--
 		<article id="milestones" class="entity-detail milestones">
 			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Milestones</h1>
@@ -83,6 +122,7 @@
 				<li class="entity-details-item"></li>
 			</ul>
 		</article>
+		-->
 		<article id="timesheets" class="entity-detail timesheets">
 			<header class="entity-details-sub-header">
 				<h1 class="entity-details-title">Timesheets</h1>
@@ -98,12 +138,40 @@
 			<section id="assigned-people" class="entity-detail">
 				<h2 class="entity-sub-title">Assigned People</h2>
 				<ul class="entity-list entity-details-list">
-					<li class="entity-details-item"></li>
+					<li class="entity-details-item">
+						<label for="" <?php validateField("task_id", $missingFields)?> class="entity-details-label"></label>
+						<table id="people-list" class="entity-table people tablesorter">
+							<thead>
+								<tr>
+									<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
+									<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Team Member</th>
+									<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Type</th>
+									<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Department</th>
+								</tr>
+							</thead>
+							<tbody>
+							<?php
+								//get out all of the tasks associated with this project.
+								//get out all of the people associated with this project.
+								list($peopleForProject) = Project_Person::getPeopleForProject($project_id);
+								
+								//$peopleList = "";
+								foreach ($peopleForProject as $projectPerson) { ?>
+									<tr>
+										<td><?php echo $projectPerson->getValue("person_name"); ?></td>
+										<td><<?php echo $projectPerson->getValue("person_type"); ?></td>
+										<td><?php echo $projectPerson->getValue("person_department"); ?></td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+					</li>
 				</ul>
 				<ul class="page-controls-list team">
 					<li class="page-controls-item link-btn"><a class="" href="#">Edit Team</a></li>
 				</ul>
 			</section>
+			<!--
 			<section id="client-contacts" class="entity-detail">
 				<h2 class="entity-sub-title">Client's Team</h2>
 				<ul class="entity-list entity-details-list">
@@ -113,6 +181,7 @@
 					<li class="page-controls-item link-btn"><a class="" href="#">Edit Client's Contacts</a></li>
 				</ul>
 			</section>
+			-->
 		</article>
 		<article id="settings" class="entity-detail settings">
 			<header class="entity-details-sub-header">
