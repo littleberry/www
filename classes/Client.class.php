@@ -169,12 +169,7 @@ class Client extends DataObject {
 			$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
 			$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
 			$st->bindValue(":client_archived", $this->data["client_archived"], PDO::PARAM_INT);
-			//NO NO NO THIS IS TOO HARDCODED!!
-			if ($this->data["client_logo_link"]) {
-				$st->bindValue(":client_logo_link", "images/" . $this->data["client_logo_link"], PDO::PARAM_STR);
-			} else {
-				$st->bindValue(":client_logo_link", "images/default.jpg", PDO::PARAM_STR);
-			}
+			$st->bindValue(":client_logo_link", $this->data["client_logo_link"], PDO::PARAM_STR);
 			$st->execute();
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
@@ -250,12 +245,7 @@ class Client extends DataObject {
 			$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
 			$st->bindValue(":client_archived", $this->data["client_archived"], PDO::PARAM_INT);
 			$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
-			//NO NO NO THIS IS TOO HARDCODED!!
-			if ($this->data["client_logo_link"]) {
-				$st->bindValue(":client_logo_link", "images/" . $this->data["client_logo_link"], PDO::PARAM_STR);
-			} else {
-				$st->bindValue(":client_logo_link", "images/default.jpg", PDO::PARAM_STR);
-			}				
+			$st->bindValue(":client_logo_link", $this->data["client_logo_link"], PDO::PARAM_STR);
 			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
 			$st->execute();	
 			parent::disconnect($conn);
@@ -263,6 +253,30 @@ class Client extends DataObject {
 			parent::disconnect($conn);
 			die("Query failed on update: " . $e->getMessage());
 		}
+		
+		
+		//update the address data into the address table for the appropriate client_id.
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_CLIENT_ADDRESS . " SET
+			client_address = :client_address,
+			client_state = :client_state,
+			client_zip = :client_zip,
+			client_city = :client_city
+			WHERE client_id = :client_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":client_id", $client_id, PDO::PARAM_STR);
+			$st->bindValue(":client_address", $this->data["client_address"], PDO::PARAM_INT);
+			$st->bindValue(":client_state", $this->data["client_state"], PDO::PARAM_STR);
+			$st->bindValue(":client_zip", $this->data["client_zip"], PDO::PARAM_INT);
+			$st->bindValue(":client_city", $this->data["client_city"], PDO::PARAM_STR);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on update of client address, sql is $sql " . $e->getMessage());
+		}
+
 	}
 	
 	//update the archive flag in the client table.
