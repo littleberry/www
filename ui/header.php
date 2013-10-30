@@ -24,6 +24,7 @@ Edit this file for updating links to pages/screens
 	<script src="libraries/jquery.tablesorter.min.js" type="text/javascript"></script> <!--This should only be loaded for projects.php -->
 	<script src="libraries/jquery.tablesorter.widgets.min.js" type="text/javascript"></script> <!--This should only be loaded for projects.php -->
 	<script src="libraries/jquery-ui-1.10.3.custom.min.js" type="text/javascript"></script> <!--This should only be loaded for projects.php -->
+	<script src="libraries/purl.js" type="text/javascript"></script> <!--This should only be loaded for projects.php -->
 </head>
 
 <body>
@@ -35,6 +36,12 @@ Edit this file for updating links to pages/screens
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Reports</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Invoices</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="manage.php">Manage</a></li>
+			
+		</ul>
+	</nav>
+	<nav id="util-nav" class="util-nav">
+		<ul id="util-menu" class="util-menu">
+			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out</a></li>
 		</ul>
 	</nav>
 	<nav id="section-nav" class="section-nav manage">
@@ -44,7 +51,6 @@ Edit this file for updating links to pages/screens
 			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="people.php">People</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="tasks.php">Tasks</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out</a></li>
 		</ul>
 	</nav>
 </header>

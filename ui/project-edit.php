@@ -6,13 +6,14 @@
 	//}
 	
 	require_once("../common/common.inc.php");
+	require_once("../common/errorMessages.php");
 	require_once("../classes/Client.class.php");
 	require_once("../classes/Project_Person.class.php");
 	require_once("../classes/Project_Task.class.php");
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Task.class.php");
 
-	include('header.php'); //add header.php to page
+	
 ?>
 <?php	/*OVERALL CONTROL
 		1. first time user comes in, call the displayClientAndContactsEditForm function.
@@ -20,12 +21,21 @@
 		3. User clicks on a button to submit the form, call the editClientAndContacts function.
 		4. If required fields are missing in the form, re-display the form with error messages.
 		5. If there are no missing required fields, call Project::updateProject*/	
- 			
+ 			if (isset($_GET["func"])) {
+				if ($_GET["func"] == "returnClientMenu") {
+					echo returnClientMenu();
+				}
+			} else if (isset($_POST["func"])) {
+				if ($_POST["func"] == "editProject") {
+					editProject();
+				}
+			} else {
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_project") {
 					editProject();
 				} else {
 					displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
 				}
+			}
 	
 	/*DISPLAY PROJECT EDIT WEB FORM (displayProjectEditForm)
 	note...I think we can remove the PHP validation to update the style in validateField
@@ -33,26 +43,43 @@
 	2. If first time, pull the project object from the database.
 	3. on reocurring pulls, error messages may or may not be there, based on the user's input, object details will come from the $_POST variable.*/
 ?>	
-<?php function displayProjectEditForm($errorMessages, $missingFields, $project) {
-	if ($errorMessages) {
-		foreach($errorMessages as $errorMessage) {
-			echo $errorMessage;
+<?php
+	//Returns a select menu of clients with ids. Meant to be called via ajax.
+	function returnClientMenu() {
+		//$select = "<strong>test</strong>";
+		$select = "";
+		//get the clients out to populate the drop down.
+		list($clients) = Client::getClients();
+		$select .= '<select name="client-id" id="project-client-select" size="1">';
+		
+		foreach ($clients as $client) {
+			$select .= '<option value="' . $client->getValue("client_id") . '">' . $client->getValue("client_name") .'</option>';
 		}
+		$select .= '</select>';
+		
+		return $select;
 	}
 	
-	//get  out the project ID, since the user came in from the edit project button.
-	if (isset($_GET["project_id"])) {
-		$project_id = $_GET["project_id"];
-		$project=Project::getProjectByProjectId($project_id);
-	} elseif (isset($_POST["project_id"])) {
-		$project_id = $_POST["project_id"];
-		$project=Project::getProjectByProjectId($project_id);
-	} else {
-		echo "You cannot edit a project unless you have provided a project ID.";
-		exit();
+	function displayProjectEditForm($errorMessages, $missingFields, $project) {
+		if ($errorMessages) {
+			foreach($errorMessages as $errorMessage) {
+				echo $errorMessage;
+			}
+		}
+		
+		//get  out the project ID, since the user came in from the edit project button.
+		if (isset($_GET["project_id"])) {
+			$project_id = $_GET["project_id"];
+			$project=Project::getProjectByProjectId($project_id);
+		} elseif (isset($_POST["project_id"])) {
+			$project_id = $_POST["project_id"];
+			$project=Project::getProjectByProjectId($project_id);
+		} else {
+			echo "You cannot edit a project unless you have provided a project ID.";
+			exit();
 	}
 	
-
+	include('header.php'); //add header.php to page
 ?>
 <div id="page-content" class="page-content">
 	<header class="page-header">
@@ -72,7 +99,7 @@
 
 	<div class="content">
 		<!--BEGIN FORM-->
-		<form action="project-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+		<form action="project-edit.php" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="action" value="edit_project">
 			<input type="hidden" name="project_id" value="<?php echo $_GET["project_id"]?>">
 			<article class="entity-detail">
@@ -86,11 +113,11 @@
 						<ul class="details-list entity-details-list project">
 							<li class="entity-details-item name project">
 								<label for="project-name" <?php validateField("project_name", $missingFields)?> class="entity-details-label">Project Name:</label>
-								<input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="1" value="<?php echo $project->getValueEncoded("project_name")?>" />
+								<input id="project-name" name="project-name" class="project-name-input" type="text" tabindex="1" value="<?php echo $project->getValueEncoded("project_name")?>" />
 							</li>
 							<li class="entity-details-item project-code project">
 								<label for="project-code" <?php validateField("project_code", $missingFields)?> class="entity-details-label">Project Code</label>
-								<input id="project-code" name="project_code" class="project-code-input" type="text" tabindex="2" value="<?php echo $project->getValueEncoded("project_code")?>" />
+								<input id="project-code" name="project-code" class="project-code-input" type="text" tabindex="2" value="<?php echo $project->getValueEncoded("project_code")?>" />
 							</li>
 							<li class="entity-details-item project-client project">
 								<label for="client-id" class="entity-details-label">Select the client:</label>
@@ -158,9 +185,11 @@
 								<input id="project-budget-view-permissions" name="project-budget-view-permissions" class="project-budget" type="radio" value="contractors" tabindex="11" /> Contractors
 								<input id="project-budget-view-permissions" name="project-budget-view-permissions" class="project-budget" type="radio" checked="checked" value="all" tabindex="11" /> Both
 							</li>
-							<li class="entity-details-item">
+							<!--
+<li class="entity-details-item">
 								<label for="project-budget-email" class="entity-details-label">Send email?</label>
 							</li>
+-->
 						</ul>
 					</section>
 					<ul class="page-controls-list team">
@@ -188,7 +217,7 @@
 								<thead>
 									<tr>
 										<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
-										<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Task(<span></span> filter-match )</th>
+										<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Task</th>
 										<th class="filter-false" data-placeholder="Try <d">Remove From Project</th>
 									</tr>
 								</thead>
@@ -210,8 +239,8 @@
 						<li class="entity-details-item">
 							<label for="task_ids" class="entity-details-label">Add additional tasks:</label>
 							<?php 
-								//get the taskss out to populate the drop down.
-								list($tasks) = Task::getTasks();
+								//get the tasks out to populate the drop down.
+								list($tasks) = Task::getTasks(0);
 							?>
 							<select name="task_ids" id="task_ids" size="1">    
 								<?php foreach ($tasks as $task) { ?>
@@ -219,6 +248,12 @@
 		    					<?php } ?>
 			 				</select>
 						</li>
+						<ul class="page-controls-list tasks">
+							<li class="entity-details-item submit-btn tasks">
+								<label for="project-save-btn" class="entity-details-label project">All done?</label>
+								<input id="project-save-btn" name="project-save-btn" class="save-btn" type="submit" value="+ Save Changes" tabindex="12" /> or <a class="projects.php" href="#" tabindex="13">Cancel</a>
+							</li>
+						</ul>
 					</ul>
 				</fieldset>
 			</article>
@@ -238,7 +273,7 @@
 								<thead>
 									<tr>
 										<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
-										<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Team Member(<span></span> filter-match )</th>
+										<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Team Member</th>
 										<th class="filter-false" data-placeholder="Try <d">Remove From Project</th>
 									</tr>
 								</thead>
@@ -309,7 +344,7 @@ function editProject() {
 		//CHECK REG SUBS!!
 		"project_id" => isset($_POST["project_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_id"]) : "",
 		//not available for edit.
-		"project_code" => isset($_POST["project_code"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_code"]) : "",
+		"project_code" => isset($_POST["project-code"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project-code"]) : "",
 		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
 		"client_id" => isset($_POST["client-id"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-id"]) : "",
 		"project_billable" => isset($_POST["project-billable"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project-billable"]) : "",
@@ -400,7 +435,7 @@ function editProject() {
 		
 	if ($errorMessages) {
 		error_log("There were errors in the input (errorMessages was not blank. Redisplaying the edit form with missing fields.");
-		displayClientAndContactsEditForm($errorMessages, $missingFields, $project);
+		displayProjectEditForm($errorMessages, $missingFields, $project);
 	} else {
 		try {
 			$client_id = $project->getValue("client_id");
@@ -421,7 +456,7 @@ function editProject() {
 				$project_task->insertProjectTask($task_id, $project_id[0]);
 			}
 
-			displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Person(array()));
+			displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
 		} catch (Error $e) {
 			die("could not insert a project. " . $e->getMessage());
 			
@@ -431,8 +466,3 @@ function editProject() {
 }
 
 ?>
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 3de1060ded11547d1b62058699f864e597413e06

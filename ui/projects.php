@@ -4,7 +4,7 @@
 	require_once("../classes/Client.class.php");
 	
 	//this page doubles as the project archive page, so get the value off the get and display those projects here.
-	$archivedView = 0;
+	$archivedView = "0";
 	if (isset($_GET["archives"])) {
 		$archivedView = $_GET["archives"];
 	} elseif (isset($_POST["archives"])) {
@@ -21,13 +21,15 @@
 	}
 	
 	//HOLY FUNKY LOGIC, BATMAN!!
-	if (isset($_POST["change_archive"])) {
+	/*
+if (isset($_POST["change_archive"])) {
 		if ($archivedView) {
 			Project::setArchiveFlag('0', $project_id);
 		} else {
 			Project::setArchiveFlag('1', $project_id);
 		}
 	}
+*/
 
 	
 	//if(!isUserLoggedIn()){
@@ -37,53 +39,57 @@
 	//	//header( 'Location: http://strawberry.dev/MBTimeTtracker/usercake/login.php' ) ;
 	//}
 	//I am taking this out temporarily until we come back to it.
-	checkLogin();
+	//checkLogin();
 	//$person = unserialize($_SESSION['person']);
 
 	include('header.php'); //add header.php to page
 ?>
 	
 
-<section id="page-content" class="page-content">
-	<section class="content">
+<div id="page-content" class="page-content">
+	<header class="page-header">
+		<h1 class="page-title">Active Projects</h1>
+		<nav class="page-controls-nav">
+			<ul class="page-controls-list project">
+				<li class="page-controls-item link-btn">
+				<a class="view-all-link" href="project-add.php">+ Add Project</a></li>
+				<li class="page-controls-item"><a class="view-archive-link" href="project-archives.php">View Archives</a></li>
+				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
+			</ul>
+		</nav>
+	</header>
+	<div class="content">
+		<!--BEGIN FORM-->
 		<form action="projects.php" method="post">
+			<input type="hidden" value="<?php echo $archivedView ?>" name="archives">
 			<table id="project-list" class="entity-table projects tablesorter">
 				<thead>
 					<tr>
-						<!-- you can also add a placeholder using script; $('.tablesorter th:eq(0)').data('placeholder', 'hello') -->
-						<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Project(<span></span> filter-match )</th>
+						<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Project</th>
 						<th data-placeholder="Try <d">Client</th>
 						<th data-placeholder="Try >=33">Hours/Budget</th><!-- add class="filter-false" to disable the filter in this column -->
+						<th class="filter-false">Archive?</th>
+						<!-- <th data-placeholder="" class="filter-false"><input id="select-project" name="select-project" type="checkbox" value="all" title="Select project" /><th> -->
 					</tr>
 				</thead>
 				<tbody>
-				<input type="hidden" value="<?php echo $archivedView ?>" name="archives">
-				<?php $projectList = Project::getClientsProjectsByStatus($archivedView);
-					foreach($projectList as $project) { ?>
+					<?php $projectList = Project::getClientsProjectsByStatus($archivedView);
+					foreach($projectList as $project) { 
+						$clientName = Client::getClientNameById($project->getValueEncoded("client_id")); ?>
 						<tr>
-	
-						<!-- <td><input id="select-project" name="select-project" type="checkbox" value="all" title="Select project" /> -->
-							<td>
-							<?php if ($archivedView) {
-								$buttonTitle = "Unarchive this Project";
-							} else {
-								$buttonTitle = "Archive this Project";
-							}
-							?>
-							<a class="project-info-name-link" href="<?php echo "project-detail.php?project_id=" . $project->getValueEncoded("project_id")?>" title="View project details"><?php echo $project->getValueEncoded("project_name")?></a>   							<?php $clientNames = Client::getClientNameById($project->getValueEncoded("client_id")) ?> <td><button type="submit" name="change_archive" value="<?php echo $project->getValueEncoded('project_id'); ?>"><?php echo $buttonTitle ?></button></td>
-							
-							<td><a class="client-info-contact-link" href="<?php echo "client-detail.php?client_id=" . $project->getValueEncoded("client_id")?>" title="View client details"><?php echo  $clientNames["client_name"]?></a></td>
+							<td><a class="project-info-name-link" href="<?php echo "project-detail.php?project_id=" . $project->getValueEncoded("project_id")?>" title="View project details"><?php echo $project->getValueEncoded("project_name")?></a></td>
+							<td><a class="client-info-contact-link" href="<?php echo "client-detail.php?client_id=" . $project->getValueEncoded("client_id")?>" title="View client details"><?php echo  $clientName["client_name"]?></a></td>
 							<td>x Hours/y budget</td>
-	
+							<!-- <td><input name="select-project" class="archive-checkbox" type="checkbox" value="<?php echo $project->getValueEncoded('project_id'); ?>" title="Select project" /><td> -->
+							<!-- <td><strong>Expenses</strong> to data</td> -->
 						</tr>
 					<?php } ?>
 				</tbody>
 			</table>
 		</form>
 
-	</section>
-		
-</section>
+	</div>
+</div>
 <footer id="site-footer" class="site-footer">
 
 </footer>

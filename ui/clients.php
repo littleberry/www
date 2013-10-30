@@ -12,7 +12,7 @@
 	//$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
 	//header( 'Location: ../usercake/login.php' ) ;
 //}
-		checkLogin();
+	//	checkLogin();
 
 	//FUNCTION RETURNS THE INDIVIDUAL OBJECTS. 
 	list($clients) = Client::getClients();
