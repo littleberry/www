@@ -141,7 +141,7 @@ function showP(elem){
 		   				<?php 
 		   				$row = Person::getEnumValues("person_type");																					  						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 			   			foreach ($enumList as $type) {	?>
-			 				<input type="radio" name="person-type" value="<?php echo $type?>">   <?php echo $type ?>
+			 				<input type="radio" name="person-type" value="<?php echo $type?>" <?php setChecked($person, "person_type", $type) ?>>   <?php echo $type ?>
 		   				<?php }	?><br/>
 						<label for="client-name" <?php validateField("person_first_name", $missingFields)?> class="client-details-label">First Name:</label>
 						<input id="client-name" name="person-first-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $person->getValueEncoded("person_first_name")?>" /><br />
@@ -169,15 +169,16 @@ function showP(elem){
 						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 						?>
 						<?php //yeah, this is super lame. ?>
-						<select name="person-perm-id" onchange="showP(this)">
+						<select id='person-perm-id' name="person-perm-id" onchange="showP(this)">
 						<?php
 						foreach($enumList as $value) { ?>
-							<option name="person-perm-id" value="<?php echo $value?>"><?php echo $value ?></option>
+							<!--this needs to use person_perms!-->
+							<option id='person-perm-id' name="person-perm-id" value="<?php echo $value?>" <?php //setSelected($person, "person_perm_id", $value) ?>><?php echo $value ?></option>
 						<?php } ?>
 						</select>
 						<p id="perm_ru" style="display: none;">This person can track time and expenses.</p>
 						<div id="perm_pm" style="display: none;">
-						<input type="checkbox" name="create_projects" id="create_projects">Create projects for all clients<br>
+						<input type="checkbox" name="create_projects" id="create_projects" <?php setChecked($pers, "create_projects", "1") ?>>Create projects for all clients<br>
 						<input type="checkbox" name="view_rates" id="view_notes">View rates<br>
 						<input type="checkbox" name="create_invoices" id="create_invoices">Create invoices for projects they manage<br>
 						</div>
@@ -200,7 +201,7 @@ function showP(elem){
 						<label for="client-add-btn" class="client-details-label">All done?</label>
 						<!--modified field to be of type submit instead of button-->
                         <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Save Person" tabindex="11"/> 
-						 or <a class="" href="#" tabindex="11">Cancel</a></li>
+						 or <a class="" href="people.php" tabindex="11">Cancel</a></li>
 						 <li>
 						 <?php $person_id=$person->getValue("person_id");?>
 						 <input id="client-delete-btn" name="person-delete-btn" class="client-delete-btn" onclick="window.open('delete_person.php?person_id=<?php echo $person_id ?>','myWindow','width=200,height=200,left=250%,right=250%,scrollbars=no')" type="button" value="- Delete Person" tabindex="11" />	
@@ -231,8 +232,7 @@ function showP(elem){
     			 </select><br />
 
 					<ul>
-					<?php //THURS: write the sql query to get all of this person's assigned projects and display them.
-					//also, update the project_person table with new assignments.
+					<?php 
 					//get out all of the people associated with this project.
 					list($projectForPerson) = Project_Person::getProjectsForPerson($person->getValue("person_id"));
 					if ($projectForPerson) {
@@ -251,7 +251,7 @@ function showP(elem){
 						<label for="client-add-btn" class="client-details-label">All done?</label>
 						<!--modified field to be of type submit instead of button-->
                         <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Save Projects" tabindex="11"/> 
-						 or <a class="" href="#" tabindex="11">Cancel</a>
+						 or <a class="" href="people.php" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 			</fieldset>
@@ -268,7 +268,7 @@ function showP(elem){
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label"></label>
                         <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Resend Invitation" tabindex="11"/> 
-						 or <a class="" href="#" tabindex="11">Cancel</a>
+						 or <a class="" href="people.php" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 	<?php } else {?>
@@ -286,11 +286,12 @@ function showP(elem){
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label"></label>
                         <input id="client-add-btn" name="person-add-btn" class="client-add-btn" type="submit" value="Change Password" tabindex="11"/> 
-						 or <a class="" href="#" tabindex="11">Cancel</a>
+						 or <a class="" href="people.php" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 	<?php } ?>	
 	</header>
+	<div id='cow'>
 
 </form>
 <?php } ?>
@@ -531,8 +532,11 @@ function showP(elem){
 		}
 	}
 } 
-
 ?>
+<script type="text/javascript">
+//yeah, OK, so my javascript is rusty.
+showP(document.getElementById('person-perm-id'));
+</script>
 <footer id="site-footer" class="site-footer">
 
 </footer>
