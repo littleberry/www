@@ -4,13 +4,17 @@ $(document).ready( function() {
 	var $cancelLink = $( '<a id="cancel-link" class="" href="#">Cancel</a>' );
 	var $label = $( '<label class="entity-details-label"></label>' )
 	var $inputText = $( '<input type="text" />' );
+	var $editBtn;
 	
-	var projectDetail = {};
-	/*
-$.get( "returnJSON.php", {
-			func: "returnTasksJSON" ,
-			id: "1",
-			collection: "task"
+	//var url = $.url(); //parse current URL
+	var projectId = $.url().param("project_id"); //parse current URL and return the project_id. Uses the Purl.js plugin
+	
+	var projectData = {};
+	
+	$.get( "returnJSON.php", {
+			func: "returnProjectJSON" ,
+			id: projectId,
+			collection: "project"
 		}).done( function( data ) {
 				console.log("done: " + data);
 			})
@@ -18,50 +22,153 @@ $.get( "returnJSON.php", {
 				console.log("fail: " + data);
 			})
 			.success( function( data ) {
-				projectDetail.project = $.parseJSON(data);
-				console.log(projectDetail.project);
+				projectData.project = $.parseJSON(data);
+				console.log(projectData.project);
 			});
-*/
-
+	$.get( "returnJSON.php", {
+			func: "returnPeopleJSON" ,
+			id: projectId,
+			collection: "project"
+		}).done( function( data ) {
+				//console.log("done: " + data);
+			})
+			.fail( function( data ) {
+				console.log("fail: " + data);
+			})
+			.success( function( data ) {
+				projectData.team = $.parseJSON(data);
+				projectData.team.removed = [];
+				projectData.team.added = [];
+				//console.log(projectData.team);
+			});
+	$.get( "returnJSON.php", {
+			func: "returnTasksJSON" ,
+			id: projectId,
+			collection: "project"
+		}).done( function( data ) {
+				//console.log("done: " + data);
+			})
+			.fail( function( data ) {
+				console.log("fail: " + data);
+			})
+			.success( function( data ) {
+				projectData.tasks = $.parseJSON(data);
+				projectData.tasks.removed = [];
+				projectData.tasks.added = [];
+				//console.log(projectData.tasks);
+			});
+	
 	//console.log(projectDetail)
 	
-	$saveBtn.click( function( evt ){
-		console.log("save data");
+	function saveData( dataObj ) {
+		var sendData = {};
+		for (item in dataObj) {
+			sendData[item] = dataObj[item];
+		}
+		sendData["func"] = "editProject";
+		console.log(sendData);
+		$.post( "project-edit.php", sendData )
+			.done( function( getData ) {
+				console.log("done");
+			})
+			.fail( function( getData ) {
+				console.log("fail");
+			})
+			.success( function( getData ) {
+				console.log("success");
+			});
+	}
+	
+	$saveBtn.click( function( evt ) {
+		console.log($(this).parents( 'ul' ).prev().find( 'input' ));
+		$( this ).parents( 'ul' ).prev().find( 'input' )
+			.each( function( index, elem ) {
+				projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
+				console.log(elem);
+				swapInputText( elem );
+			});
+		saveData( projectData.project[0] );
+		$editBtn.appendTo( $( this ).parent() );
+		$editBtn = null;
+		$( this ).detach();
 	});
+
+	function swapInputText( elem ) {
+		if ( $( elem ).is( "input" ) ) {
+			var useName = $( elem ).prev( 'label' ).attr( 'for' );
+			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
+			$( elem ).parent()
+				.empty()
+				.text( useLabel + ": " )
+				.append( '<span class="edit ' + useName + '">' + projectData.project[0][useName] + '</span>' );
+				
+		} else {
+			var useName = $( elem ).attr( 'class' ).split(' ')[1];
+			var useLabel = $( elem ).parent().text().split(':')[0];
+			$( elem ).parent()
+				.empty()
+				.append( function() {
+					return $label.clone() 
+						.attr( 'for', useName )
+						.text( useLabel + ": " );
+				})
+				.append( function() {
+					return $inputText.clone() 
+						.val( projectData.project[0][useName] )
+						.attr( 'name', useName );
+				});
+		}
+	}
+	function swapSelect( elem, list ) {
+		var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
+		var useLabel = $( elem ).parent().text().split(':')[0];
+		var $select = $( '<select name="' + useName + '" id="project-client-select" size="1"></select>' );
+
+		if ( list == "client" ) {
+			var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
+			$.get( "returnJSON.php", {
+					func: "returnClientJSON",
+					id: "",
+					collection: ""
+				})
+				.done( function( getData ) {
+					console.log("done");
+				})
+				.fail( function( getData ) {
+					console.log("fail");
+				})
+				.success( function( getData ) {
+					var data = $.parseJSON(getData);
+					//console.log("success: " + data[0]["client_name"]);
+					for ( var i = 0; i < data.length; i++ ) {
+						$select.append( '<option value="' + data[i]["client_id"] + '>' + data[i]["client_name"] + '</option>' );
+					}
+					console.log($select);
+					$( elem ).parent()
+						.empty()
+						.append( function() {
+							return $label.clone() 
+								.attr( 'for', useName )
+								.text( useLabel + ": " );
+							})
+						.append( $select );
+				});					
+			//return $( elem ).replaceWith( $select );
+
+		}
+	}
 	
 	$( '#edit-project-btn' ).click( function( evt ) {
 		$( '#project-info .edit' )
 			.each( function( index, elem ) {
-				var useName = $( elem ).attr( 'class' ).split(' ')[1];
-				//console.log(useName);
-				$( this ).replaceWith( function() {
-					return $inputText.clone() 
-						.val( $( this ).text() )
-						.attr( 'name', useName );
-					})
-					
-					.prev().replaceWith( function () {
-						return $label.clone() 
-							.text( $( this ).text() );
-						
-					});
-				//console.log(index);
+				swapInputText( elem );
 			});
 		$( '#project-info .select' )
 			.each( function( index, elem ) {
-				var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
-				var $test = "";
-				$.get( "project-edit.php",
-					{ func: "returnClientMenu" },
-					function(data) {
-						console.log(data);
-						console.log( $(elem));
-						$test = data;
-						
-						return $( elem ).replaceWith( $test );
-					});
+				swapSelect( elem, "client" )
 			});
-		$( this ).replaceWith( $saveBtn );
+		$saveBtn.appendTo( $( this ).parent() );
+		$editBtn = $( this ).detach();
 		//console.log($projectInfoEdit);
 		evt.preventDefault();
 	});

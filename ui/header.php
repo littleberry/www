@@ -24,6 +24,7 @@ Edit this file for updating links to pages/screens
 	<script src="libraries/jquery.tablesorter.min.js" type="text/javascript"></script> <!--This should only be loaded for projects.php -->
 	<script src="libraries/jquery.tablesorter.widgets.min.js" type="text/javascript"></script> <!--This should only be loaded for projects.php -->
 	<script src="libraries/jquery-ui-1.10.3.custom.min.js" type="text/javascript"></script> <!--This should only be loaded for projects.php -->
+	<script src="libraries/purl.js" type="text/javascript"></script> <!--This should only be loaded for projects.php -->
 </head>
 
 <body>

@@ -24,6 +24,10 @@
 				if ($_GET["func"] == "returnClientMenu") {
 					echo returnClientMenu();
 				}
+			} else if (isset($_POST["func"])) {
+				if ($_POST["func"] == "editProject") {
+					editProject();
+				}
 			} else {
 				if (isset($_POST["action"]) and $_POST["action"] == "edit_project") {
 					editProject();
@@ -94,7 +98,7 @@
 
 	<div class="content">
 		<!--BEGIN FORM-->
-		<form action="project-edit.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
+		<form action="project-edit.php" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="action" value="edit_project">
 			<input type="hidden" name="project_id" value="<?php echo $_GET["project_id"]?>">
 			<article class="entity-detail">
