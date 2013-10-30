@@ -88,7 +88,7 @@ function returnProjectJSON($id, $collection) {
 		$projects = Project_Person::getProjectsForPerson($id);
 		$projects = $projects[0];
 	} else if ($collection == "project") {
-		if ($id) {
+		if ($id != "") {
 			$projects = array();
 			$projects[] = Project::getProjectByProjectId($id);
 		} else {
@@ -125,7 +125,7 @@ function returnProjectJSON($id, $collection) {
 
 function returnClientJSON($id) {
 	//Returns the Client object as JSON encoded data for jQuery to use
-	if ($id) {
+	if ($id != "") {
 		$clients = array();
 		$clients[] = Client::getClient($id);
 	} else {
@@ -194,12 +194,12 @@ function returnPeopleJSON($id, $collection) {
 		$people = $people[0];
 	} else if (($collection == "person") && ($id != "")) {
 		$people = array();
-		$people[] = Person::getPerson($id);
+		$people[] = Person::getPersonById($id);
 	} else {
 		$people = Person::getPeople();
 	}
 	
-	print_r($people);
+	//print_r($people);
 	$peopleJSON = array();
 	foreach ($people as $person) {
 		$peopleJSON[] = array(

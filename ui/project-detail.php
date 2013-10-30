@@ -139,7 +139,7 @@
 				<h2 class="entity-sub-title">Assigned People</h2>
 				<ul class="entity-list entity-details-list">
 					<li class="entity-details-item">
-						<label for="" <?php validateField("task_id", $missingFields)?> class="entity-details-label"></label>
+						<label for="" <?php validateField("person_id", $missingFields)?> class="entity-details-label"></label>
 						<table id="people-list" class="entity-table people tablesorter">
 							<thead>
 								<tr>
@@ -190,26 +190,27 @@
 			<section id="project-info" class="entity-detail">
 				<h2 class="entity-sub-title">Project Info</h2>
 				<ul class="entity-list entity-details-list">
-					<li class="entity-details-item">Name: <span class="edit project-name"><?php echo $project_details->getValue("project_name")?></span></li>
-					<li class="entity-details-item">Client: <span class="select client-id"><a href="<?php echo "client-detail.php?client_id=" . $project_details->getValue("client_id")?>" class="" title="View client's details"><?php echo $client_details->getValue("client_name")?></a></span></li>
-					<li class="entity-details-item">Project code: <span class="edit project-code"><?php echo $project_details->getValue("project_code")?></span></li>
-					<?php if ($project_details->getValue("project_archived")) { ?>
-						<li class="entity-details-item archive-project">This project is currently archived.</li>
-					<?php } else { ?>
-						<li class="entity-details-item archive-project">This project is currently active.</li>	
-					<?php } ?>
+					<li class="entity-details-item">Name: <span class="edit project_name"><?php echo $project_details->getValue("project_name")?></span></li>
+					<li class="entity-details-item">Client: <span class="select client_id"><a href="<?php echo "client-detail.php?client_id=" . $project_details->getValue("client_id")?>" class="" title="View client's details"><?php echo $client_details->getValue("client_name")?></a></span></li>
+					<li class="entity-details-item">Project code: <span class="edit project_code"><?php echo $project_details->getValue("project_code")?></span></li>
+					<li class="entity-details-item">Status: <span class="checkbox project_archived">
+					<?php if ($project_details->getValue("project_archived")) {
+						echo "Archived";
+					} else {
+						echo "Active";
+					} ?></span></li>
 				</ul>
 				<ul class="page-controls-list team">
-					<li class="page-controls-item link-btn"><a id="edit-project-btn" class="" href="#">Edit Project Info</a></li>
+					<li class="page-controls-item link-btn"><a id="edit-project-info-btn" class="" href="#">Edit Project Info</a></li>
 				</ul>
 			</section>
 			<section id="project-notes" class="entity-detail">
 				<h2 class="entity-sub-title">Project Notes</h2>
-				<p class="entity-list entity-details-block">
+				<p class="entity-list entity-details-block textarea project_notes">
 					<?php echo $project_details->getValue("project_notes")?>
 				</p>
 				<ul class="page-controls-list team">
-					<li class="page-controls-item link-btn"><a class="" href="#">Edit Project Notes</a></li>
+					<li class="page-controls-item link-btn"><a id="edit-project-notes-btn" href="#">Edit Project Notes</a></li>
 				</ul>
 			</section>
 			<section id="project-invoicing" class="entity-detail">
