@@ -201,16 +201,16 @@
 					} ?></span></li>
 				</ul>
 				<ul class="page-controls-list team">
-					<li class="page-controls-item link-btn"><a id="edit-project-btn" class="" href="#">Edit Project Info</a></li>
+					<li class="page-controls-item link-btn"><a id="edit-project-info-btn" class="" href="#">Edit Project Info</a></li>
 				</ul>
 			</section>
 			<section id="project-notes" class="entity-detail">
 				<h2 class="entity-sub-title">Project Notes</h2>
-				<p class="entity-list entity-details-block">
+				<p class="entity-list entity-details-block textarea project_notes">
 					<?php echo $project_details->getValue("project_notes")?>
 				</p>
 				<ul class="page-controls-list team">
-					<li class="page-controls-item link-btn"><a class="" href="#">Edit Project Notes</a></li>
+					<li class="page-controls-item link-btn"><a id="edit-project-notes-btn" href="#">Edit Project Notes</a></li>
 				</ul>
 			</section>
 			<section id="project-invoicing" class="entity-detail">

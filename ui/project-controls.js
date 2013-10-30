@@ -4,6 +4,8 @@ $(document).ready( function() {
 	var $cancelLink = $( '<a id="cancel-link" class="" href="#">Cancel</a>' );
 	var $label = $( '<label class="entity-details-label"></label>' )
 	var $inputText = $( '<input type="text" />' );
+	var $inputCheckbox = $( '<input type="checkbox" />' )
+	var $textarea = $( '<textarea class="entity-details-block"></textarea>' )
 	var $editBtn;
 	
 	//var url = $.url(); //parse current URL
@@ -16,15 +18,16 @@ $(document).ready( function() {
 			id: projectId,
 			collection: "project"
 		}).done( function( data ) {
-				console.log("done: " + data);
+				//console.log("done: " + data);
 			})
 			.fail( function( data ) {
 				console.log("fail: " + data);
 			})
 			.success( function( data ) {
 				projectData.project = $.parseJSON(data);
-				console.log(projectData.project);
+				//console.log(projectData.project);
 			});
+	
 	$.get( "returnJSON.php", {
 			func: "returnPeopleJSON" ,
 			id: projectId,
@@ -85,7 +88,24 @@ $(document).ready( function() {
 			.each( function( index, elem ) {
 				projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
 				console.log(elem);
-				swapInputText( elem );
+				if ( $( elem ).is ( '[type="text"]' ) ) {
+					swapInputText( elem );
+				} else if ( $( elem ).is ( '[type="checkox"]' ) ) {
+					swapInputCheckbox( elem );
+				}
+				
+			});
+		$( this ).parents( 'ul' ).prev().find( 'select' )
+			.each( function( index, elem ) {
+				projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
+				console.log(elem);
+				swapSelect( elem );
+			});
+		$( this ).parents( 'ul' ).prev().find( 'textarea' )
+			.each( function( index, elem ) {
+				projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
+				console.log(elem);
+				swapTextArea( elem );
 			});
 		saveData( projectData.project[0] );
 		$editBtn.appendTo( $( this ).parent() );
@@ -94,7 +114,7 @@ $(document).ready( function() {
 	});
 
 	function swapInputText( elem ) {
-		if ( $( elem ).is( "input" ) ) {
+		if ( $( elem ).is( 'input' ) ) {
 			var useName = $( elem ).prev( 'label' ).attr( 'for' );
 			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
 			$( elem ).parent()
@@ -119,59 +139,167 @@ $(document).ready( function() {
 				});
 		}
 	}
+	function swapInputCheckbox( elem ) {
+		if ( $( elem ).is( 'input' ) ) {
+			var useName = $( elem ).prev( 'label' ).attr( 'for' );
+			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
+			$( elem ).parent()
+				.empty()
+				.text( useLabel + ": " )
+				.append( '<span class="edit ' + useName + '">' + projectData.project[0][useName] + '</span>' );
+				
+		} else {
+			var useName = $( elem ).attr( 'class' ).split(' ')[1];
+			var useLabel = $( elem ).parent().text().split(':')[0];
+			$( elem ).parent()
+				.empty()
+				.append( function() {
+					return $label.clone() 
+						.attr( 'for', useName )
+						.text( useLabel + ": " );
+				})
+				.append( function() {
+					console.log(projectData.project[0][useName]);
+					return $inputCheckbox.clone() 
+						.val( 1 )
+						.prop( 'checked', function() {
+							if ( projectData.project[0][useName] == 1 ) {
+								return true;
+							} else {
+								return false;
+							}
+						})
+						.attr( 'name', useName );
+				})
+				.append( ' Archive project?' );
+		}
+	}
 	function swapSelect( elem, list ) {
-		var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
-		var useLabel = $( elem ).parent().text().split(':')[0];
+		console.log($( elem ));
+		
+		//console.log( $(elem).text());
 		var $select = $( '<select name="' + useName + '" id="project-client-select" size="1"></select>' );
+		
+		if ( $( elem ).is( 'select' ) ) {
+			//console.log($( elem ).find( 'option:selected' ).text());
+			var useName = $( elem ).prev( 'label' ).attr( 'for' );
+			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
+			$( elem ).parent()
+				.empty()
+				.text( useLabel + ": " )
+				.append( '<span class="edit ' + useName + '">' + $( elem ).find( 'option:selected' ).text() + '</span>' );
 
-		if ( list == "client" ) {
+		} else {
 			var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
-			$.get( "returnJSON.php", {
-					func: "returnClientJSON",
-					id: "",
-					collection: ""
-				})
-				.done( function( getData ) {
-					console.log("done");
-				})
-				.fail( function( getData ) {
-					console.log("fail");
-				})
-				.success( function( getData ) {
-					var data = $.parseJSON(getData);
-					//console.log("success: " + data[0]["client_name"]);
-					for ( var i = 0; i < data.length; i++ ) {
-						$select.append( '<option value="' + data[i]["client_id"] + '>' + data[i]["client_name"] + '</option>' );
-					}
-					console.log($select);
-					$( elem ).parent()
-						.empty()
-						.append( function() {
-							return $label.clone() 
-								.attr( 'for', useName )
-								.text( useLabel + ": " );
-							})
-						.append( $select );
-				});					
-			//return $( elem ).replaceWith( $select );
+			var useLabel = $( elem ).parent().text().split(':')[0];
 
+			if ( list == "client" ) {
+				var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
+				$.get( "returnJSON.php", {
+						func: "returnClientJSON",
+						id: "",
+						collection: ""
+					})
+					.done( function( getData ) {
+						console.log("done");
+					})
+					.fail( function( getData ) {
+						console.log("fail");
+					})
+					.success( function( getData ) {
+						var data = $.parseJSON(getData);
+						for ( var i=0; i < data.length; i++ ) {
+							//console.log("success: " + data[i]["client_name"]);
+							var $opt = makeOption( data[i], elem )
+								.appendTo( $select );
+						}
+						//console.log($select);
+						$( elem ).parent()
+							.empty()
+							.append( function() {
+								return $label.clone() 
+									.attr( 'for', useName )
+									.text( useLabel + ": " );
+								})
+							.append( $select );
+					});
+			}
+			
 		}
 	}
 	
-	$( '#edit-project-btn' ).click( function( evt ) {
+	function makeOption( data, elem ) {
+		return $( '<option>' )
+			.val( data["client_id"] )
+			.text( data["client_name"] )
+			.prop( "selected" , function() {
+				if ( data["client_name"] == $( elem ).text() ) {
+					return true;
+				} else {
+					return false;
+				}
+			})
+	}
+	
+	function swapTextArea( elem ) {
+		if ( $( elem ).is( "textarea" ) ) {
+			var useName = $( elem ).prev( 'label' ).attr( 'for' );
+			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
+			$( elem ).parent()
+				.empty()
+				.text( useLabel + ": " )
+				.append( '<span class="edit ' + useName + '">' + projectData.project[0][useName] + '</span>' );
+				
+		} else {
+			var useName = $( elem ).attr( 'class' ).split(' ');
+			var useLabel = $( elem ).parent().text().split(':')[0];
+			var useName = useName.pop();
+			console.log($( elem ).parent());
+			$( elem )
+				.before( function() {
+					return $label.clone() 
+						.attr( 'for', useName )
+						.text( useLabel + ": " );
+				})
+				.before( function() {
+					return $textarea.clone() 
+						.val( projectData.project[0][useName] )
+						.attr( 'name', useName );
+				});
+		}
+	}
+
+	
+	$( '#edit-project-info-btn' ).click( function( evt ) {
 		$( '#project-info .edit' )
 			.each( function( index, elem ) {
 				swapInputText( elem );
 			});
 		$( '#project-info .select' )
 			.each( function( index, elem ) {
-				swapSelect( elem, "client" )
+				swapSelect( elem, "client" );
+			});
+		$( '#project-info .checkbox' )
+			.each( function( index, elem ) {
+				swapInputCheckbox( elem );
 			});
 		$saveBtn.appendTo( $( this ).parent() );
 		$editBtn = $( this ).detach();
 		//console.log($projectInfoEdit);
 		evt.preventDefault();
 	});
+	
+	$( '#edit-project-notes-btn' ).click( function( evt ) {
+		$( '#project-notes .textarea' )
+			.each( function( index, elem ) {
+				swapTextArea( elem );
+			});
+		$saveBtn.appendTo( $( this ).parent() );
+		$editBtn = $( this ).detach();
+		//console.log($projectInfoEdit);
+		evt.preventDefault();
+	});
+
 
 	$(function() { //tabs interface for project-detail.php
 		$( ".tabs" ).tabs();
