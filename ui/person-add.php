@@ -294,7 +294,7 @@ function showP(elem){
 				$person_perms->insertPermissions();
 				include("newUserEmail.php");
 				$_SESSION['person'] = serialize($person);
-				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)));
+				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)) . "&person_perms=" . urlencode(serialize($person_perms)));
 			}
 		} catch (Exception $e) {
 			echo "something went wrong inserting this person into our database.";
