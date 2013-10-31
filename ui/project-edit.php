@@ -12,6 +12,7 @@
 	require_once("../classes/Project_Task.class.php");
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Task.class.php");
+	require_once("../classes/Person.class.php");
 
 	
 ?>
@@ -251,7 +252,14 @@ function FillPeople(f) {
 								</tbody>
 							</table>
 						</li>
-						<input id="client-phone" name="task_id" class="client-phone-input" type="text" tabindex="2" value="" />
+
+						<input id="client-phone" name="task_id" class="client-phone-input" type="text" tabindex="2" value="<?php //NOTE TO ALL THOSE THAT FOLLOW HERE:
+											//this should NOT work this way, it is only here to show the demo to MB. This is not the way these fields should work at ALL.
+											list($tasksForProject) = Project_Task::getTasksForProject($project_id);
+											foreach ($tasksForProject as $projectTask) { 
+												echo $projectTask->getValue("task_id") . ",";
+											}
+											?>" />
 				</li>
 						<li class="entity-details-item">
 							<label for="task_ids" class="entity-details-label">Add additional tasks:</label>
@@ -301,14 +309,27 @@ function FillPeople(f) {
 										//$peopleList = "";
 										foreach ($peopleForProject as $projectPerson) { ?>
 											<tr>
-												<td><?php echo $projectPerson->getValue("person_id"); ?></td>
+												<td><?php 
+												$personName = Person::getPersonById($projectPerson->getValue("person_id"));
+												echo $personName->getValue("person_first_name") . " ";
+												echo $personName->getValue("person_last_name");
+												?></td>
 												<td><a href="#" class="remove-btn"></a></td>
 											</tr>
 										<?php } ?>
 								</tbody>
 							</table>
 						</li>
-											<input id="client-phone" name="person_id" class="client-phone-input" type="text" tabindex="2" value="" />
+											<input id="client-phone" name="person_id" class="client-phone-input" type="text" tabindex="2" value="<?php
+											//NOTE TO ALL THOSE THAT FOLLOW HERE:
+											//this should NOT work this way, it is only here to show the demo to MB. This is not the way these fields should work at ALL.
+											list($peopleForProject) = Project_Person::getPeopleForProject($project_id);
+											foreach ($peopleForProject as $projectPerson) { 
+												$personName = Person::getPersonById($projectPerson->getValue("person_id"));
+												echo $projectPerson->getValue("person_id") . ",";
+											}
+											?>
+											" />
 
 						<li class="entity-details-item">
 							<label for="person_ids" class="entity-details-label">Add additional people:</label>
