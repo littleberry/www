@@ -82,7 +82,7 @@
 			<?php 
 				//we'll use an existing function to work this magic. Get all the clients with
 				//projects and then display them (active and archived) by name for a particular client.
-				$clientProjects = Project::getClientsProjectsByStatus(1);
+				$clientProjects = Project::getClientsProjectsByStatus(0);
 				foreach($clientProjects as $clientProject) {
 					if ($client_id == $clientProject->getValueEncoded("client_id")) {
 						?> <li class="client-projects-list-item"><?php echo $clientProject->getValueEncoded("project_name") ?></li> <?php
@@ -95,7 +95,7 @@
 				<?php 
 				//we'll use an existing function to work this magic. Get all the clients with
 				//projects and then display them (active and archived) by name for a particular client.
-				$clientProjects = Project::getClientsProjectsByStatus(0);
+				$clientProjects = Project::getClientsProjectsByStatus(1);
 				foreach($clientProjects as $clientProject) {
 					if ($client_id == $clientProject->getValueEncoded("client_id")) {
 						?> <li class="client-projects-list-item"><?php echo $clientProject->getValueEncoded("project_name") ?></li> <?php
