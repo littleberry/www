@@ -60,7 +60,7 @@
 		return $select;
 	}
 	
-	function displayProjectEditForm($errorMessages, $missingFields, $project) {
+	function displayProjectEditForm($errorMessages, $missingFields, $project, $project_person, $project_task) {
 		if ($errorMessages) {
 			foreach($errorMessages as $errorMessage) {
 				echo $errorMessage;
@@ -77,20 +77,35 @@
 		} else {
 			echo "You cannot edit a project unless you have provided a project ID.";
 			exit();
-	}
-	
+		}
+		
+
+		
 	include('header.php'); //add header.php to page
 ?>
+<script type="text/javascript">
+function FillTasks(f) {
+    //alert(f.task_ids.value);
+    f.task_id.value = f.task_ids.value + "," + f.task_id.value;    
+}
+function FillPeople(f) {
+    //alert(f.person_ids.value);
+    f.person_id.value = f.person_ids.value + "," + f.person_id.value;    
+}
+
+</script>
 <div id="page-content" class="page-content">
 	<header class="page-header">
-		<h1 class="page-title">Edit Project: Project Name<?php //echo $project_details->getValue("project_name")?></h1>
-		<h2 class="page-sub-title"><a href="#" class="" title="View client's details">Client</a></h2>
+		<h1 class="page-title">Edit Project: <?php echo $project->getValue("project_name")?></h1>
+		<?php $client_name = Client::getClientNameById($project->getValueEncoded("client_id"));
+		?>
+		<h2 class="page-sub-title"><a href="client-detail.php?client_id=<?php echo $project->getValueEncoded("client_id")?>" class="" title="View client's details"><?php echo $client_name["client_name"]?></a></h2>
 		<nav class="page-controls-nav">
 			<ul class="page-controls-list project">
 				<li class="page-controls-item link-btn">
 				<a class="view-all-link" href="#">Save Project</a></li>
 				<!-- <a class="view-all-link" href="project-edit.php?project_id=<?php //echo $project_id?>">Save Project</a> --></li>
-				<li class="page-controls-item"><a class="view-archive-link" href="project-archives.php">View Archives</a></li>
+				<li class="page-controls-item"><a class="view-archive-link" href="projects.php?archives=1">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 			</ul>
 		</nav>
@@ -101,7 +116,7 @@
 		<!--BEGIN FORM-->
 		<form action="project-edit.php" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="action" value="edit_project">
-			<input type="hidden" name="project_id" value="<?php echo $_GET["project_id"]?>">
+			<input type="hidden" name="project_id" value="<?php echo $project_id?>">
 			<article class="entity-detail">
 				<fieldset class="entity-details-entry">
 					<header class="entity-details-header project">
@@ -126,7 +141,7 @@
 										//get the clients out to populate the drop down.
 										list($clients) = Client::getClients();
 										foreach ($clients as $client) { ?>
-										<option value="<?php echo $client->getValue("client_id") ?>"><?php echo $client->getValue("client_name")?></option>
+										<option value="<?php echo $client->getValue("client_id") ?>" <?php setSelected($client, "client_id", $project->getValue("client_id")) ?>><?php echo $client->getValue("client_name")?></option>
 									<?php } ?>
 								</select>
 							</li>
@@ -236,13 +251,15 @@
 								</tbody>
 							</table>
 						</li>
+						<input id="client-phone" name="task_id" class="client-phone-input" type="text" tabindex="2" value="" />
+				</li>
 						<li class="entity-details-item">
 							<label for="task_ids" class="entity-details-label">Add additional tasks:</label>
 							<?php 
 								//get the tasks out to populate the drop down.
-								list($tasks) = Task::getTasks(0);
+								list($tasks) = Task::getTasks("0");
 							?>
-							<select name="task_ids" id="task_ids" size="1">    
+							<select name="task_ids" id="task_ids" size="1" onchange="FillTasks(this.form); return false;">    
 								<?php foreach ($tasks as $task) { ?>
 		   						<option value="<?php echo $task->getValue("task_id") ?>"><?php echo $task->getValue("task_name")?></option>
 		    					<?php } ?>
@@ -251,7 +268,7 @@
 						<ul class="page-controls-list tasks">
 							<li class="entity-details-item submit-btn tasks">
 								<label for="project-save-btn" class="entity-details-label project">All done?</label>
-								<input id="project-save-btn" name="project-save-btn" class="save-btn" type="submit" value="+ Save Changes" tabindex="12" /> or <a class="projects.php" href="#" tabindex="13">Cancel</a>
+								<input id="project-save-btn" name="project-save-btn" class="save-btn" type="submit" value="+ Save Changes" tabindex="12" /> or <a class="projects.php" href="projects.php" tabindex="13">Cancel</a>
 							</li>
 						</ul>
 					</ul>
@@ -291,13 +308,15 @@
 								</tbody>
 							</table>
 						</li>
+											<input id="client-phone" name="person_id" class="client-phone-input" type="text" tabindex="2" value="" />
+
 						<li class="entity-details-item">
 							<label for="person_ids" class="entity-details-label">Add additional people:</label>
 							<?php 
 								//get the people out to populate the drop down.
 								list($people) = Person::getPeople();
 							?>
-							<select name="people_ids" id="people_ids" size="1">    
+							<select name="person_ids" id="person_ids" size="1" onchange="FillPeople(this.form); return false;">    
 								<?php foreach ($people as $person) { ?>
 		   						<option value="<?php echo $person->getValue("person_id") ?>"><?php echo $person->getValue("person_first_name");echo " " . $person->getValue("person_last_name")?></option>
 		    					<?php } ?>
@@ -435,28 +454,32 @@ function editProject() {
 		
 	if ($errorMessages) {
 		error_log("There were errors in the input (errorMessages was not blank. Redisplaying the edit form with missing fields.");
-		displayProjectEditForm($errorMessages, $missingFields, $project);
+		displayProjectEditForm($errorMessages, $missingFields, $project, $project_person, $project_task);
 	} else {
 		try {
 			$client_id = $project->getValue("client_id");
-			//insert the project into the project table.
+			//update the project into the project table.
 			$project->updateProject($client_id);
-			//insert the project and the associated people into the project_people table.
 			$project_id = Project::getProjectId($project->getValue("project_name"));
 			$person_ids = explode(',', $project_person->getValue("person_id"));
-			//try deleting all of the rows in the table and then adding the new ones, since we don't know how many people will be deleted.
-			Project_Person::deleteProjectPerson($project_id[0]);
-			foreach ($person_ids as $person_id) {			
-				$project_person->insertProjectPerson($person_id, $project_id[0]);
+			//delete all of the rows in the table associated with this project.
+			Project_Person::deleteProjectPerson($project_id["project_id"]);
+			//add the new ones, since we don't know how many people will be deleted and how many will be added.
+			foreach ($person_ids as $person_id) {
+			if ($person_id) {
+				$project_person->insertProjectPerson($person_id, $project_id["project_id"]);
 			}
+			}
+			//do the same for tasks.
 			$task_ids = explode(',', $project_task->getValue("task_id"));
-			//try deleting all of the rows in the table and then adding the new ones, since we don't know how many tasks will be deleted.
-			Project_Task::deleteProjectTask($project_id[0]);
-			foreach ($task_ids as $task_id) {				
-				$project_task->insertProjectTask($task_id, $project_id[0]);
+			Project_Task::deleteProjectTask($project_id["project_id"]);
+			foreach ($task_ids as $task_id) {
+			if ($task_id) {	
+				$project_task->insertProjectTask($task_id, $project_id["project_id"]);
+			}
 			}
 
-			displayProjectEditForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
+			displayProjectEditForm(array(), array(), $project, $project_person, $project_task);
 		} catch (Error $e) {
 			die("could not insert a project. " . $e->getMessage());
 			
