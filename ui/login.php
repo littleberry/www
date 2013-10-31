@@ -10,8 +10,8 @@
 	<div class="content">
 		<form id="user-login" action="" method="post"> <!--event handling dealt with in js file-->
 			<ul class="details-list">
-				<li class="details-item username"><label for="username" class="entity-details-label">User name: </label><input name="username" type="text" id="username" value=""/></li>
-				<li class="details-item password"><label for="password" class="entity-details-label">Password: </label><input name="password" type="password" id="password" value=""/></li>
+				<li class="details-item username"><label for="username" class="entity-details-label"><b>User name:</b> (this is the email address you used when you activated your account): </label><input name="username" type="text" id="username" value=""/></li>
+				<li class="details-item password"><label for="password" class="entity-details-label"><b>Password:</b> </label><input name="password" type="password" id="password" value=""/></li>
 				<li class="details-item username"><label for="Submit" class="entity-details-label">Ready? </label><input type="submit" name="Submit" value="Login"/></li>
 			</ul>
 		</form>
