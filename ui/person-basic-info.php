@@ -560,7 +560,7 @@ function showP(elem){
 			} catch (Exception $e) {
 				echo "could not send the email for some reason.";
 			}
-			echo "HEre is the person perms " . gettype($person_perms);
+			//echo "HEre is the person perms " . gettype($person_perms);
 			displayPersonInsertForm($errorMessages, $missingFields, $person, $project, $person_perms);
 		}
 	}
