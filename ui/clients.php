@@ -41,7 +41,7 @@
 				$archive_flag = Client::getArchiveFlag($client->getValueEncoded("client_id")); 
 				//THIS IS NOT THE WAY TO DO THIS. 
 				if (isset($_POST["client-archive-btn"]) && $_POST["client-archive-btn"] == $client_id[0]){
-					$archive_flag = 1;
+					$archive_flag = 0 ;
 					Client::setArchiveFlag($archive_flag, $client->getValueEncoded("client_id"));
 					$archive_flag = Client::getArchiveFlag($client->getValueEncoded("client_id"));
 				}
@@ -63,7 +63,7 @@
 					//we'll use an existing function to work this magic. Get all the clients with
 					//active projects and then display them by count for a particular client.
 					$clientProjects = Project::getClientsProjectsByStatus(1);
-					$activeProjectCount = 0;
+					$activeProjectCount = 1;
 					foreach($clientProjects as $clientProject) {
 						if ($client->getValueEncoded("client_id") == $clientProject->getValueEncoded("client_id")) {
 							$activeProjectCount++;
