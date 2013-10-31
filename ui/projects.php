@@ -53,7 +53,7 @@ if (isset($_POST["change_archive"])) {
 			<ul class="page-controls-list project">
 				<li class="page-controls-item link-btn">
 				<a class="view-all-link" href="project-add.php">+ Add Project</a></li>
-				<li class="page-controls-item"><a class="view-archive-link" href="project-archives.php">View Archives</a></li>
+				<li class="page-controls-item"><a class="view-archive-link" href="projects.php?archives=1">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 			</ul>
 		</nav>
@@ -80,7 +80,7 @@ if (isset($_POST["change_archive"])) {
 							<td><a class="project-info-name-link" href="<?php echo "project-detail.php?project_id=" . $project->getValueEncoded("project_id")?>" title="View project details"><?php echo $project->getValueEncoded("project_name")?></a></td>
 							<td><a class="client-info-contact-link" href="<?php echo "client-detail.php?client_id=" . $project->getValueEncoded("client_id")?>" title="View client details"><?php echo  $clientName["client_name"]?></a></td>
 							<td>x Hours/y budget</td>
-							<td><input name="select-project" class="archive-checkbox" type="checkbox" value="<?php echo $project->getValueEncoded('project_id'); ?>" title="Select project" /><td>
+							<!--td><input name="select-project" class="archive-checkbox" type="checkbox" value="<?php echo $project->getValueEncoded('project_id'); ?>" title="Select project" /><td-->
 							<!-- <td><strong>Expenses</strong> to data</td> -->
 						</tr>
 					<?php } ?>
