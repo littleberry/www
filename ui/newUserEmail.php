@@ -21,7 +21,7 @@ $mail->SMTPSecure = "tls";                 // sets the prefix to the server
 $mail->Host = "smtp.gmail.com";      // sets GMAIL as the SMTP server
 $mail->Port = 587;      
 $mail->Username = "catsbap";
-$mail->Password = "bapot3844";
+$mail->Password = "ot3844";
 $mail->From = "admin@timetracker.com";
 $mail->FromName = "admin@timetracker.com";
 $mail->AddAddress($_POST["person-email"]); 
