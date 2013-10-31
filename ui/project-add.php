@@ -42,6 +42,18 @@
 	}
 	
 ?>
+<script type="text/javascript">
+function FillTasks(f) {
+    //alert(f.task_ids.value);
+    f.task_id.value = f.task_ids.value + "," + f.task_id.value;    
+}
+function FillPeople(f) {
+    //alert(f.task_ids.value);
+    f.person_id.value = f.person_ids.value + "," + f.person_id.value;    
+}
+
+</script>
+
 	<form action="project-add.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
       <section class="content">
       <input type="hidden" name="action" value="project-add"/>
@@ -116,11 +128,11 @@
 				<ul class="details-list client-details-list">
 				<?php 
 						//get the taskss out to populate the drop down.
-						list($tasks) = Task::getTasks(1);
+						list($tasks) = Task::getTasks("0");
 					?>
 					<li class="client-details-item currency">
 						<label for="client-currency" class="client-details-label">Please choose a task:</label>
-                        <select name="task_ids" id="client_currency_index" size="1">    
+                        <select name="task_ids" id="client_currency_index" size="1" onchange="FillTasks(this.form); return false;">    
 						<?php foreach ($tasks as $task) { ?>
    							<option value="<?php echo $task->getValue("task_id") ?>"><?php echo $task->getValue("task_name")?></option>
     					<?php } ?>
@@ -150,7 +162,7 @@
 					?>
 					<li class="client-details-item currency">
 						<label for="client-currency" class="client-details-label">Please choose a person:</label>
-                        <select name="person_ids" id="client_currency_index" size="1">    
+                        <select name="person_ids" id="client_currency_index" size="1" onchange="FillPeople(this.form); return false;">    
 						<?php foreach ($people as $person) { ?>
    							<option value="<?php echo $person->getValue("person_id") ?>"><?php echo $person->getValue("person_first_name");echo " " . $person->getValue("person_last_name")?></option>
     					<?php } ?>
@@ -164,7 +176,7 @@
 					<li class="client-details-item submit-client">
 						<label for="client-add-btn" class="client-details-label">All done?</label>
                         <input id="client-add-btn" name="project-add-btn" class="client-add-btn" type="submit" value="+ Add Project" tabindex="11"/> 
-						 or <a class="" href="#" tabindex="11">Cancel</a>
+						 or <a class="" href="projects.php" tabindex="11">Cancel</a>
 					</li>
 				</ul>
 			</fieldset>
@@ -265,12 +277,19 @@
 			//insert the project and the associated people into the project_people table.
 			$project_id = Project::getProjectId($project->getValue("project_name"));
 			$person_ids = explode(',', $project_person->getValue("person_id"));
-			foreach ($person_ids as $person_id) {			
-				$project_person->insertProjectPerson($person_id, $project_id[0]);
+			foreach ($person_ids as $person_id) {
+			if ($person_id) {
+				//echo "inserting person id " . $person_id . " and " . "project id " . $project_id["project_id"]; 
+				$project_person->insertProjectPerson($person_id, $project_id["project_id"]);
+			}
 			}
 			$task_ids = explode(',', $project_task->getValue("task_id"));
+			echo "<br><br>";
 			foreach ($task_ids as $task_id) {				
-				$project_task->insertProjectTask($task_id, $project_id[0]);
+			if ($task_id) {
+				//echo "inserting task id " . $task_id . " and " . "project id " . $project_id["project_id"];
+				$project_task->insertProjectTask($task_id, $project_id["project_id"]);
+			}
 			}
 
 			displayProjectInsertForm(array(), array(), new Project(array()), new Project_Person(array()), new Project_Task(array()));
