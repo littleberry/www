@@ -23,7 +23,7 @@
 	}
 	
 	//HOLY FUNKY LOGIC, BATMAN!!
-	/*
+	
 if (isset($_POST["change_archive"])) {
 		if ($archivedView) {
 			Project::setArchiveFlag('0', $project_id);
@@ -31,7 +31,7 @@ if (isset($_POST["change_archive"])) {
 			Project::setArchiveFlag('1', $project_id);
 		}
 	}
-*/
+
 
 	
 	//if(!isUserLoggedIn()){
@@ -83,6 +83,7 @@ if (isset($_POST["change_archive"])) {
 							<td><a class="client-info-contact-link" href="<?php echo "client-detail.php?client_id=" . $project->getValueEncoded("client_id")?>" title="View client details"><?php echo  $clientName["client_name"]?></a></td>
 							<td>x Hours/y budget</td>
 							<!--td><input name="select-project" class="archive-checkbox" type="checkbox" value="<?php echo $project->getValueEncoded('project_id'); ?>" title="Select project" /><td-->
+							<td><input name="change_archive" class="archive-checkbox" type="submit" value="<?php echo $project->getValueEncoded('project_id'); ?>"></td>
 							<!-- <td><strong>Expenses</strong> to data</td> -->
 						</tr>
 					<?php } ?>
