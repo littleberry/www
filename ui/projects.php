@@ -5,6 +5,7 @@
 	
 	//protect this page
 	checklogin();
+	
 	//this page doubles as the project archive page, so get the value off the get and display those projects here.
 	$archivedView = "0";
 	if (isset($_GET["archives"])) {
