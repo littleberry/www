@@ -62,7 +62,7 @@
 					<?php 
 					//we'll use an existing function to work this magic. Get all the clients with
 					//active projects and then display them by count for a particular client.
-					$clientProjects = Project::getClientsProjectsByStatus(1);
+					$clientProjects = Project::getClientsProjectsByStatus(0);
 					$activeProjectCount = 0;
 					foreach($clientProjects as $clientProject) {
 						if ($client->getValueEncoded("client_id") == $clientProject->getValueEncoded("client_id")) {
