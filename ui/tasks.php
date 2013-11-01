@@ -94,10 +94,9 @@ include('header.php'); //add header.php to page
 					if ($processType == "E") { ?><br/>
 <button id="client-add-btn" name="task-archived" class="client-add-btn" value="1" tabindex="11"/>Archive Task</button><br/> 					<?php } ?>
 					<?php
-					//this is here to expose when we get there.
-					//<label for="contact-info-sync" class="client-details-label">Common Task (added to all future projects):</label>
-					//<input id="contact-info-sync" name="task-common" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" />
-					?>
+					//this is here to expose when we get there.?>
+					<label for="contact-info-sync" class="client-details-label">Common Task (added to all future projects):</label>
+					<input id="contact-info-sync" name="task-common" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" />
 				<fieldset class="client-details-entry">
 				<ul class="details-list client-details-submit">
 					<li class="client-details-item submit-client">
