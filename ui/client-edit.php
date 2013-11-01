@@ -353,8 +353,6 @@
 		</section>
 	</section>
 </section>
-
-<<<<<<< HEAD
 <!--END FORM-->
 </form><?php } ?>
 		
