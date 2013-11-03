@@ -20,6 +20,7 @@ class Project_Task extends DataObject {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
 			$st->execute();
+			$tasks=array();
 			foreach ($st->fetchAll() as $row) {
 				$tasks[] = new Task($row);
 			}
@@ -90,7 +91,7 @@ class Project_Task extends DataObject {
 				parent::disconnect($conn);
 				die("Query failed on project task update: " . $e->getMessage() . " sql is " . $sql);
 			}
-	}	
+	}		
 }
 	
 	/*public static function getEnumValues($colName) {
