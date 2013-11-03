@@ -12,9 +12,19 @@ Header file for all Manage sections. Needs to eventually be able to tell which p
 
 Edit this file for updating links to pages/screens
 
+What do we do about the login screen? In the case of a user that has not logged in, we don't want to show them the header; we don't have enough information to figure out what to do. 
+
 
 -->
 */
+
+if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
+	$person = Person::getByEmailAddress($_SESSION["person"]);
+	$person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
+} else {
+	$person = Person::getByEMailAddress("catsbap@gmail.com");
+	$person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
+}
 ?>
 <html lang="en">
 <head>
@@ -32,9 +42,6 @@ Edit this file for updating links to pages/screens
 </head>
 
 <body>
-<?php $person = Person::getByEmailAddress($_SESSION["person"]);
-$person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
-?> 
 <header id="site-header" class="site-header">
 	<h1 class="site-title">Time Tracker</h1>
 	<nav id="site-nav" class="site-nav">
@@ -49,7 +56,7 @@ $person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEnco
 	</nav>
 	<nav id="util-nav" class="util-nav">
 		<ul id="util-menu" class="util-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out <?php echo $_SESSION["person"];?></a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out <?php echo $person->getValue("person_email");?></a></li>
 		</ul>
 	</nav>
 	<nav id="section-nav" class="section-nav manage">
