@@ -309,8 +309,7 @@ public static function getProjectByProjectId($project_id) {
 			die("Query failed on update: " . $e->getMessage());
 		}
 
-	}
-
+	}	
 }
 
 ?>
