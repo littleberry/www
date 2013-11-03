@@ -16,7 +16,7 @@ class Project extends DataObject {
 		"project_budget_by"=>"",
 		"project_budget_total_fees"=>"",
 		"project_budget_total_hours"=>"",
-		"project_send_email"=>"",
+		"project_send_email_percentage"=>"",
 		"project_show_budget"=>"",
 		"project_budget_includes_expenses"=>"",
 		"project_notes"=>"",
@@ -121,7 +121,7 @@ class Project extends DataObject {
 			project_budget_by,
 			project_budget_total_fees,
 			project_budget_total_hours,
-			project_send_email,
+			project_send_email_percentage,
 			project_show_budget,
 			project_budget_includes_expenses,
 			project_notes,
@@ -137,7 +137,7 @@ class Project extends DataObject {
 			:project_budget_by,
 			:project_budget_total_fees,
 			:project_budget_total_hours,
-			:project_send_email,
+			:project_send_email_percentage,
 			:project_show_budget,
 			:project_budget_includes_expenses,
 			:project_notes,
@@ -155,7 +155,7 @@ class Project extends DataObject {
 			$st->bindValue(":project_budget_by", $this->data["project_budget_by"], PDO::PARAM_STR);
 			$st->bindValue(":project_budget_total_fees", $this->data["project_budget_total_fees"], PDO::PARAM_INT);
 			$st->bindValue(":project_budget_total_hours", $this->data["project_budget_total_hours"], PDO::PARAM_INT);
-			$st->bindValue(":project_send_email", $this->data["project_send_email"], PDO::PARAM_STR);
+			$st->bindValue(":project_send_email_percentage", $this->data["project_send_email_percentage"], PDO::PARAM_STR);
 			$st->bindValue(":project_show_budget", $this->data["project_show_budget"], PDO::PARAM_STR);
 			$st->bindValue(":project_budget_includes_expenses", $this->data["project_budget_includes_expenses"], PDO::PARAM_STR);
 			$st->bindValue(":project_notes", $this->data["project_notes"], PDO::PARAM_STR);
@@ -226,7 +226,7 @@ public static function getProjectByProjectId($project_id) {
 				project_budget_by = :project_budget_by,
 				project_budget_total_fees = :project_budget_total_fees,
 				project_budget_total_hours = :project_budget_total_hours,
-				project_send_email = :project_send_email,
+				project_send_email_percentage = :project_send_email_percentage,
 				project_show_budget = :project_show_budget,
 				project_budget_includes_expenses = :project_budget_includes_expenses
 				WHERE project_id = :project_id";
@@ -243,7 +243,7 @@ public static function getProjectByProjectId($project_id) {
 				$st->bindValue(":project_budget_by", $this->data["project_budget_by"], PDO::PARAM_STR);
 				$st->bindValue(":project_budget_total_fees", $this->data["project_budget_total_fees"], PDO::PARAM_INT);
 				$st->bindValue(":project_budget_total_hours", $this->data["project_budget_total_hours"], PDO::PARAM_INT);
-				$st->bindValue(":project_send_email", $this->data["project_send_email"], PDO::PARAM_STR);
+				$st->bindValue(":project_send_email_percentage", $this->data["project_send_email"], PDO::PARAM_STR);
 				$st->bindValue(":project_show_budget", $this->data["project_show_budget"], PDO::PARAM_STR);
 				$st->bindValue(":project_budget_includes_expenses", $this->data["project_budget_includes_expenses"], PDO::PARAM_STR);
 				$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
