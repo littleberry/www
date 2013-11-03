@@ -39,12 +39,13 @@ function setSelected(DataObject $obj, $fieldName, $fieldValue) {
 function checkLogin() {
 //if the session variable doesn't exist show the log in page.
 	//session_start();
-	//print_r($_SESSION["person"]);
+	//error_log(print_r($_SESSION["person"], true));
+	//exit;
 	if (!$_SESSION["person"]) {
 	//not sure why there is supposed to be a person variable here.
 	//or !$_SESSION["person"] = Person::getPerson($_SESSION["person"]->getValue( "person_username" ))) 
 	//{
-		$_SESSION["person"] = "";
+		//$_SESSION["person"] = "";
 		//$_SESSION["callLoginFromPage"] = $page;
 		//error_log("no session!");
 		//error_log(print_r($_SESSION["person"],true));
