@@ -19,7 +19,7 @@
 		if (isset($_POST["action"]) and $_POST["action"] == "person-add") {
 				processPerson();
 		} else {
-				displayPersonInsertForm(array(), array(), new Person(array()));
+				displayPersonInsertForm(array(), array(), new Person(array()), new Person_Permissions(array()));
 		} 
 ?>
 <section id="page-content" class="page-content">
@@ -111,7 +111,7 @@ function showP(elem){
 				</header>
 				<ul class="details-list client-details-list">
 		   			<li class="client-details-item name">
-		   			This person is a: 
+		   			This person is a:
 		   				<?php 
 		   				$row = Person::getEnumValues("person_type");																					  						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
 			   			foreach ($enumList as $type) {	?>
