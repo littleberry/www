@@ -94,6 +94,35 @@ function FillPeople(f) {
     f.person_id.value = f.person_ids.value + "," + f.person_id.value;    
 }
 
+//THESE ARE ONLY HERE FOR THE DEMO
+function showProjectHourlyRate(f) {
+	if(f.value == "Project hourly rate"){
+		document.getElementById('project_hourly_rate').style.display = "inline";
+    } else {
+	    document.getElementById('project_hourly_rate').style.display = "none";
+    }
+}
+
+function showBudgetFields(f) {
+	if (f.value == "Total project hours") {
+    	document.getElementById('project_budget_total_hours').style.display = "inline";
+        document.getElementById('project_budget_total_fees').style.display = "none";
+        document.getElementById('project_budget_includes_expenses'). style.display = "none";
+        document.getElementById('project_budget_includes_expenses_label'). style.display = "none";
+	} else if (f.value == "Total project fees") {
+		document.getElementById('project_budget_total_hours').style.display = "none";
+        document.getElementById('project_budget_total_fees').style.display = "inline";
+        document.getElementById('project_budget_includes_expenses'). style.display = "inline";
+        document.getElementById('project_budget_includes_expenses_label'). style.display = "inline";
+	} else {
+		document.getElementById('project_budget_total_hours').style.display = "none";
+        document.getElementById('project_budget_total_fees').style.display = "none";
+        document.getElementById('project_budget_includes_expenses'). style.display = "none";
+        document.getElementById('project_budget_includes_expenses_label'). style.display = "none";
+	}
+}
+
+
 </script>
 <div id="page-content" class="page-content">
 	<header class="page-header">
@@ -146,12 +175,54 @@ function FillPeople(f) {
 									<?php } ?>
 								</select>
 							</li>
-							<li class="entity-details-item project-archive project">
+							<!--li class="entity-details-item project-archive project">
 								<label for="project-archived" <?php validateField("project_archived", $missingFields)?> class="entity-details-label">Archived project?</label>
-								<input id="project-archived" name="project-archived" class="project-archive-input" type="text" tabindex="3" value="<?php echo $project->getValueEncoded("project_archived")?>" />
+								<input id="project-archived" name="project-archived" class="project-archive-input" type="text" tabindex="3" value="<?php echo $project->getValueEncoded("project_archived")?>" /-->
 							</li>
 						</ul>
 					</section>
+					<!--DEMO TO SHOW THE FIELDS WORK-->
+					<?php //took these out for now. Do not expose them in the UI!?>
+					<h4>Invoice Methods:</h4>
+					<li class="billable">
+						<input type="radio" id="project_billable" name="project_billable" class="client-email-input" tabindex="3" value="0" <?php setChecked($project, "project_billable", 0) ?>/>
+						<label for="project_billable" class="client-details-label">This project is not billable</label><br/>
+						<input type="radio" id="project_billable" name="project_billable" class="client-email-input" tabindex="3" value="1" <?php setChecked($project, "project_billable", 1) ?>/>
+						<label for="project_billable" class="client-details-label">This project is billable and we invoice by:</label>
+					</li>
+					<?php
+						$row = Project::getEnumValues("project_invoice_by");
+						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
+						?>
+						<select name="project_invoice_by" onchange="showProjectHourlyRate(this)">
+						<?php
+						foreach($enumList as $value) { ?>
+							<option name="project_invoice_by" value="<?php echo $value?>"><?php echo $value ?></option>
+						<?php } ?>
+						</select>    <input id="project_hourly_rate" name="project_hourly_rate" style="width:50px;display:none;" value="$"/>
+
+						<h4>Budget</h4>
+						<?php
+						$row = Project::getEnumValues("project_budget_by");
+						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
+						?>
+						<select name="project_budget_by" onchange="showBudgetFields(this)">
+						<?php
+						foreach($enumList as $value) { ?>
+							<option name="project_budget_by" value="<?php echo $value?>"><?php echo $value ?></option>
+						<?php } ?>
+						</select>     <input id="project_budget_total_hours" name="project_budget_total_hours" style="width:50px;display:none;" value="Hours"/>
+						<input id="project_budget_total_fees" name="project_budget_total_fees" style="width:50px;display:none;" value="$"/><br/>
+						<input type="checkbox" id="project_budget_includes_expenses" name="project_budget_includes_expenses" style="display:none;"tabindex="3" />
+						<div style="display:none;" id="project_budget_includes_expenses_label" for="project_budget_includes_expenses_label" class="project_budget_includes_expenses_label" >Budget includes project expenses</div>						
+						<li class="invoice_instructions">
+						<input type="checkbox" id="project_show_budget" name="project_show_budget" class="project_show_budget" tabindex="3" />
+						<label for="project_show_budget" class="project_show_budget">Show budget report to all employees and contractors on this project</label><br/>
+						<input type="checkbox" id="project_send_email" name="project_send_email" tabindex="3" />
+						<label for="project_email" class="client-details-label">Send email alerts if project reaches	<input id="project_send_email_percentage" name="project_send_email_percentage" style="width:50px;" value=""/> of budget</label>
+						</li>
+					<!--END DEMO-->
+					
 					<section id="project-info" class="entity-detail">
 						<h2 class="entity-sub-title">Project Notes</h2>
 						<ul class="details-list entity-details-list project">
@@ -159,7 +230,7 @@ function FillPeople(f) {
 							<textarea id="project-notes" name="project-notes" class="entity-details-block" tabindex="4"><?php echo $project->getValueEncoded("project_notes")?></textarea></li>
 						</ul>
 					</section>
-					<section id="project-info" class="entity-detail">
+					<!--section id="project-info" class="entity-detail">
 						<h2 class="entity-sub-title">Invoicing Method</h2>
 						<ul class="details-list entity-details-list project">
 							<li class="entity-details-item invoicing project">
@@ -201,7 +272,7 @@ function FillPeople(f) {
 								<input id="project-budget-view-permissions" name="project-budget-view-permissions" class="project-budget" type="radio" value="contractors" tabindex="11" /> Contractors
 								<input id="project-budget-view-permissions" name="project-budget-view-permissions" class="project-budget" type="radio" checked="checked" value="all" tabindex="11" /> Both
 							</li>
-							<!--
+							<
 <li class="entity-details-item">
 								<label for="project-budget-email" class="entity-details-label">Send email?</label>
 							</li>
@@ -381,24 +452,23 @@ function editProject() {
 		
 	//EDIT THE PROJECT OBJECT ($PROJECT)
 	$project = new Project( array(
-		//CHECK REG SUBS!!
-		"project_id" => isset($_POST["project_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project_id"]) : "",
-		//not available for edit.
-		"project_code" => isset($_POST["project-code"]) ? preg_replace("/[^ 0-9]/", "", $_POST["project-code"]) : "",
+		"project_code" => isset($_POST["project-code"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-code"]) : "",
+		"project_id" => isset($_POST["project_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_id"]) : "",
 		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
-		"client_id" => isset($_POST["client-id"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-id"]) : "",
-		"project_billable" => isset($_POST["project-billable"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["project-billable"]) : "",
-		"project_invoice_by" => isset($_POST["project-invoice-by"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-invoice-by"]) : "",
-		"project_hourly_rate" => isset($_POST["project-hourly_rate"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-hourly_rate"]) : "",
-		"project_budget_by" => isset($_POST["project-budget-by"])? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-budget-by"]) : "",
-		"project_budget_total_fees" => isset($_POST["project-budget-total-fees"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-total-fees"]) : "",
-		"project_budget_total_hours" => isset($_POST["project-budget-total-hours"])? preg_replace("/[^0-9]/", "", $_POST["project-budget-total-hours"]) : "",
-		"project_send_email" => isset($_POST["project-send-email"])? preg_replace("/[^0-9]/", "", $_POST["project-send-email"]) : "",
-		"project_show_budget" => isset($_POST["project-show-budget"])? preg_replace("/[^0-9]/", "", $_POST["project-show-budget"]) : "",
-		"project_budget_includes_expenses" => isset($_POST["project-budget-includes-expenses"])? preg_replace("/[^0-9]/", "", $_POST["project-budget-includes-expenses"]) : "",
-		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-notes"]) : "",
-		"project_archived" => isset($_POST["project-archived"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["project-archived"]) : "",
+		"client_id" => isset($_POST["client-id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-id"]) : "",
+		"project_billable" => isset($_POST["project_billable"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_billable"]) : "",
+		"project_invoice_by" => isset($_POST["project_invoice_by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project_invoice_by"]) : "",
+		"project_hourly_rate" => isset($_POST["project_hourly_rate"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_hourly_rate"]) : "",
+		"project_budget_by" => isset($_POST["project_budget_by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project_budget_by"]) : "",
+		"project_budget_total_fees" => isset($_POST["project_budget_total_fees"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_total_fees"]) : "",
+		"project_budget_total_hours" => isset($_POST["project_budget_total_hours"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_total_hours"]) : "",
+		"project_send_email_percentage" => isset($_POST["project_send_email_percentage"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_send_email_percentage"]) : "",
+		"project_show_budget" => isset($_POST["project_show_budget"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_show_budget"]) : "",
+		"project_budget_includes_expenses" => isset($_POST["project_budget_includes_expenses"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_includes_expenses"]) : "",
+		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
+		"project_archived" => isset($_POST["project_archived"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_archived"]) : "",
 	));
+
 	//edit the project_person object ($project_person)
 	$project_person = new Project_Person( array(
 		"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \,\-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : "",
