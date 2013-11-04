@@ -20,7 +20,7 @@
 	if (isset($_POST["action"]) and $_POST["action"] == "save_timesheet") {
 		saveTimesheet();
 	} else {
-		displayTimesheet(new Timesheet(array()));
+		displayTimesheet(new Timesheet(array()), new Timesheet_Detail(array()));
 	}
 	
 
@@ -54,7 +54,7 @@ function FillTasks(f) {
 				<thead>
 					<tr>
 						<?php
-						if (isset($_SESSION["person"])) {
+						if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
 							$person=Person::getByEmailAddress($_SESSION["person"]);
 						} else {
 							echo "Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.";
