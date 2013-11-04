@@ -243,7 +243,7 @@ public static function getProjectByProjectId($project_id) {
 				$st->bindValue(":project_budget_by", $this->data["project_budget_by"], PDO::PARAM_STR);
 				$st->bindValue(":project_budget_total_fees", $this->data["project_budget_total_fees"], PDO::PARAM_INT);
 				$st->bindValue(":project_budget_total_hours", $this->data["project_budget_total_hours"], PDO::PARAM_INT);
-				$st->bindValue(":project_send_email_percentage", $this->data["project_send_email"], PDO::PARAM_STR);
+				$st->bindValue(":project_send_email_percentage", $this->data["project_send_email_percentage"], PDO::PARAM_STR);
 				$st->bindValue(":project_show_budget", $this->data["project_show_budget"], PDO::PARAM_STR);
 				$st->bindValue(":project_budget_includes_expenses", $this->data["project_budget_includes_expenses"], PDO::PARAM_STR);
 				$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
