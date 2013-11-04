@@ -52,6 +52,33 @@ function FillPeople(f) {
     f.person_id.value = f.person_ids.value + "," + f.person_id.value;    
 }
 
+function showProjectHourlyRate(f) {
+	if(f.value == "Project hourly rate"){
+		document.getElementById('project_hourly_rate').style.display = "inline";
+    } else {
+	    document.getElementById('project_hourly_rate').style.display = "none";
+    }
+}
+
+function showBudgetFields(f) {
+	if (f.value == "Total project hours") {
+    	document.getElementById('project_budget_total_hours').style.display = "inline";
+        document.getElementById('project_budget_total_fees').style.display = "none";
+        document.getElementById('project_budget_includes_expenses'). style.display = "none";
+        document.getElementById('project_budget_includes_expenses_label'). style.display = "none";
+	} else if (f.value == "Total project fees") {
+		document.getElementById('project_budget_total_hours').style.display = "none";
+        document.getElementById('project_budget_total_fees').style.display = "inline";
+        document.getElementById('project_budget_includes_expenses'). style.display = "inline";
+        document.getElementById('project_budget_includes_expenses_label'). style.display = "inline";
+	} else {
+		document.getElementById('project_budget_total_hours').style.display = "none";
+        document.getElementById('project_budget_total_fees').style.display = "none";
+        document.getElementById('project_budget_includes_expenses'). style.display = "none";
+        document.getElementById('project_budget_includes_expenses_label'). style.display = "none";
+	}
+}
+
 </script>
 
 	<form action="project-add.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
@@ -87,26 +114,47 @@ function FillPeople(f) {
 						<input id="client-phone" name="project-code" class="client-phone-input" type="text" tabindex="2" value="<?php echo $project->getValueEncoded("project_code")?>" />
 					</li>
 					<?php //took these out for now. Do not expose them in the UI!?>
-					<!--<li class="client-details-item email">
-						<label for="client-email" <?php validateField("client_invoice_method", $missingFields)?> class="client-details-label">Invoice Method:</label>
-						<input id="client-email" name="invoice-method" class="client-email-input" type="text" tabindex="3" value="<?php echo $project->getValueEncoded("project_invoice_by")?>" />
+					<h4>Invoice Methods:</h4>
+					<li class="billable">
+						<input type="radio" id="project_billable" name="project_billable" class="client-email-input" tabindex="3" value="0" />
+						<label for="project_billable" class="client-details-label">This project is not billable</label><br/>
+						<input type="radio" id="project_billable" name="project_billable" class="client-email-input" tabindex="3" value="1" checked/>
+						<label for="project_billable" class="client-details-label">This project is billable and we invoice by:</label>
 					</li>
-					<li class="client-details-item fax">
-						<label for="client-fax" class="client-details-label">Invoice Rate:</label>
-						<input id="client-fax" name="project-invoice-rate" class="client-fax-input" type="text" tabindex="4" value="" />
-					</li>-->
-					<li class="client-details-item address">
+					<?php
+						$row = Project::getEnumValues("project_invoice_by");
+						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
+						?>
+						<select name="project_invoice_by" onchange="showProjectHourlyRate(this)">
+						<?php
+						foreach($enumList as $value) { ?>
+							<option name="project_invoice_by" value="<?php echo $value?>"><?php echo $value ?></option>
+						<?php } ?>
+						</select>    <input id="project_hourly_rate" name="project_hourly_rate" style="width:50px;display:none;" value="$"/>
+
+						<h4>Budget</h4>
+						<?php
+						$row = Project::getEnumValues("project_budget_by");
+						$enumList = explode(",", str_replace("'", "", substr($row['COLUMN_TYPE'], 5, (strlen($row['COLUMN_TYPE'])-6))));
+						?>
+						<select name="project_budget_by" onchange="showBudgetFields(this)">
+						<?php
+						foreach($enumList as $value) { ?>
+							<option name="project_budget_by" value="<?php echo $value?>"><?php echo $value ?></option>
+						<?php } ?>
+						</select>     <input id="project_budget_total_hours" name="project_budget_total_hours" style="width:50px;display:none;" value="Hours"/>
+						<input id="project_budget_total_fees" name="project_budget_total_fees" style="width:50px;display:none;" value="$"/><br/>
+						<input type="checkbox" id="project_budget_includes_expenses" name="project_budget_includes_expenses" style="display:none;"tabindex="3" />
+						<div style="display:none;" id="project_budget_includes_expenses_label" for="project_budget_includes_expenses_label" class="project_budget_includes_expenses_label" >Budget includes project expenses</div>						
+						<li class="invoice_instructions">
+						<input type="checkbox" id="project_show_budget" name="project_show_budget" class="project_show_budget" tabindex="3" />
+						<label for="project_show_budget" class="project_show_budget">Show budget report to all employees and contractors on this project</label><br/>
+						<input type="checkbox" id="project_send_email" name="project_send_email" tabindex="3" />
+						<label for="project_email" class="client-details-label">Send email alerts if project reaches	<input id="project_send_email_percentage" name="project_send_email_percentage" style="width:50px;" value=""/> of budget</label>
+						</li>
 						<label for="client-streetAddress" <?php validateField("project_notes", $missingFields)?> class="client-details-label">Project Notes:</label>
 						<textarea id="client-streetAddress" name="project_notes" class="client-streetAddress-input" tabindex="5"><?php echo $project->getValueEncoded("project_notes")?></textarea><br />
-					<!--	<label for="client-city" <?php validateField("project_budget_type", $missingFields)?> class="client-details-label">Project Budget Type:</label>
-						<input id="client-city" name="project-budget-type" class="client-city-input" type="text" tabindex="6" value="<?php echo $project->getValueEncoded("project_budget_by")?>" /><br />
-						<label for="client-zip" <?php validateField("project_budget_hours", $missingFields)?> class="client-details-label">Project Budget Hours:</label>
-						<input id="client-zip" name="project-budget-hours" class="client-zip-input" type="text" tabindex="8" value="<?php echo $project->getValueEncoded("project_budget_total_hours")?>" /><br />
-						<select id="client-country" name="client-country" class="client-country-select" tabindex="9">
-							<option value="">Show project budget?</option>
-							<option selected="selected" value="1">Yes</option>
-							<option selected="selected" value="0">No</option>
-						</select-->
+						</select>
 					</li>
 				</ul>
         	</fieldset>
@@ -198,16 +246,16 @@ function FillPeople(f) {
 		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
 		"client_id" => isset($_POST["client_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client_id"]) : "",
 		"project_billable" => isset($_POST["project_billable"]) ? preg_replace("/[^ A-Z]/", "", $_POST["project_billable"]) : "",
-		"project_invoice_by" => isset($_POST["project-invoice-by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project-invoice-by"]) : "",
+		"project_invoice_by" => isset($_POST["project_invoice_by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project_invoice_by"]) : "",
 		"project_hourly_rate" => isset($_POST["project_hourly_rate"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_hourly_rate"]) : "",
-		"project_budget_by" => isset($_POST["project-budget-by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project-budget-by"]) : "",
-		"project_budget_total_fees" => isset($_POST["project-budget-total-fees"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-total-fees"]) : "",
-		"project_budget_total_hours" => isset($_POST["project-budget-total-hours"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-budget-total-hours"]) : "",
-		"project_send_email" => isset($_POST["project_send_email"])? preg_replace("/[^ A-Z]/", "", $_POST["project_send_email"]) : "",
-		"project_show_budget" => isset($_POST["project_show_budget"])? preg_replace("/[^ A-Z]/", "", $_POST["project_show_budget"]) : "",
-		"project_budget_includes_expenses" => isset($_POST["project_budget_includes_expenses"])? preg_replace("/[^ A-Z]/", "", $_POST["project_budget_includes_expenses"]) : "",
+		"project_budget_by" => isset($_POST["project_budget_by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project_budget_by"]) : "",
+		"project_budget_total_fees" => isset($_POST["project_budget_total_fees"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_total_fees"]) : "",
+		"project_budget_total_hours" => isset($_POST["project_budget_total_hours"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_total_hours"]) : "",
+		"project_send_email_percentage" => isset($_POST["project_send_email_percentage"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_send_email_percentage"]) : "",
+		"project_show_budget" => isset($_POST["project_show_budget"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_show_budget"]) : "",
+		"project_budget_includes_expenses" => isset($_POST["project_budget_includes_expenses"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_includes_expenses"]) : "",
 		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
-		"project_archived" => isset($_POST["project_archived"])? preg_replace("/[^ A-Z]/", "", $_POST["project_archived"]) : "",
+		"project_archived" => isset($_POST["project_archived"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_archived"]) : "",
 	));
 	//create the project_person object ($project_person)
 	$project_person = new Project_Person( array(
@@ -271,6 +319,23 @@ function FillPeople(f) {
 		displayProjectInsertForm($errorMessages, $missingFields, $project, $project_person);
 	} else {
 		try {
+			//clean up the checkboxes here.
+			if (isset($project) && $project->getValue("project_show_budget") == "on") {
+				$project->setValue("project_show_budget", 1);					
+			} else {
+				$project->setValue("project_show_budget",0);
+			}
+			if (isset($project) && $project->getValue("project_billable") == "on") {
+				$project->setValue("project_billable", 1);					
+			} else {
+				$project->setValue("project_billable",0);
+			}
+			if (isset($project) && $project->getValue("project_budget_includes_expenses") == "on") {
+				$project->setValue("project_budget_includes_expenses", 1);					
+			} else {
+				$project->setValue("project_budget_includes_expenses",0);
+			}
+			//end checkbox cleanup
 			$client_id = $project->getValue("client_id");
 			//insert the project into the project table.
 			$project->insertProject($client_id);
