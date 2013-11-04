@@ -40,7 +40,7 @@ include('header.php'); //add header.php to page
 		
 		<nav class="page-controls-nav">
 			<ul class="client-page-controls">
-				<li class="page-controls-item add-client-button"><a class="add-client-link" href="task-add.php">+ Add Task</a></li>
+				<li class="page-controls-item add-client-button"><a class="add-client-link" href="tasks.php">+ Add Task</a></li>
 				<li class="page-controls-item"><a class="view-client-archive-link" href="task_archives.php">View Task Archives</a></li>
 			</ul>
 		</nav>
@@ -88,7 +88,7 @@ include('header.php'); //add header.php to page
 						<input id="client-phone" name="task-hourly-rate" class="client-phone-input" type="text" tabindex="2" value="<?php echo $thisTask->getValueEncoded("task_hourly_rate")?>" />
 					</li>
 					<label for="contact-info-sync" class="client-details-label">Billable By Default:</label>
-						<input id="contact-info-sync" name="task-bill-by-default" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" /><br/>
+						<input id="contact-info-sync" name="task-bill-by-default" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" <?php setChecked($thisTask, "task_bill_by_default", 1) ?>/><br/>
 					<?php
 					//only show the archive button if we are editing.
 					if ($processType == "E") { ?><br/>
@@ -96,7 +96,7 @@ include('header.php'); //add header.php to page
 					<?php
 					//this is here to expose when we get there.?>
 					<label for="contact-info-sync" class="client-details-label">Common Task (added to all future projects):</label>
-					<input id="contact-info-sync" name="task-common" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" />
+					<input id="contact-info-sync" name="task-common" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" <?php setChecked($thisTask, "task_common", 1) ?>/>
 				<fieldset class="client-details-entry">
 				<ul class="details-list client-details-submit">
 					<li class="client-details-item submit-client">
