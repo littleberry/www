@@ -17,14 +17,15 @@ What do we do about the login screen? In the case of a user that has not logged 
 
 -->
 */
-
-if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
+//I'm taking out this code until we have a chance to look at it.
+/*if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
 	$person = Person::getByEmailAddress($_SESSION["person"]);
 	$person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
 } else {
 	$person = Person::getByEMailAddress("catsbap@gmail.com");
 	$person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
 }
+*/
 ?>
 <html lang="en">
 <head>
@@ -47,16 +48,16 @@ if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
 	<nav id="site-nav" class="site-nav">
 		<ul id="site-menu" class="site-menu">
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Timesheets</a></li>
-			<?php if ($person_perms->getValueEncoded("person_perm_id") != "Regular User") {?>
+			<?php //if ($person_perms->getValueEncoded("person_perm_id") != "Regular User") {?>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Reports</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Invoices</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="manage.php">Manage</a></li>
-		<?php } ?>	
+		<?php //} ?>	
 		</ul>
 	</nav>
 	<nav id="util-nav" class="util-nav">
 		<ul id="util-menu" class="util-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out <?php echo $person->getValue("person_email");?></a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out <?php //echo $person->getValue("person_email");?></a></li>
 		</ul>
 	</nav>
 	<nav id="section-nav" class="section-nav manage">
@@ -70,7 +71,7 @@ if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
 
 		</ul>
 	</nav>
-	<?php if ($person_perms->getValueEncoded("person_perm_id") != "Regular User") {?>
+	<?php //if ($person_perms->getValueEncoded("person_perm_id") != "Regular User") {?>
 	<nav id="section-nav" class="section-nav manage">
 		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
@@ -80,5 +81,5 @@ if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
 			<li class="section-menu-item"><a class="section-menu-link" href="tasks.php">Tasks</a></li>
 		</ul>
 	</nav>
-	<?php } ?>
+	<?php //} ?>
 </header>
