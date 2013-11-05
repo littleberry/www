@@ -56,7 +56,7 @@ class Task extends DataObject {
 	//function returns the individual common tasks.
 	public static function getCommonTasks() {
 		$conn=parent::connect();
-		$sql = "SELECT distinct(task_name) FROM " . TBL_TASK . " WHERE task_common = 1";
+		$sql = "SELECT distinct(task_name), task_id FROM " . TBL_TASK . " WHERE task_common = 1";
 	
 		try {
 			$st = $conn->prepare($sql);
