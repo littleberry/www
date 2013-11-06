@@ -26,7 +26,7 @@ function displayForm($errorMessages, $missingFields, $person) {
 				$emailAddress = "";
 		}
 		
-			include('header.php');
+			include('header_login.php');
 
 		?>
 		<!DOCTYPE html>
