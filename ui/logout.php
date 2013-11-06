@@ -4,7 +4,7 @@
 	//session_start();
 	$_SESSION["person"] = "";
 	
-	include('header.php'); //add header.php to page
+	include('header_login.php'); //add header.php to page
 	?>	
 
 
