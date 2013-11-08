@@ -157,16 +157,16 @@ function showBudgetFields(f) {
 						<h2 class="entity-sub-title">Project Info</h2>
 						<ul class="details-list entity-details-list project">
 							<li class="entity-details-item name project">
-								<label for="project-name" <?php validateField("project_name", $missingFields)?> class="entity-details-label">Project Name:</label>
-								<input id="project-name" name="project-name" class="project-name-input" type="text" tabindex="1" value="<?php echo $project->getValueEncoded("project_name")?>" />
+								<label for="project_name" <?php validateField("project_name", $missingFields)?> class="entity-details-label">Project Name:</label>
+								<input id="project-name" name="project_name" class="project-name-input" type="text" tabindex="1" value="<?php echo $project->getValueEncoded("project_name")?>" />
 							</li>
 							<li class="entity-details-item project-code project">
-								<label for="project-code" <?php validateField("project_code", $missingFields)?> class="entity-details-label">Project Code</label>
-								<input id="project-code" name="project-code" class="project-code-input" type="text" tabindex="2" value="<?php echo $project->getValueEncoded("project_code")?>" />
+								<label for="project_code" <?php validateField("project_code", $missingFields)?> class="entity-details-label">Project Code</label>
+								<input id="project-code" name="project_code" class="project-code-input" type="text" tabindex="2" value="<?php echo $project->getValueEncoded("project_code")?>" />
 							</li>
 							<li class="entity-details-item project-client project">
-								<label for="client-id" class="entity-details-label">Select the client:</label>
-		                  <select name="client-id" id="project-client-select" size="1">    
+								<label for="client_id" class="entity-details-label">Select the client:</label>
+		                  <select name="client_id" id="project-client-select" size="1">    
 									<?php 
 										//get the clients out to populate the drop down.
 										list($clients) = Client::getClients();
@@ -226,8 +226,8 @@ function showBudgetFields(f) {
 					<section id="project-info" class="entity-detail">
 						<h2 class="entity-sub-title">Project Notes</h2>
 						<ul class="details-list entity-details-list project">
-							<li class="entity-details-item project-notes project"><label for="project-notes" <?php validateField("project_notes", $missingFields)?> class="entity-details-label">Project Notes:</label>
-							<textarea id="project-notes" name="project-notes" class="entity-details-block" tabindex="4"><?php echo $project->getValueEncoded("project_notes")?></textarea></li>
+							<li class="entity-details-item project-notes project"><label for="project_notes" <?php validateField("project_notes", $missingFields)?> class="entity-details-label">Project Notes:</label>
+							<textarea id="project-notes" name="project_notes" class="entity-details-block" tabindex="4"><?php echo $project->getValueEncoded("project_notes")?></textarea></li>
 						</ul>
 					</section>
 					<!--section id="project-info" class="entity-detail">
@@ -435,6 +435,7 @@ function showBudgetFields(f) {
 
 <?php 
 function editProject() {
+	error_log(print_r($_POST,true));
 	//PROJECT PROCESSING FUNCTIONS (editProjects();)
 	//1. Set up the required fields.
 	//2. Create the object based on the values that were submitted the last time the user submitted the form.
@@ -452,10 +453,10 @@ function editProject() {
 		
 	//EDIT THE PROJECT OBJECT ($PROJECT)
 	$project = new Project( array(
-		"project_code" => isset($_POST["project-code"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-code"]) : "",
+		"project_code" => isset($_POST["project_code"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_code"]) : "",
 		"project_id" => isset($_POST["project_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_id"]) : "",
-		"project_name" => isset($_POST["project-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-name"]) : "",
-		"client_id" => isset($_POST["client-id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client-id"]) : "",
+		"project_name" => isset($_POST["project_name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_name"]) : "",
+		"client_id" => isset($_POST["client_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["client_id"]) : "",
 		"project_billable" => isset($_POST["project_billable"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_billable"]) : "",
 		"project_invoice_by" => isset($_POST["project_invoice_by"])? preg_replace("/[^ a-zA-Z]/", "", $_POST["project_invoice_by"]) : "",
 		"project_hourly_rate" => isset($_POST["project_hourly_rate"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_hourly_rate"]) : "",
