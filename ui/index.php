@@ -1,32 +1,31 @@
 <?php
-	//require_once($_SERVER["DOCUMENT_ROOT"] . "/usercake/models/config.php");
 	require_once("../common/common.inc.php");
 	require_once("../classes/Person.class.php");
 
-//usercake stuff, take out for now.
-//if(!isUserLoggedIn()){
-//	$_SESSION["redirect"] = $_SERVER["PHP_SELF"];
-//	header( 'Location: usercake/login.php' ) ;
-
-//}	
-
-//if(isset($_POST["action"]) and $_POST["action"] == "login") {
-//	processForm();
-//}else{
-//	displayForm(array(), array(), new Person(array()));
 if (isset($_GET["data"])) {
-	$_SESSION['person'] = $_GET["data"];
+	$_SESSION['logged_in'] = $_GET["data"];
+	$controlUI = 1;
+} else {
+	$controlUI = 0;
 }
 ?>
 <!DOCTYPE html>
-	<?php	include('header.php'); //add header.php to page ?>
+	<?php	
+if ($controlUI) {
+include('header.php');
+} else {
+include('header_login.php'); //add header.php to page
+}
+?>
 <section id="page-content" class="page-content">
-HELLO, I AM THE INDEX.PHP PAGE.
-THIS PAGE WILL EVENTUALLY BE THE DASHBOARD.
-
+<?php if ($controlUI) { ?>
+HELLO! THIS PAGE WILL EVENTUALLY BE THE DASHBOARD.
+<?php } else { ?>
+START YOUR FREE TRIAL TODAY! WE OFFER AMAZING DEALS ON THE BEST TIME TRACKING SOFTWARE ANYWHERE!
+CLICK HERE TO <a href="login.php">LOG IN</a>
+<?php } ?>
 </section>
 <footer id="site-footer" class="site-footer">
-
 </footer>
 </body>
 </html>
