@@ -18,7 +18,7 @@ $(document).ready( function() {
 			id: projectId,
 			collection: "project"
 		}).done( function( data ) {
-				//console.log("done: " + data);
+				console.log("done: " + data);
 			})
 			.fail( function( data ) {
 				console.log("fail: " + data);
