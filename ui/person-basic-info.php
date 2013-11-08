@@ -18,9 +18,10 @@
 		$person = unserialize(urldecode($_GET['person']));
 		$person_perms = unserialize(urldecode($_GET['person_perms']));
 		error_log("AUTH: PERSON VALUE IS " . print_r($person,true));
+		error_log("AUTH: PERSON PERMISSIONS VALUE IS " . print_r($person_perms,true));
 		//set project to null because it's blank.
 		$project = "";
-	} elseif (isset($_SESSION['person'])) {
+	} elseif (isset($_SESSION['logged_in'])) {
 		error_log("AUTH: User's session var is set because they logged in.");
 		//we're not going to set this here.
 		//$person = $_SESSION['person'];

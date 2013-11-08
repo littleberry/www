@@ -38,7 +38,6 @@
 
 <!--DISPLAY PERSON INSERT WEB FORM--->
 <?php function displayPersonInsertForm($errorMessages, $missingFields, $person, $person_perms) { 
-	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
 		foreach($errorMessages as $errorMessage) {
@@ -47,6 +46,7 @@
 	}
 	
 include('header.php'); //add header.php to page
+
 ?>
 <script type="text/javascript">
 function FillBilling(f) {

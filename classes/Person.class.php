@@ -4,7 +4,7 @@
 //connectivity
 require_once("DataObject.class.php");
 
-class Person extends DataObject {
+class Person extends DataObject implements JsonSerializable {
 	protected $data = array(
 		//these fields are in the person table.
 		"person_id"=>"",
@@ -21,8 +21,27 @@ class Person extends DataObject {
 		"person_logo_link" =>""
 	);
 	
-//just starting to work on authentication here... not sure this is where we want to ultimately put this, but for now I'm putting it in the person class.
-
+	//seeing if we can just make this easier
+	function jsonSerialize() {
+        $jsonData = array(
+        // Represent the object
+        // in the way you want it arranged in the API
+        "person_id" => $this->getValueEncoded("person_id"),
+        "person_username" => $this->getValueEncoded("person_username"),
+        "person_password" => $this->getValueEncoded("person_password"),
+        "person_name" => $this->getValueEncoded("person_name"),
+        "person_first_name" => $this->getValueEncoded("person_first_name"),
+		"person_last_name" => $this->getValueEncoded("person_last_name"),
+		"person_email" => $this->getValueEncoded("person_email"),
+		"person_department" => $this->getValueEncoded("person_department"),
+		"person_hourly_rate" => $this->getValueEncoded("person_hourly_rate"),
+		"person_type" => $this->getValueEncoded("person_type"),
+		"person_logo_link" => $this->getValueEncoded("person_logo_link")
+		);
+        return $jsonData;
+    }
+    
+//just starting to work on authentication here... not sure this is where we want to ultimately put this, but for now I'm putting it in the person class.    
 	public function authenticate() {
 		$conn=parent::connect();
 		//we're using the user's email address as the login right now. 

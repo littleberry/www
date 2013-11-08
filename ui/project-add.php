@@ -349,7 +349,11 @@ function showBudgetFields(f) {
 			}
 			}
 			$task_ids = explode(',', $project_task->getValue("task_id"));
-			echo "<br><br>";
+			list($commonTasks) = Task::getCommonTasks();
+			foreach($commonTasks as $commonTask) {
+				$task_ids[] = $commonTask->getValue("task_id");
+			}
+			//print_r($task_ids);
 			foreach ($task_ids as $task_id) {				
 			if ($task_id) {
 				//echo "inserting task id " . $task_id . " and " . "project id " . $project_id["project_id"];

@@ -8,7 +8,10 @@ class Timesheet_Detail extends DataObject {
 		//these fields are in the timesheet table.
 		"timesheet_id"=>"",
 		"timesheet_date"=>"",
-		"timesheet_data"=>""
+		"timesheet_start_time"=>"",
+		"timesheet_end_time"=>"",
+		"timesheet_number_of_hours"=>"",
+		"timesheet_approved"=>""
 	);
 	
 	//START HERE SATURDAY. UPDATE TBL_TIMESHEET_DATA SO THAT THE TIMESHEET INFORMATION IS STORED IN THIS OBJECT
@@ -36,19 +39,30 @@ class Timesheet_Detail extends DataObject {
 		$conn=parent::connect();
 		$sql = "INSERT INTO " . TBL_TIMESHEET_DETAIL . " (
 			timesheet_id,
+			timesheet_timestamp,
 			timesheet_date,
-			timesheet_data
+			timesheet_start_time,
+			timesheet_end_time,
+			timesheet_number_of_hours,
+			timesheet_approved
 			) VALUES (
 			:timesheet_id,
+			:timesheet_timestamp,
 			:timesheet_date,
-			:timesheet_data
+			:timesheet_start_time,
+			:timesheet_end_time,
+			:timesheet_number_of_hours,
+			:timesheet_approved
 			)";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_timestamp", $this->data["timesheet_timestamp"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($this->data["timesheet_date"])), PDO::PARAM_STR);
-			$st->bindValue(":timesheet_data", $this->data["timesheet_data"], PDO::PARAM_INT);
-			
+			$st->bindValue(":timesheet_start_time", $this->data["timesheet_start_time"], PDO::PARAM_INT);
+			$st->bindValue(":timesheet_end_time", $this->data["timesheet_end_time"], PDO::PARAM_INT);
+			$st->bindValue(":timesheet_number_of_hours", $this->data["timesheet_number_of_hours"], PDO::PARAM_INT);
+			$st->bindValue(":timesheet_approved", $this->data["timesheet_approved"], PDO::PARAM_INT);
 			$st->execute();
 			parent::disconnect($conn);
 		} catch (PDOException $e) {

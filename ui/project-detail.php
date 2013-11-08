@@ -228,7 +228,7 @@
 				<ul class="entity-list entity-details-list">
 					<li class="entity-details-item">Project budget: <?php echo $project_details->getValue("project_budget_by")?></li>
 					<li class="entity-details-item">All employees and contractors can view budget: <?php echo $project_details->getValue("project_show_budget")?></li>
-					<li class="entity-details-item">Send email when budget reaches xx%: <?php echo $project_details->getValue("project_send_email_percentage")?></li>
+					<li class="entity-details-item">Send email when budget reaches <?php echo $project_details->getValue("project_send_email_percentage")?>%</li>
 				</ul>
 				<ul class="page-controls-list team">
 					<li class="page-controls-item link-btn"><a class="" href="#">Edit Budget Settings</a></li>

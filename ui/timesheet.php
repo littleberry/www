@@ -20,13 +20,16 @@
 	if (isset($_POST["action"]) and $_POST["action"] == "save_timesheet") {
 		saveTimesheet();
 	} else {
-		displayTimesheet(new Timesheet(array()));
+		displayTimesheet(new Timesheet(array()), new Timesheet_Detail(array()));
 	}
 	
 
 
 function displayTimesheet($timesheet, $timesheet_detail) {
-
+for ($i=0; $i<7; $i++) {
+	echo date('Y-m-d', mktime(1, 0, 0, date('m'), date('d')+$i-date('w'), date('Y'))) . ' 00:00:00';
+	echo "<br>";
+}
 ?>
 <script type="text/javascript">
 function FillTasks(f) {
@@ -54,8 +57,8 @@ function FillTasks(f) {
 				<thead>
 					<tr>
 						<?php
-						if (isset($_SESSION["person"])) {
-							$person=Person::getByEmailAddress($_SESSION["person"]);
+						if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
+							$person=Person::getByEmailAddress($_SESSION["logged_in"]);
 						} else {
 							echo "Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.";
 							exit();
@@ -127,7 +130,7 @@ while ($day = $week->fetch()) {
         <td style="border:1px solid;">
         <?php //echo date("D", mktime(0,0,0,1,$i+2,2000));?>
         <input readonly name="timesheet_date_<?php echo $i ?>" value="<?php echo($year->thisYear() . "-" . $month->thisMonth() . "-" . $day->thisDay())?>">
-        <input name="timesheet_data_<?php echo $i ?>"><?php //echo $timesheet_data_[$i]->getValue("timesheet_date")?></td>
+        <input name="timesheet_total_time_<?php echo $i ?>"><?php //echo $timesheet_total_time_[$i]->getValue("timesheet_total_time")?></td>
         <?php 
     }
 
@@ -169,7 +172,10 @@ function saveTimesheet() {
 		//CHECK REG SUBS!!
 		"timesheet_id" => isset($_POST["timesheet_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_id"]) : "",
 		"timesheet_date" => isset($_POST["timesheet_date_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_date_$i"]) : "",
-		"timesheet_data" => isset($_POST["timesheet_data_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_data_$i"]) : ""
+		"timesheet_start_time" => isset($_POST["timesheet_start_time_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_start_time_$i"]) : "",
+		"timesheet_end_time" => isset($_POST["timesheet_end_time_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_end_time_$i"]) : "",
+		"timesheet_number_of_hours" => isset($_POST["timesheet_number_of_hours_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_number_of_hours_$i"]) : "",
+		"timesheet_approved" => isset($_POST["timesheet_approved_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_approved_$i"]) : ""
 		));
 	}
 	
@@ -178,8 +184,9 @@ function saveTimesheet() {
 	//print_r($lastInsertId);
 		
 	for ($i=1; $i<=7; $i++) {
-		
-		$timesheet_detail[$i]->insertTimesheetDetail($lastInsertId[0]);
+		error_log("Here is the OBJECT");
+		error_log(print_r($timesheet_detail[$i], true));
+		//$timesheet_detail[$i]->insertTimesheetDetail($lastInsertId[0]);
 		//print_r($timesheet_detail[$i]);
 		//LAST_INSERT_ID()...use this function to insert the children rows.
 		//echo "Here is the POST";

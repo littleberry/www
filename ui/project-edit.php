@@ -226,8 +226,8 @@ function showBudgetFields(f) {
 					<section id="project-info" class="entity-detail">
 						<h2 class="entity-sub-title">Project Notes</h2>
 						<ul class="details-list entity-details-list project">
-							<li class="entity-details-item project-notes project"><label for="project-notes" <?php validateField("project_notes", $missingFields)?> class="entity-details-label">Project Notes:</label>
-							<textarea id="project-notes" name="project-notes" class="entity-details-block" tabindex="4"><?php echo $project->getValueEncoded("project_notes")?></textarea></li>
+							<li class="entity-details-item project-notes project"><label for="project_notes" <?php validateField("project_notes", $missingFields)?> class="entity-details-label">Project Notes:</label>
+							<textarea id="project-notes" name="project_notes" class="entity-details-block" tabindex="4"><?php echo $project->getValueEncoded("project_notes")?></textarea></li>
 						</ul>
 					</section>
 					<!--section id="project-info" class="entity-detail">
@@ -435,6 +435,7 @@ function showBudgetFields(f) {
 
 <?php 
 function editProject() {
+	error_log(print_r($_POST,true));
 	//PROJECT PROCESSING FUNCTIONS (editProjects();)
 	//1. Set up the required fields.
 	//2. Create the object based on the values that were submitted the last time the user submitted the form.

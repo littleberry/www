@@ -1,4 +1,4 @@
-<?php 	include('header.php'); //add header.php to page 
+<?php 	include('header_login.php'); //add header.php to page 
 	//I'm just trying this out. User is redirected here if checklogin in common.inc.php fails.
 	//this calls the javascript function check_login() which is in the ajax-login.js file in this directory. 
 	

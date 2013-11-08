@@ -14,14 +14,26 @@ What do we do about the login screen? In the case of a user that has not logged 
 */
 
 //I'm taking out this code until we have a chance to look at it.
-/*if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
-	$person = Person::getByEmailAddress($_SESSION["person"]);
-	$person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
-} else {
-	$person = Person::getByEMailAddress("catsbap@gmail.com");
-	$person_perms = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
-}
-*/
+//The header needs to know who this person is if it's not already set in order to control the header UI.
+//BUT...if the person variable is already set, keep it.
+//if (!isset($person)) {
+	if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
+		$header_controller = Person::getByEmailAddress($_SESSION["logged_in"]);
+		$header_controller_vars = Person_Permissions::getPermissionsAsObject($header_controller->getValueEncoded("person_id"));
+		if (!$header_controller_vars) {
+			error_log("this person has no header control vars set. Please have a person with the proper access set up their permissions.");
+		}
+	}else{
+		echo "You are not logged in and cannot view the internal header.";
+	}
+//} else {
+	//the person variable is already set here. Use it to figure out what to display in the header.
+//	error_log(print_r($person));
+	//->getValueEncoded("person_id"));
+//	$header_controller_vars = Person_Permissions::getPermissionsAsObject($person->getValueEncoded("person_id"));
+//	error_log(print_r($header_controller_vars));
+//	exit;
+//}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,16 +57,16 @@ What do we do about the login screen? In the case of a user that has not logged 
 	<nav id="site-nav" class="site-nav">
 		<ul id="site-menu" class="site-menu">
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Timesheets</a></li>
-			<?php //if ($person_perms->getValueEncoded("person_perm_id") != "Regular User") {?>
+			<?php if ($header_controller_vars->getValueEncoded("person_perm_id") != "Regular User") {?>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Reports</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Invoices</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="manage.php">Manage</a></li>
-		<?php //} ?>	
+		<?php } ?>	
 		</ul>
 	</nav>
 	<nav id="util-nav" class="util-nav">
 		<ul id="util-menu" class="util-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out <?php //echo $person->getValue("person_email");?></a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="logout.php">Log Out <?php echo $header_controller->getValue("person_email");?></a></li>
 		</ul>
 	</nav>
 	<nav id="section-nav" class="section-nav manage">
@@ -68,7 +80,7 @@ What do we do about the login screen? In the case of a user that has not logged 
 
 		</ul>
 	</nav>
-	<?php //if ($person_perms->getValueEncoded("person_perm_id") != "Regular User") {?>
+	<?php if ($header_controller_vars->getValueEncoded("person_perm_id") != "Regular User") {?>
 	<nav id="section-nav" class="section-nav manage">
 		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
@@ -78,5 +90,5 @@ What do we do about the login screen? In the case of a user that has not logged 
 			<li class="section-menu-item"><a class="section-menu-link" href="tasks.php">Tasks</a></li>
 		</ul>
 	</nav>
-	<?php //} ?>
+	<?php } ?>
 </header>
