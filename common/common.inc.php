@@ -41,7 +41,8 @@ function checkLogin() {
 	//session_start();
 	//error_log(print_r($_SESSION["person"], true));
 	//exit;
-	if (!$_SESSION["person"]) {
+	if (!$_SESSION["logged_in"]) {
+	//if (!$_SESSION["person"]) {
 	//not sure why there is supposed to be a person variable here.
 	//or !$_SESSION["person"] = Person::getPerson($_SESSION["person"]->getValue( "person_username" ))) 
 	//{
