@@ -259,7 +259,7 @@ function showP(elem){
 			$person_email = Person::getByEmailAddress($person->getValueEncoded('person_email'));
 			if ($person_email) {
 				//this person is already there, pass the person back to the page.
-				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)));			
+				header("Location: person-basic-info.php?person=" . urlencode(serialize($person)) . "&person_perms=" . urlencode(serialize($person_perms)));			
 			} else {
 				$person->insertPerson();
 				if ($person->getValue("person_perm_id") == "Regular User") {
