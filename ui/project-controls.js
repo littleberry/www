@@ -82,45 +82,71 @@ $(document).ready( function() {
 			});
 	}
 	
+
 	$saveBtn.click( function( evt ) {
-		console.log($(this).parents( 'ul' ).prev().find( 'input' ));
-		$( this ).parents( 'ul' ).prev().find( 'input' )
+		var isGood = true; //Data innocent until proven guilty
+		var $container = $( this ).parents( 'ul' ).prev();
+		
+		/*
+$container.find( '.required' )
 			.each( function( index, elem ) {
-				projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
-				console.log(elem);
-				if ( $( elem ).is ( '[type="text"]' ) ) {
-					swapInputText( elem );
-				} else if ( $( elem ).is ( '[type="checkox"]' ) ) {
-					swapInputCheckbox( elem );
+				if ( $( elem ).val() == '' ) {
+					isGood = false;
+					$( elem ).addClass( 'error empty' );
+				} else if ( $( elem ).hasClass( 'error empty' ) && $( elem ).val != '' ) {
+					$( elem ).removeClass( 'error empty' );
+					isGood = true;
 				}
-				
 			});
-		$( this ).parents( 'ul' ).prev().find( 'select' )
-			.each( function( index, elem ) {
-				projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
-				console.log(elem);
-				swapSelect( elem );
-			});
-		$( this ).parents( 'ul' ).prev().find( 'textarea' )
-			.each( function( index, elem ) {
-				projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
-				console.log(elem);
-				swapTextArea( elem );
-			});
-		saveData( projectData.project[0] );
-		$editBtn.appendTo( $( this ).parent() );
-		$editBtn = null;
-		$( this ).detach();
+*/
+
+		console.log($(this).parents( 'ul' ).prev().find( 'input' ));
+		if ( isGood ) {
+			$container.find( 'input' )
+				.each( function( index, elem ) {
+					projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
+					console.log(elem);
+					if ( $( elem ).is ( '[type="text"]' ) ) {
+						swapInputText( elem );
+					} else if ( $( elem ).is ( '[type="checkox"]' ) ) {
+						swapInputCheckbox( elem );
+					}
+					
+				});
+			$container.find( 'select' )
+				.each( function( index, elem ) {
+					projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
+					console.log(elem);
+					swapSelect( elem );
+				});
+			$container.find( 'textarea' )
+				.each( function( index, elem ) {
+					projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
+					console.log(elem);
+					swapTextArea( elem );
+				});
+			saveData( projectData.project[0] );
+			$editBtn.appendTo( $( this ).parent() );
+			$editBtn = null;
+			$( this ).detach();
+		} else {
+			
+		}
+		evt.preventDefault();
 	});
 
 	function swapInputText( elem ) {
+		var required = '';
+		if ( $( elem ).hasClass( 'required' ) ) {
+			required = " required";
+		}
 		if ( $( elem ).is( 'input' ) ) {
 			var useName = $( elem ).prev( 'label' ).attr( 'for' );
 			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
 			$( elem ).parent()
 				.empty()
 				.text( useLabel + ": " )
-				.append( '<span class="edit ' + useName + '">' + projectData.project[0][useName] + '</span>' );
+				.append( '<span class="edit ' + useName + required + '">' + projectData.project[0][useName] + '</span>' );
 				
 		} else {
 			var useName = $( elem ).attr( 'class' ).split(' ')[1];
@@ -130,23 +156,41 @@ $(document).ready( function() {
 				.append( function() {
 					return $label.clone() 
 						.attr( 'for', useName )
-						.text( useLabel + ": " );
+						.text( useLabel + ": " )
+						.addClass( required );
 				})
 				.append( function() {
 					return $inputText.clone() 
 						.val( projectData.project[0][useName] )
-						.attr( 'name', useName );
+						.attr( 'name', useName )
+						.blur( function( evt ) {
+							if ( $( this ).prev().hasClass( 'required' ) ) {
+								console.log(evt.currentTarget);
+								if ( $( this ).val() == '' ) {
+									//isGood = false;
+									$( this ).prev().addClass( 'error empty' );
+								} else if ( $( this ).prev().hasClass( 'error empty' ) && $( this ).val != '' ) {
+									$( this ).prev().removeClass( 'error empty' );
+									//isGood = true;
+								}
+							}
+						});
 				});
 		}
 	}
+	
 	function swapInputCheckbox( elem ) {
+		var required = '';
+		if ( $( elem ).hasClass( 'required' ) ) {
+			required = " required";
+		}
 		if ( $( elem ).is( 'input' ) ) {
 			var useName = $( elem ).prev( 'label' ).attr( 'for' );
 			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
 			$( elem ).parent()
 				.empty()
 				.text( useLabel + ": " )
-				.append( '<span class="edit ' + useName + '">' + projectData.project[0][useName] + '</span>' );
+				.append( '<span class="edit ' + useName + required + '">' + projectData.project[0][useName] + '</span>' );
 				
 		} else {
 			var useName = $( elem ).attr( 'class' ).split(' ')[1];
@@ -156,7 +200,8 @@ $(document).ready( function() {
 				.append( function() {
 					return $label.clone() 
 						.attr( 'for', useName )
-						.text( useLabel + ": " );
+						.text( useLabel + ": " )
+						.addClass( required );
 				})
 				.append( function() {
 					console.log(projectData.project[0][useName]);
@@ -175,6 +220,10 @@ $(document).ready( function() {
 		}
 	}
 	function swapSelect( elem, list ) {
+		var required = '';
+		if ( $( elem ).hasClass( 'required' ) ) {
+			required = " required";
+		}
 		console.log($( elem ));
 		
 		//console.log( $(elem).text());
@@ -187,7 +236,7 @@ $(document).ready( function() {
 			$( elem ).parent()
 				.empty()
 				.text( useLabel + ": " )
-				.append( '<span class="edit ' + useName + '">' + $( elem ).find( 'option:selected' ).text() + '</span>' );
+				.append( '<span class="edit ' + useName + required + '">' + $( elem ).find( 'option:selected' ).text() + '</span>' );
 
 		} else {
 			var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
@@ -219,7 +268,8 @@ $(document).ready( function() {
 							.append( function() {
 								return $label.clone() 
 									.attr( 'for', useName )
-									.text( useLabel + ": " );
+									.text( useLabel + ": " )
+									.addClass( required );
 								})
 							.append( $select );
 					});
@@ -242,13 +292,17 @@ $(document).ready( function() {
 	}
 	
 	function swapTextArea( elem ) {
+		var required = '';
+		if ( $( elem ).hasClass( 'required' ) ) {
+			required = " required";
+		}
 		if ( $( elem ).is( "textarea" ) ) {
 			var useName = $( elem ).prev( 'label' ).attr( 'for' );
 			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
 			$( elem ).parent()
 				.empty()
 				.text( useLabel + ": " )
-				.append( '<span class="edit ' + useName + '">' + projectData.project[0][useName] + '</span>' );
+				.append( '<span class="edit ' + useName + required + '">' + projectData.project[0][useName] + '</span>' );
 				
 		} else {
 			var useName = $( elem ).attr( 'class' ).split(' ');
@@ -259,7 +313,8 @@ $(document).ready( function() {
 				.before( function() {
 					return $label.clone() 
 						.attr( 'for', useName )
-						.text( useLabel + ": " );
+						.text( useLabel + ": " )
+						.addClass( required );
 				})
 				.before( function() {
 					return $textarea.clone() 

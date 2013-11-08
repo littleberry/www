@@ -190,7 +190,7 @@
 			<section id="project-info" class="entity-detail">
 				<h2 class="entity-sub-title">Project Info</h2>
 				<ul class="entity-list entity-details-list">
-					<li class="entity-details-item">Name: <span class="edit project_name"><?php echo $project_details->getValue("project_name")?></span></li>
+					<li class="entity-details-item">Name: <span class="edit project_name required"><?php echo $project_details->getValue("project_name")?></span></li>
 					<li class="entity-details-item">Client: <span class="select client_id"><a href="<?php echo "client-detail.php?client_id=" . $project_details->getValue("client_id")?>" class="" title="View client's details"><?php echo $client_details->getValue("client_name")?></a></span></li>
 					<li class="entity-details-item">Project code: <span class="edit project_code"><?php echo $project_details->getValue("project_code")?></span></li>
 					<li class="entity-details-item">Status: <span class="checkbox project_archived">
@@ -228,7 +228,7 @@
 				<ul class="entity-list entity-details-list">
 					<li class="entity-details-item">Project budget: <?php echo $project_details->getValue("project_budget_by")?></li>
 					<li class="entity-details-item">All employees and contractors can view budget: <?php echo $project_details->getValue("project_show_budget")?></li>
-					<li class="entity-details-item">Send email when budget reaches xx%: <?php echo $project_details->getValue("project_send_email")?></li>
+					<li class="entity-details-item">Send email when budget reaches xx%: <?php echo $project_details->getValue("project_send_email_percentage")?></li>
 				</ul>
 				<ul class="page-controls-list team">
 					<li class="page-controls-item link-btn"><a class="" href="#">Edit Budget Settings</a></li>

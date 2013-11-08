@@ -112,7 +112,7 @@ function returnProjectJSON($id, $collection) {
 			"project_budget_by" => $project->getValue("project_budget_by"),
 			"project_budget_total_fees" => $project->getValue("project_budget_total_fees"),
 			"project_budget_total_hours" => $project->getValue("project_budget_total_hours"),
-			"project_send_email" => $project->getValue("project_send_email"),
+			"project_send_email_percentage" => $project->getValue("project_send_email_percentage"),
 			"project_show_budget" => $project->getValue("project_show_budget"),
 			"project_budget_includes_expenses" => $project->getValue("project_budget_includes_expenses"),
 			"project_notes" => $project->getValue("project_notes"),

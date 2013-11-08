@@ -4,19 +4,15 @@
 
 ?>
 
-<!DOCTYPE html>
 <?php
 /*
-<!--
 Header file for all Manage sections. Needs to eventually be able to tell which page is displaying and edit the <title> element and whatever else accordingly. Eventually it should also be able to adjust displayed menu for other sections and states (i.e. logged in or not, user permissions, etc.)
 
 Edit this file for updating links to pages/screens
 
 What do we do about the login screen? In the case of a user that has not logged in, we don't want to show them the header; we don't have enough information to figure out what to do. 
-
-
--->
 */
+
 //I'm taking out this code until we have a chance to look at it.
 /*if (isset($_SESSION["person"]) && $_SESSION["person"] != "") {
 	$person = Person::getByEmailAddress($_SESSION["person"]);
@@ -27,6 +23,7 @@ What do we do about the login screen? In the case of a user that has not logged 
 }
 */
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>Manage</title>

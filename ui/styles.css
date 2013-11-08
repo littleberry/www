@@ -170,6 +170,12 @@ input[type=button].delete-btn:hover {
 .required:before {
 	content: "* "
 }
+span.required {
+	color: inherit;
+}
+span.required:before {
+	content: none;
+}
 .disabled {
 	display: none;
 }
@@ -180,6 +186,9 @@ input[type=button].delete-btn:hover {
 	margin: 1em;
 	padding: 1em;
 	border: #D22F12;
+}
+.error .empty:after {
+	content: "This is a required field."
 }
 .success {
 	position: relative;
