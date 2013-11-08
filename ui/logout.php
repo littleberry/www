@@ -2,7 +2,7 @@
 	require_once("../common/common.inc.php");
 	
 	//session_start();
-	$_SESSION["person"] = "";
+	$_SESSION["logged_in"] = "";
 	
 	include('header_login.php'); //add header.php to page
 	?>	
