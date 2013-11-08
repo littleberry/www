@@ -137,7 +137,7 @@ $container.find( '.required' )
 
 	function swapInputText( elem ) {
 		var required = '';
-		if ( $( elem ).hasClass( 'required' ) ) {
+		if ( $( elem ).hasClass( 'required' ) || $( elem ).prev( 'label' ).hasClass( 'required' ) ) {
 			required = " required";
 		}
 		if ( $( elem ).is( 'input' ) ) {
