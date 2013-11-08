@@ -23,9 +23,9 @@ class Person extends DataObject implements JsonSerializable {
 	
 	//seeing if we can just make this easier
 	function jsonSerialize() {
-        $data = array(
-        // Represent your object using a nested array or stdClass,
-        // in the way you want it arranged in your API
+        $jsonData = array(
+        // Represent the object
+        // in the way you want it arranged in the API
         "person_id" => $this->getValueEncoded("person_id"),
         "person_username" => $this->getValueEncoded("person_username"),
         "person_password" => $this->getValueEncoded("person_password"),
@@ -38,7 +38,7 @@ class Person extends DataObject implements JsonSerializable {
 		"person_type" => $this->getValueEncoded("person_type"),
 		"person_logo_link" => $this->getValueEncoded("person_logo_link")
 		);
-        return $data;
+        return $jsonData;
     }
     
 //just starting to work on authentication here... not sure this is where we want to ultimately put this, but for now I'm putting it in the person class.    
