@@ -116,7 +116,7 @@ $container.find( '.required' )
 			$container.find( 'select' )
 				.each( function( index, elem ) {
 					projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
-					console.log(elem);
+					console.log(projectData.project[0][$( elem ).attr( 'name' )]);
 					swapSelect( elem );
 				});
 			$container.find( 'textarea' )
@@ -236,7 +236,7 @@ $container.find( '.required' )
 			$( elem ).parent()
 				.empty()
 				.text( useLabel + ": " )
-				.append( '<span class="edit ' + useName + required + '">' + $( elem ).find( 'option:selected' ).text() + '</span>' );
+				.append( '<span class="select ' + useName + required + '">' + $( elem ).find( 'option:selected' ).text() + '</span>' );
 
 		} else {
 			var useName = $( elem ).attr( 'class' ).split( ' ' )[1];

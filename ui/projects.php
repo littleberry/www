@@ -4,7 +4,7 @@
 	require_once("../classes/Client.class.php");
 	
 	//protect this page
-	checklogin();
+	//checklogin();
 	
 	//this page doubles as the project archive page, so get the value off the get and display those projects here.
 	$archivedView = "0";
@@ -25,7 +25,7 @@
 	
 	//HOLY FUNKY LOGIC, BATMAN!!
 	
-if (isset($_POST["change_archive"])) {
+	if (isset($_POST["change_archive"])) {
 		if ($archivedView) {
 			Project::setArchiveFlag('0', $project_id);
 		} else {
