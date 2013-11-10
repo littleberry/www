@@ -146,7 +146,7 @@ class Project extends DataObject {
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
-			$st->bindValue(":project_code", $this->data["project_code"], PDO::PARAM_INT);
+			$st->bindValue(":project_code", $this->data["project_code"], PDO::PARAM_STR);
 			$st->bindValue(":project_name", $this->data["project_name"], PDO::PARAM_STR);
 			$st->bindValue(":client_id", $this->data["client_id"], PDO::PARAM_INT);
 			$st->bindValue(":project_billable", $this->data["project_billable"], PDO::PARAM_STR);
@@ -290,6 +290,24 @@ public static function getProjectByProjectId($project_id) {
 			die("Query failed getting the client id, sql is $sql " . $e->getMessage());
 		}
 	}
+	
+	//function returns project Name 
+	public function getProjectName($project_id) {
+		$conn=parent::connect();
+		$sql = "SELECT project_name FROM " . TBL_PROJECT . " WHERE project_id = :project_id";			
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed getting the client id, sql is $sql " . $e->getMessage());
+		}
+	}
+	
 	
 	//update the project archive. This must be called in project!
 	public function setArchiveFlag($flag, $project_id) {
