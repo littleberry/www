@@ -104,11 +104,16 @@ $container.find( '.required' )
 		if ( isGood ) {
 			$container.find( 'input' )
 				.each( function( index, elem ) {
-					projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
 					console.log(elem);
 					if ( $( elem ).is ( '[type="text"]' ) ) {
+						projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
 						swapInputText( elem );
-					} else if ( $( elem ).is ( '[type="checkox"]' ) ) {
+					} else if ( $( elem ).is ( '[type="checkbox"]' ) ) {
+						if ( $( elem ).prop( "checked" ) ) {
+							projectData.project[0][$( elem ).attr( 'name' )] = $( elem ).val();
+						} else {
+							projectData.project[0][$( elem ).attr( 'name' )] = 0;
+						}
 						swapInputCheckbox( elem );
 					}
 					
@@ -180,7 +185,10 @@ $container.find( '.required' )
 	}
 	
 	function swapInputCheckbox( elem ) {
+		console.log( elem );
 		var required = '';
+		var statusToggle = $( elem ).data( "status-toggle" ).split( ":" );
+		
 		if ( $( elem ).hasClass( 'required' ) ) {
 			required = " required";
 		}
@@ -190,7 +198,7 @@ $container.find( '.required' )
 			$( elem ).parent()
 				.empty()
 				.text( useLabel + ": " )
-				.append( '<span class="edit ' + useName + required + '">' + projectData.project[0][useName] + '</span>' );
+				.append( '<span class="checkbox ' + useName + required + '" data-status-toggle="' + statusToggle.join(":") + '">' + statusToggle[projectData.project[0][useName]] + '</span>' );
 				
 		} else {
 			var useName = $( elem ).attr( 'class' ).split(' ')[1];
@@ -214,20 +222,19 @@ $container.find( '.required' )
 								return false;
 							}
 						})
-						.attr( 'name', useName );
+						.attr( 'name', useName )
+						.data( 'status-toggle', $( elem ).data( 'status-toggle' ) );
 				})
 				.append( ' Archive project?' );
 		}
 	}
+	
 	function swapSelect( elem, list ) {
 		var required = '';
 		if ( $( elem ).hasClass( 'required' ) ) {
 			required = " required";
 		}
-		console.log($( elem ));
-		
-		//console.log( $(elem).text());
-		var $select = $( '<select name="' + useName + '" id="project-client-select" size="1"></select>' );
+		//console.log($( elem ));
 		
 		if ( $( elem ).is( 'select' ) ) {
 			//console.log($( elem ).find( 'option:selected' ).text());
@@ -242,6 +249,7 @@ $container.find( '.required' )
 			var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
 			var useLabel = $( elem ).parent().text().split(':')[0];
 
+			var $select = $( '<select name="' + useName + '" id="project-client-select" size="1"></select>' );
 			if ( list == "client" ) {
 				var useName = $( elem ).attr( 'class' ).split( ' ' )[1];
 				$.get( "returnJSON.php", {

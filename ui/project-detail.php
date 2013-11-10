@@ -193,7 +193,7 @@
 					<li class="entity-details-item">Name: <span class="edit project_name required"><?php echo $project_details->getValue("project_name")?></span></li>
 					<li class="entity-details-item">Client: <span class="select client_id"><a href="<?php echo "client-detail.php?client_id=" . $project_details->getValue("client_id")?>" class="" title="View client's details"><?php echo $client_details->getValue("client_name")?></a></span></li>
 					<li class="entity-details-item">Project code: <span class="edit project_code"><?php echo $project_details->getValue("project_code")?></span></li>
-					<li class="entity-details-item">Status: <span class="checkbox project_archived">
+					<li class="entity-details-item">Status: <span class="checkbox project_archived" data-status-toggle="Active:Archived">
 					<?php if ($project_details->getValue("project_archived")) {
 						echo "Archived";
 					} else {
