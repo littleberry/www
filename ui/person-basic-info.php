@@ -70,15 +70,8 @@ include('header.php'); //add header.php to page
 ?>
 <script type="text/javascript">
 function FillProjects(f) {
-    //window.alert(f);
     f.projectidselectname.value = f.projectidselectname.value + f.projectid[f.projectid.selectedIndex].text + ",";
-    f.projectidselect.value = f.projectidselect.value + f.projectid.value + ",";
-    //USE THIS V FUNCTION TO UPDATE A HIDDEN FIELD
-    //f.projectidselect.value = f.projectidselect.value + f.projectid.value + ",";
-    //f.shippingname.value;
-    //f.billingcity.value = f.shippingcity.value;
-    //return false;
-    
+    f.projectidselect.value = f.projectidselect.value + f.projectid.value + ",";    
 }
 function showP(elem){
    if(elem.value == "Regular User"){
