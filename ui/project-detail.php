@@ -206,9 +206,7 @@
 			</section>
 			<section id="project-notes" class="entity-detail">
 				<h2 class="entity-sub-title">Project Notes</h2>
-				<p class="entity-list entity-details-block textarea project_notes">
-					<?php echo $project_details->getValue("project_notes")?>
-				</p>
+				<p class="entity-list entity-details-block textarea project_notes"><?php echo $project_details->getValue("project_notes")?></p>
 				<ul class="page-controls-list team">
 					<li class="page-controls-item link-btn"><a id="edit-project-notes-btn" href="#">Edit Project Notes</a></li>
 				</ul>
@@ -220,7 +218,7 @@
 					<li class="entity-details-item">Project hourly rate: <?php echo $project_details->getValue("project_hourly_rate")?></li>
 				</ul>
 				<ul class="page-controls-list team">
-					<li class="page-controls-item link-btn"><a class="" href="#">Edit Invoice Settings</a></li>
+					<li class="page-controls-item link-btn"><a class="edit-invoicing-btn" href="#">Edit Invoice Settings</a></li>
 				</ul>
 			</section>
 			<section id="project-budget" class="entity-detail">

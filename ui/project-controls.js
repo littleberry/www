@@ -4,11 +4,10 @@ $(document).ready( function() {
 	var $cancelLink = $( '<a id="cancel-link" class="" href="#">Cancel</a>' );
 	var $label = $( '<label class="entity-details-label"></label>' )
 	var $inputText = $( '<input type="text" />' );
-	var $inputCheckbox = $( '<input type="checkbox" />' )
+	var $inputCheckbox = $( '<input type="checkbox" />' );
 	var $textarea = $( '<textarea class="entity-details-block"></textarea>' )
 	var $editBtn;
 	
-	//var url = $.url(); //parse current URL
 	var projectId = $.url().param("project_id"); //parse current URL and return the project_id. Uses the Purl.js plugin
 	
 	var projectData = {};
@@ -61,7 +60,6 @@ $(document).ready( function() {
 				//console.log(projectData.tasks);
 			});
 	
-	//console.log(projectDetail)
 	
 	function saveData( dataObj ) {
 		var sendData = {};
@@ -78,14 +76,18 @@ $(document).ready( function() {
 				console.log("fail");
 			})
 			.success( function( getData ) {
-				console.log("success");
+				$( 'h1.page-title' ).text( 'Project: ' + projectData.project[0]['project_name'] );
+				$( 'h2.page-sub-title a' )
+					.attr( 'href', 'client-detail.php?client_id=' + projectData.project[0]['client_id'] )
+					.attr( 'title', "View client's details" )
+					.text( $( 'span.client_id' ).text() );
 			});
 	}
 	
 
 	$saveBtn.click( function( evt ) {
 		var isGood = true; //Data innocent until proven guilty
-		var $container = $( this ).parents( 'ul' ).prev();
+		var $container = $( this ).parents( 'section.entity-detail' );//.prev();
 		
 		/*
 $container.find( '.required' )
@@ -281,6 +283,9 @@ $container.find( '.required' )
 								})
 							.append( $select );
 					});
+			} else if ( list == "invoice-methods") {
+				
+				
 			}
 			
 		}
@@ -307,28 +312,34 @@ $container.find( '.required' )
 		if ( $( elem ).is( "textarea" ) ) {
 			var useName = $( elem ).prev( 'label' ).attr( 'for' );
 			var useLabel = $( elem ).prev( 'label' ).text().split(":")[0];
-			$( elem ).parent()
-				.empty()
-				.text( useLabel + ": " )
-				.append( '<span class="edit ' + useName + required + '">' + projectData.project[0][useName] + '</span>' );
+			console.log( $( elem ) );
+			$( elem ).prev( 'label' )
+				.before( '<p class="entity-list entity-details-block textarea ' + useName + required + '">' + projectData.project[0][useName] + '</span>' );
+			$( elem ).prev( 'label' )
+				.remove();
+			$( elem )
+				.remove();
 				
 		} else {
 			var useName = $( elem ).attr( 'class' ).split(' ');
-			var useLabel = $( elem ).parent().text().split(':')[0];
-			var useName = useName.pop();
-			console.log($( elem ).parent());
-			$( elem )
-				.before( function() {
+			useName = useName[useName.length - 1];
+			var useLabel = $( elem ).next().text();
+			
+			//var useName = useName.pop();
+			$( elem ).prev()
+				.after( function() {
+					return $textarea.clone() 
+						.val( projectData.project[0][useName] )
+						.attr( 'name', useName );
+				})
+				.after( function() {
 					return $label.clone() 
 						.attr( 'for', useName )
 						.text( useLabel + ": " )
 						.addClass( required );
-				})
-				.before( function() {
-					return $textarea.clone() 
-						.val( projectData.project[0][useName] )
-						.attr( 'name', useName );
 				});
+			$( elem )
+				.remove();
 		}
 	}
 
@@ -362,6 +373,27 @@ $container.find( '.required' )
 		//console.log($projectInfoEdit);
 		evt.preventDefault();
 	});
+
+	/*
+$( '#edit-invoicing-btn' ).click( function( evt ) {
+		$( '#project-invoicing .edit' )
+			.each( function( index, elem ) {
+				swapInputText( elem );
+			});
+		$( '#project-invoicing .select' )
+			.each( function( index, elem ) {
+				swapSelect( elem, "invoice-methods" );
+			});
+		$( '#project-invoicing .checkbox' )
+			.each( function( index, elem ) {
+				swapInputCheckbox( elem );
+			});
+		$saveBtn.appendTo( $( this ).parent() );
+		$editBtn = $( this ).detach();
+		//console.log($projectInfoEdit);
+		evt.preventDefault();
+	});
+*/
 
 
 	$(function() { //tabs interface for project-detail.php
