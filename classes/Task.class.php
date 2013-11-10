@@ -119,6 +119,22 @@ class Task extends DataObject {
 		}
 	}
 	
+	public function getTaskName($task_id) {
+		$conn=parent::connect();
+		$sql = "SELECT task_name FROM " . TBL_TASK . " WHERE task_id = :task_id";			
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
+			$st->execute();
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			if ($row) return $row;
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed getting the task id, sql is $sql " . $e->getMessage());
+		}
+	}
+	
 	//return all data for a task based on the task_id.
 	public static function getTaskById($task_id) {
 		$conn=parent::connect();
