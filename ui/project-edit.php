@@ -132,9 +132,7 @@ function showBudgetFields(f) {
 		<h2 class="page-sub-title"><a href="client-detail.php?client_id=<?php echo $project->getValueEncoded("client_id")?>" class="" title="View client's details"><?php echo $client_name["client_name"]?></a></h2>
 		<nav class="page-controls-nav">
 			<ul class="page-controls-list project">
-				<li class="page-controls-item link-btn">
-				<a class="view-all-link" href="#">Save Project</a></li>
-				<!-- <a class="view-all-link" href="project-edit.php?project_id=<?php //echo $project_id?>">Save Project</a> --></li>
+				<li class="page-controls-item link-btn"><a class="save-link" href="#">Save Project</a></li>
 				<li class="page-controls-item"><a class="view-archive-link" href="projects.php?archives=1">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 			</ul>

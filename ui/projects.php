@@ -54,8 +54,7 @@
 		<h1 class="page-title">Active Projects</h1>
 		<nav class="page-controls-nav">
 			<ul class="page-controls-list project">
-				<li class="page-controls-item link-btn">
-				<a class="view-all-link" href="project-add.php">+ Add Project</a></li>
+				<li class="page-controls-item link-btn"><a class="view-all-link" href="project-add.php">+ Add Project</a></li>
 				<li class="page-controls-item"><a class="view-archive-link" href="projects.php?archives=1">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 			</ul>

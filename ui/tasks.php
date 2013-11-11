@@ -30,90 +30,94 @@
 		} 
 
 function displayTaskInsertForm($errorMessages, $missingFields, $task, $processType) {
-include('header.php'); //add header.php to page
+	include('header.php'); //add header.php to page
 
 ?>
 
-<section id="page-content" class="page-content">
+<div id="page-content" class="page-content">
 	<header class="page-header">
-		<h1 class="page-title">Tasks</h1>
-		
+		<h1 class="page-title">All Tasks</h1>
 		<nav class="page-controls-nav">
-			<ul class="client-page-controls">
-				<li class="page-controls-item add-client-button"><a class="add-client-link" href="tasks.php">+ Add Task</a></li>
-				<li class="page-controls-item"><a class="view-client-archive-link" href="task_archives.php">View Task Archives</a></li>
+			<ul class="page-controls-list project">
+				<li class="page-controls-item link-btn"><a id="add-task-btn" class="save-link" href="tasks.php">+ Add Task</a></li>
+				<li class="page-controls-item"><a class="view-archive-link" href="task_archives.php">View Task Archives</a></li>
 			</ul>
 		</nav>
 	</header>
 		<?php 
 		//this is the add task UI (IT IS NOT SEPARATE IN THIS MODULE!!!)?>
-				<a class="client-info-contact-link" href="tasks.php?task_id=" title="View contact details"><button>Add Task</button></a>
+	<!-- <a class="client-info-contact-link" href="tasks.php?task_id=" title="View contact details">Add Task</a> -->
 
-		<form action="tasks.php" method="post" style="margin-bottom:50px;" enctype="multipart/form-data">
-      <input type="hidden" name="action" value="<?php echo $processType ?>"/>
-      	<section class="client-detail l-col-80">
-        	<fieldset class="client-details-entry">
-				<legend class="client-details-title">Enter task details:</legend>
-				<header class="client-details-header">
-					<h1 class="client-details-title">Enter task details:</h1>
+	<div id="add-task-modal" class="entity-detail" title="Add/Edit Task">
+		<form action="tasks.php" method="post" enctype="multipart/form-data">
+			<input type="hidden" name="action" value="<?php echo $processType ?>"/>
+			<fieldset class="entity-details-entry">
+				<header class="entity-details-header project">
+					<h1 class="entity-details-title">Enter task details:</h1>
 					<h4 class="required">= Required</h4>
 				</header>
-				<ul class="details-list client-details-list">
-						<label for="client-name" <?php validateField("task_name", $missingFields)?> class="client-details-label">Task Name:</label>
-						<?php 
-						$tasker = "";
-						//the user wants to add this person, so get the task name off the object that was sent with the post.
-						if ($processType == 'A') {
-							$taskName = $task->getValueEncoded("task_name");
-							$thisTask = $task;
-						} else {
-						//the user came in from edit, so get the task ID off of the get.
-							if (isset($_GET["task_id"])) {
-								$tasker = $_GET["task_id"];
-							//this is just a safety thing.
-							} elseif (isset($_POST["task_id"])) {
-								$tasker = $_POST["task_id"];
+				<section id="project-info" class="entity-detail">
+					<ul class="details-list entity-details-list task">
+						<li class="entity-details-item name task">
+							<label for="task_name" <?php validateField("task_name", $missingFields)?> class="entity-details-label">Task Name:</label>
+							<?php 
+							$tasker = "";
+							//the user wants to add this task, so get the task name off the object that was sent with the post.
+							if ($processType == 'A') {
+								$taskName = $task->getValueEncoded("task_name");
+								$thisTask = $task;
+							} else {
+							//the user came in from edit, so get the task ID off of the get.
+								if (isset($_GET["task_id"])) {
+									$tasker = $_GET["task_id"];
+								//this is just a safety thing.
+								} elseif (isset($_POST["task_id"])) {
+									$tasker = $_POST["task_id"];
+								}
+								//dude, tasker is the task_id, but this is at least funny, reminds me of Disney.
+								$thisTask = $task->getTaskById($tasker);
+								//get the task name.
+								$taskName = $thisTask->getValue("task_name");
 							}
-							//dude, tasker is the task_id, but this is at least funny, reminds me of Disney.
-							$thisTask = $task->getTaskById($tasker);
-							//get the task name.
-							$taskName = $thisTask->getValue("task_name");
-						}
-						//so, in the end, we have a list of tasks with thier names and their IDs. All of this so we can put it back in the UI.
-						?>
-						<input id="client-name" name="task-name" class="client-name-input" type="text" tabindex="1" value="<?php echo $taskName ?>" /><input type="hidden" name="task_id" value="<?php echo $tasker; ?>"><br />
-					</li>
-					<li class="client-details-item phoneNum">
-						<label for="client-phone" <?php validateField("task_hourly_rate", $missingFields)?> class="client-details-label">Hourly Rate:</label>
-						<input id="client-phone" name="task-hourly-rate" class="client-phone-input" type="text" tabindex="2" value="<?php echo $thisTask->getValueEncoded("task_hourly_rate")?>" />
-					</li>
-					<label for="contact-info-sync" class="client-details-label">Billable By Default:</label>
-						<input id="contact-info-sync" name="task-bill-by-default" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" <?php setChecked($thisTask, "task_bill_by_default", 1) ?>/><br/>
-					<?php
-					//only show the archive button if we are editing.
-					if ($processType == "E") { ?><br/>
-<button id="client-add-btn" name="task-archived" class="client-add-btn" value="1" tabindex="11"/>Archive Task</button><br/> 					<?php } ?>
-					<?php
-					//this is here to expose when we get there.?>
-					<label for="contact-info-sync" class="client-details-label">Common Task (added to all future projects):</label>
-					<input id="contact-info-sync" name="task-common" class="contact-info-sync-input" type="checkbox" tabindex="11" value="1" <?php setChecked($thisTask, "task_common", 1) ?>/>
-				<fieldset class="client-details-entry">
-				<ul class="details-list client-details-submit">
-					<li class="client-details-item submit-client">
-						<label for="client-add-btn" class="client-details-label"></label>
-						<!--modified field to be of type submit instead of button-->
-                        <input id="client-add-btn" name="task-add-btn" class="client-add-btn" type="submit" value="Save Task" tabindex="11"/> 
-						<label for="client-add-btn" class="client-details-label"></label>
-						<!--modified field to be of type submit instead of button-->
-                        <?php
-                        //this is here to expose when we get here.
-                        //<input id="client-add-btn" name="task-add-to-all-btn" class="client-add-btn" type="submit" value="+ Add Task To All Current Projects" tabindex="11"/> 
-                        ?>
-					</li>
-				</ul>
+							//so, in the end, we have a list of tasks with their names and their IDs. All of this so we can put it back in the UI.
+							?>
+							<input id="task-name" name="task_name" class="task-name-input" type="text" tabindex="1" value="<?php echo $taskName ?>" />
+							<input type="hidden" name="task_id" value="<?php echo $tasker; ?>">
+						</li>
+						<li class="entity-details-item hourly-rate task">
+							<label for="task_hourly_rate" <?php validateField("task_hourly_rate", $missingFields)?> class="entity-details-label">Hourly Rate:</label>
+							<input id="task-hourly-rate" name="task_hourly_rate" class="task-rate-input" type="text" tabindex="2" value="<?php echo $thisTask->getValueEncoded("task_hourly_rate")?>" />
+						</li>
+						<li class="entity-details-item billable task">
+							<label for="task_bill_by_default" class="entity-details-label">Billable By Default:</label>
+							<input id="task-billable" name="task_bill_by_default" class="task-billable-input" type="checkbox" tabindex="3" value="1" <?php setChecked($thisTask, "task_bill_by_default", 1) ?>/>
+						</li>
+						<li class="entity-details-item archived task">
+							<?php //only show the archive button if we are editing.
+							if ($processType == "E") { ?>
+								<button id="client-add-btn" name="task-archived" class="client-add-btn" value="1" tabindex="4"/>Archive Task</button>
+							<?php } ?>
+						</li>
+						<li class="entity-details-item common task">
+							<?php //this is here to expose when we get there.?>
+							<label for="task_common" class="entity-details-label">Task common to all future projects:</label>
+							<input id="task-common" name="task_common" class="task-common-input" type="checkbox" tabindex="5" value="1" <?php setChecked($thisTask, "task_common", 1) ?>/>
+						</li>
+						<li class="entity-details-item">
+							<label for="save_task" class="entity-details-label">All done?</label>
+							<!-- <a class="" href="#">+ Save Task</a> -->
+							<input id="task-save-btn" name="task_save_btn" class="save-btn" type="submit" value="+ Save Task" tabindex="12" /> or <a class="" href="projects.php" tabindex="13">Cancel</a>
+							<!-- <input id="client-add-btn" name="task-add-btn" class="client-add-btn" type="submit" value="+ Save Task" tabindex="11"/> -->
+							<?php
+	                        //this is here to expose when we get here.
+	                        //<input id="client-add-btn" name="task-add-to-all-btn" class="client-add-btn" type="submit" value="+ Add Task To All Current Projects" tabindex="11"/> 
+	                        ?>
+						</li>
+					</ul>
+				</section>
 			</fieldset>
-</section>
-</form>
+		</form>
+	</div>
 
 		
 		<?php
@@ -280,11 +284,11 @@ echo "processtype is " . $processType;
 } 
 
 ?>
-</section>
+</div>
 
 <footer id="site-footer" class="site-footer">
 
 </footer>
-
+<script src="task-controls.js"></script>
 </body>
 </html>
