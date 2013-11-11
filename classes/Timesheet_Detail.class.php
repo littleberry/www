@@ -6,6 +6,7 @@ require_once("DataObject.class.php");
 class Timesheet_Detail extends DataObject {
 	protected $data = array(
 		//these fields are in the timesheet table.
+		"timesheet_detail_id" =>"",
 		"timesheet_id"=>"",
 		"timesheet_date"=>"",
 		"timesheet_start_time"=>"",
@@ -14,13 +15,13 @@ class Timesheet_Detail extends DataObject {
 		"timesheet_approved"=>""
 	);
 	
-	//START HERE SATURDAY. UPDATE TBL_TIMESHEET_DATA SO THAT THE TIMESHEET INFORMATION IS STORED IN THIS OBJECT
 	//display all information about a timesheet returned as an array.
 	public function getTimesheetDetail($timesheet_id) {
 		$conn=parent::connect();
-		$sql="SELECT * FROM " . TBL_TIMESHEET_DETAIL;
+		$sql="SELECT * FROM " . TBL_TIMESHEET_DETAIL . " WHERE timesheet_id = :timesheet_id";
 		try {
 			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
 			$st->execute();
 			$timesheet_detail=array();
 			foreach ($st->fetchAll() as $row) {
@@ -33,13 +34,33 @@ class Timesheet_Detail extends DataObject {
 			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+	
+	//display all information about a timesheet for a specific date returned as an array.
+	public function getTimesheetDetailByDate($timesheet_id, $timesheet_date) {
+		$conn=parent::connect();
+		$sql="SELECT * FROM " . TBL_TIMESHEET_DETAIL . " WHERE timesheet_id = :timesheet_id and timesheet_date = :timesheet_date";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($timesheet_date)), PDO::PARAM_STR);
+			$st->execute();
+			$timesheet_detail=array();
+			foreach ($st->fetchAll() as $row) {
+				$timesheet_detail[] = new Timesheet_Detail($row);
+			}
+			parent::disconnect($conn);
+			return $timesheet_detail;
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
 		
 	//function inserts new timesheet into db. 	
 	public function insertTimesheetDetail($timesheet_id) {
 		$conn=parent::connect();
 		$sql = "INSERT INTO " . TBL_TIMESHEET_DETAIL . " (
 			timesheet_id,
-			timesheet_timestamp,
 			timesheet_date,
 			timesheet_start_time,
 			timesheet_end_time,
@@ -47,7 +68,6 @@ class Timesheet_Detail extends DataObject {
 			timesheet_approved
 			) VALUES (
 			:timesheet_id,
-			:timesheet_timestamp,
 			:timesheet_date,
 			:timesheet_start_time,
 			:timesheet_end_time,
@@ -57,7 +77,6 @@ class Timesheet_Detail extends DataObject {
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
-			$st->bindValue(":timesheet_timestamp", $this->data["timesheet_timestamp"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($this->data["timesheet_date"])), PDO::PARAM_STR);
 			$st->bindValue(":timesheet_start_time", $this->data["timesheet_start_time"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_end_time", $this->data["timesheet_end_time"], PDO::PARAM_INT);
@@ -69,6 +88,31 @@ class Timesheet_Detail extends DataObject {
 			parent::disconnect($conn);
 			die("Query failed on insert of timesheet details, sql is $sql " . $e->getMessage());
 		}	
+	}
+	
+	public function updateTimesheetDetail($timesheet_detail_id) {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_TIMESHEET_DETAIL . " SET
+			timesheet_date = :timesheet_date,
+			timesheet_start_time = :timesheet_start_time,
+			timesheet_end_time = :timesheet_end_time,
+			timesheet_number_of_hours = :timesheet_number_of_hours,
+			timesheet_approved = :timesheet_approved
+			WHERE timesheet_detail_id = :timesheet_detail_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($this->data["timesheet_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_start_time", $this->data["timesheet_start_time"], PDO::PARAM_INT);
+			$st->bindValue(":timesheet_end_time", $this->data["timesheet_end_time"], PDO::PARAM_INT);
+			$st->bindValue(":timesheet_number_of_hours", $this->data["timesheet_number_of_hours"], PDO::PARAM_INT);
+			$st->bindValue(":timesheet_approved", $this->data["timesheet_approved"], PDO::PARAM_INT);
+			$st->bindValue(":timesheet_detail_id", $timesheet_detail_id, PDO::PARAM_INT);
+			$st->execute();	
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on update: " . $e->getMessage());
+		}
 	}
 
 
@@ -217,34 +261,7 @@ class Timesheet_Detail extends DataObject {
 	//if we want to break out the address, write the config to do the update later
 	//so that we can update those fields as well.
 	//9/4/13
-	public function updateClient($client_id) {
-		$conn=parent::connect();
-		$sql = "UPDATE " . TBL_CLIENT . " SET
-			client_name = :client_name,
-			client_email = :client_email,
-			client_phone = :client_phone,
-			client_fax = :client_fax,
-			client_currency_index = :client_currency_index,
-			client_logo_link = :client_logo_link,
-			client_archived = :client_archived
-			WHERE client_id = :client_id";
-		try {
-			$st = $conn->prepare($sql);
-			$st->bindValue(":client_name", $this->data["client_name"], PDO::PARAM_STR);
-			$st->bindValue(":client_email", $this->data["client_email"], PDO::PARAM_STR);
-			$st->bindValue(":client_phone", $this->data["client_phone"], PDO::PARAM_INT);
-			$st->bindValue(":client_fax", $this->data["client_fax"], PDO::PARAM_INT);
-			$st->bindValue(":client_archived", $this->data["client_archived"], PDO::PARAM_INT);
-			$st->bindValue(":client_currency_index", $this->data["client_currency_index"], PDO::PARAM_INT);
-			$st->bindValue(":client_logo_link", basename($this->data["client_logo_link"]), PDO::PARAM_STR);
-			$st->bindValue(":client_id", $client_id, PDO::PARAM_INT);
-			$st->execute();	
-			parent::disconnect($conn);
-		} catch (PDOException $e) {
-			parent::disconnect($conn);
-			die("Query failed on update: " . $e->getMessage());
-		}
-		
+			
 		
 		//update the address data into the address table for the appropriate client_id.
 		$conn=parent::connect();
