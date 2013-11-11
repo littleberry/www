@@ -58,7 +58,7 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 	<h1 class="site-title">Time Tracker</h1>
 	<nav id="site-nav" class="site-nav">
 		<ul id="site-menu" class="site-menu">
-			<li class="site-menu-item"><a class="site-menu-link" href="#">Timesheets</a></li>
+			<li class="site-menu-item"><a class="site-menu-link" href="timesheet.php">Timesheets</a></li>
 			<?php //if ($header_controller_vars->getValueEncoded("person_perm_id") != "Regular User") {?>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Reports</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Invoices</a></li>
