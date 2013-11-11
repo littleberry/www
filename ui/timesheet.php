@@ -7,17 +7,17 @@
 	require_once("../classes/Task.class.php");
 	require_once("../classes/Timesheet.class.php");
 	require_once("../classes/Timesheet_Detail.class.php");
-	require_once 'Calendar/Month/Weekdays.php';	
-	require_once 'Calendar/Week.php';
-	require_once 'Calendar/Year.php';
-	require_once 'Calendar/Minute.php';
+	//require_once 'Calendar/Month/Weekdays.php';	
+	//require_once 'Calendar/Week.php';
+	//require_once 'Calendar/Year.php';
+	//require_once 'Calendar/Minute.php';
 	
 	//protect this page
 	checklogin();
 	
 	include('header.php'); //add header.php to page
-	
-	if (isset($_POST["action"]) and $_POST["action"] == "save_timesheet") {
+	if (isset($_POST["save_timesheet_button"]) and $_POST["save_timesheet_button"] == "Save Timesheet") {
+		error_log("THE USER WANTS TO SAVE THE TIMESHEET");
 		saveTimesheet();
 	} else {
 		displayTimesheet(new Timesheet(array()), new Timesheet_Detail(array()));
@@ -26,17 +26,13 @@
 
 
 function displayTimesheet($timesheet, $timesheet_detail) {
-for ($i=0; $i<7; $i++) {
-	echo date('Y-m-d', mktime(1, 0, 0, date('m'), date('d')+$i-date('w'), date('Y'))) . ' 00:00:00';
-	echo "<br>";
+if (isset($_GET["timesheet_date"])) {
+	$timesheet_date = $_GET["timesheet_date"];
+} else {
+	$timesheet_date = date('d-m-Y');
 }
+$d = strtotime($timesheet_date);
 ?>
-<script type="text/javascript">
-function FillTasks(f) {
-    //alert(f.task_ids.value);
-    f.task_id.value = f.task_ids.value + "," + f.task_id.value;    
-}
-</script>
 
 <div id="page-content" class="page-content">
 	<header class="page-header">
@@ -53,9 +49,6 @@ function FillTasks(f) {
 	<div class="content">
 		<!--BEGIN FORM-->
 		<form action="timesheet.php" method="post">
-			<table id="project-list" class="entity-table projects tablesorter">
-				<thead>
-					<tr>
 						<?php
 						if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 							$person=Person::getByEmailAddress($_SESSION["logged_in"]);
@@ -65,87 +58,87 @@ function FillTasks(f) {
 						}
 						?>
 						<input type="hidden" name="person_id" value="<?php echo $person->getValueEncoded("person_id");?>">
-						<input type="hidden" name="action" value="save_timesheet">
-						<img class="client-logo-img small" style="height:50px; width:50px;" src="<?php echo "images/" . $person->getValue("person_logo_link")?>" title="Person Logo" alt="Person logo" />
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-				<?php	$month = new Calendar_Month_Weekdays(date('Y'), date('m'), date('d'));
-						$week = new Calendar_Week(date('Y'), date('m'), date('d'));
-						$year = new Calendar_Year(date('Y'), date('m'), date('d'));
-
-$week->build();
-
-//get the projects currently assigned to this user.
-list($projects) = Project_Person::getProjectsForPerson($person->getValueEncoded("person_id"));
-if (count($projects) == 0) echo $person->getValueEncoded("person_first_name") . " has no projects assigned. Assign some projects <a href='projects.php'>here.</a>";
-?>
-<table style="border:1px solid;">
-<tr>
-<td>
-Choose Project/Task
-</td>
-</tr>
-<tr>
-<td>
-<select name="project_id">
-<?php foreach ($projects as $project) {?>
-	<option name="project" value="<?php echo $project->getValueEncoded("project_id")?>"><?php echo $project->getValueEncoded("project_name")?></option> 
-<?php } 
-?>
-</select>
-<?php foreach ($projects as $project) {
-	list($tasks) = Project_Task::getTasksForProject($project->getValueEncoded("project_id"));
-	if (count($tasks) == 0) {
-		echo $project->getValueEncoded("project_name") . " has no tasks assigned. Assign some tasks <a href='projects.php'>here.</a>";
-	} else {?><select name="task_id"><?php
-		foreach ($tasks as $task) {
-			?>
-			<option name="task" value="<?php echo $task->getValueEncoded("task_id")?>"><?php echo $task->getValueEncoded("task_name")?></option>
-			<?php
-		}
+						<input type="hidden" name="project_id" value="<?php 
+	if (isset($_GET["project_id"])) {
+		echo $_GET["project_id"];
+	} else {
+		echo $timesheet->getValue("project_id");
 	}
-	?></select><?php
-}
+	?>"><?php echo  Project::getProjectName($_GET["project_id"])[0] ?>	
+	<input type="hidden" name="task_id" value="<?php 
+	if (isset($_GET["task_id"]))	 {
+		echo $_GET["task_id"];
+	} else {
+		echo $timesheet->getValue("task_id");
+	}
+	?>"><?php echo Task::getTaskName($_GET["task_id"])[0]?>
+	<input type="hidden" name="timesheet_notes" value="<?php 
+	if (isset($_GET["timesheet_notes"]))	 {
+		echo $_GET["timesheet_notes"];
+	} else {
+		echo $timesheet->getValue("timesheet_notes");
+	}
+	?>">
+						<img class="client-logo-img small" style="height:50px; width:50px;" src="<?php echo "images/" . $person->getValue("person_logo_link")?>" title="Person Logo" alt="Person logo" />
+<table style="width:100%; border:1px solid;">
+<?php
+//if ($timesheet_detail) echo "this person already has a timesheet.";
+//print_r($timesheet_detail);
+
+//list($timesheets) = $timesheet->getTimesheetDetail($person->getValueEncoded("person_id"));
+
+list($timesheets) = $timesheet->getTimesheetByPerson($person->getValueEncoded("person_id"));
+
+//get the general timesheet information
+foreach ($timesheets as $timesheet) {
+	//get out the details for a particular timesheet
+	list($timesheet_details) = Timesheet_Detail::getTimesheetDetail($timesheet->getValueEncoded("timesheet_id"));
+	?><tr>
+	<td style="color:blue;border:1px solid;"><?php echo $timesheet->getValueEncoded("timesheet_id");?></td>
+	<td style="color:green;border:1px solid;"><?php echo $timesheet->getValueEncoded("task_id");?></td>
+	<td style="color:pink;border:1px solid;"><?php echo $timesheet->getValueEncoded("project_id");?></td></tr><tr>
+	<?php 
+	//yeah, not going to fight tables that will be gone eventually anyway. 
+	$i = 0;
+	foreach ($timesheet_details as $timesheet_detail) {
+		?><td style="border:1px solid;"><input type="input" name="timesheet_date_<?php echo $i?>" value="<?php echo $timesheet_detail->getValueEncoded("timesheet_date");?>"></td>
+	<?php $i++; 
+	} ?>
+	</tr>
+	<tr>
+	<?php
+	$i = 0;
+	foreach ($timesheet_details as $timesheet_detail) {
+		?><td style="border:1px solid;"><input name="timesheet_number_of_hours_<?php echo $i ?>" value="<?php echo $timesheet_detail->getValueEncoded("timesheet_number_of_hours");?>"></td>
+	<?php $i++;
+	} ?>
+	</tr>
+<?php }
+
+
+
+//add the timesheet to the UI if the person wanted to add a new timesheet.
+if (isset($_GET["project_id"])) {
 ?>
+<tr><td>
+<?php for ($i=0; $i<7; $i++) {
+	?><td><?php echo date("D M d", strtotime('sunday this week -1 week + ' . $i . ' days', $d))?>
+	<input type="input" name="timesheet_date_<?php echo $i?>" value="<?php echo date("D M d", strtotime('sunday this week -1 week + ' . $i . ' days', $d))?>"></td>
+<?php } ?>
+</td></tr><tr><td>
+<?php for ($i=0; $i<7; $i++) {
+	?><td><input name="timesheet_number_of_hours_<?php echo $i ?>"><?php echo $timesheet_detail->getValue("timesheet_number_of_hours")?></td>
+<?php } ?>
+
 </td>
 </tr>
 </table>
-
-<table style="width:100%; border:1px solid;">
-<tr>
-<?php
-$i=1;
-while ($day = $week->fetch()) {
-    if ($day->isFirst()) {
-        ?><tr style="border:1px solid;"><?php
-    }
-
-    if ($day->isEmpty()) {
-        ?><td style="border:1px solid;">&nbsp;</td><?php
-    } else {
-        ?>
-        
-        <td style="border:1px solid;">
-        <?php //echo date("D", mktime(0,0,0,1,$i+2,2000));?>
-        <input readonly name="timesheet_date_<?php echo $i ?>" value="<?php echo($year->thisYear() . "-" . $month->thisMonth() . "-" . $day->thisDay())?>">
-        <input name="timesheet_total_time_<?php echo $i ?>"><?php //echo $timesheet_total_time_[$i]->getValue("timesheet_total_time")?></td>
-        <?php 
-    }
-
-    if ($day->isLast()) {
-        ?></tr><?php
-    }
-    $i++;
-}
-?>
 </tr>
+</tbody>
+<?php } ?>
 </table>
-					</tr>
-				</tbody>
-			</table>
-			<input type="submit">
+			<input type="button" name="add_row_button" value="Add Row" onclick="javascript:window.open('add_timesheet_row.php?person_id=<?php echo $person->getValueEncoded("person_id")?>','myWindow','width=300,height=200,left=250%,right=250%,scrollbars=no')">
+			<input type="submit" name="save_timesheet_button" value="Save Timesheet">
 		</form>
 
 	</div>
@@ -153,23 +146,23 @@ while ($day = $week->fetch()) {
 <?php
 }
 
+ 
 function saveTimesheet() {
-//CREATE THE TIMESHEET OBJECT ($timesheet)
+	//CREATE THE TIMESHEET OBJECT ($timesheet)
 	$timesheet = new Timesheet( array(
 	//CHECK REG SUBS!!
 	"timesheet_id" => isset($_POST["timesheet_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_id"]) : "",
-	"timesheet_notes" => isset($_POST["client-phone"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["client-phone"]) : "",
-	"task_id" => isset($_POST["task_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9^@^.]/", "", $_POST["task_id"]) : "",
+	"timesheet_notes" => isset($_POST["timesheet_notes"]) ? preg_replace("/[^ \-\_a-zA-Z^0-9]/", "", $_POST["timesheet_notes"]) : "",
+	"task_id" => isset($_POST["task_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task_id"]) : "",
 	"project_id" => isset($_POST["project_id"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_id"]) : "",
 	"person_id" => isset($_POST["person_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person_id"]) : ""
 	));
 
-	//create the timesheet detail object ($timesheet_detail)	
-	//this is a multiple field array, since each timesheet has seven possible entries.
-	//we're gong to start the loop at 1, since there is no "0" day.
-	for ($i=1; $i<=7; $i++) {
+	//create the timesheet detail object ($timesheet_detail)
+	for ($i=0; $i<7; $i++) {
 		$timesheet_detail[$i] = new Timesheet_Detail( array(
 		//CHECK REG SUBS!!
+		"timesheet_detail_id" => isset($_POST["timesheet_detail_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_detail_id"]) : "",
 		"timesheet_id" => isset($_POST["timesheet_id"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_id"]) : "",
 		"timesheet_date" => isset($_POST["timesheet_date_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_date_$i"]) : "",
 		"timesheet_start_time" => isset($_POST["timesheet_start_time_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_start_time_$i"]) : "",
@@ -179,25 +172,63 @@ function saveTimesheet() {
 		));
 	}
 	
-	//print_r($timesheet);
-	$lastInsertId = $timesheet->insertTimesheet($timesheet->getValueEncoded("person_id"), $timesheet->getValueEncoded("task_id"), $timesheet->getValueEncoded("project_id"));
-	//print_r($lastInsertId);
-		
-	for ($i=1; $i<=7; $i++) {
-		error_log("Here is the OBJECT");
-		error_log(print_r($timesheet_detail[$i], true));
-		//$timesheet_detail[$i]->insertTimesheetDetail($lastInsertId[0]);
-		//print_r($timesheet_detail[$i]);
-		//LAST_INSERT_ID()...use this function to insert the children rows.
-		//echo "Here is the POST";
-		//print_r($_POST);
+	//get out the timesheet so we know to either update or insert the timesheet.
+	$timesheet_exists = $timesheet->getTimesheetById($timesheet->getValueEncoded("person_id"), $timesheet->getValueEncoded("task_id"), $timesheet->getValueEncoded("project_id"));
+	error_log("THESE ARE THE VALUES WE HAVE.");
+	error_log("HERE IS THE POST");
+	error_log(print_r($_POST,true));
+	error_log($timesheet->getValueEncoded("person_id"));
+	error_log($timesheet->getValueEncoded("task_id"));
+	error_log($timesheet->getValueEncoded("project_id"));
+	error_log($timesheet->getValueEncoded("timesheet_notes"));
+	error_log(print_r($timesheet_exists, true));
+	foreach ($timesheet_exists as $exists) {
+		error_log("UCKY");
+		error_log(print_r($exists,true));
+		error_log(print_r($timesheet_exists, true));
 	}
+	
+	//timesheet is not there, so update it.
+	if (!$timesheet_exists) {
+		$lastInsertId = $timesheet->insertTimesheet($timesheet->getValueEncoded("person_id"), $timesheet->getValueEncoded("task_id"), $timesheet->getValueEncoded("project_id"));
+		
+		//the timesheet doesn't exist, so we know the timesheet details aren't there and need to be inserted.
+		for ($i=0; $i<7; $i++) {
+			$timesheet_detail[$i]->insertTimesheetDetail($lastInsertId[0]);
+			error_log("Here is the OBJECT");
+			error_log(print_r($timesheet_detail[$i], true));
+		}
+	} else {
+		//the timesheet exists already, so update the timesheet with new data.
+		//if this is a timesheet detail that has already been inserted update the rows. if they are there. Otherwise, insert the details.
+		foreach ($timesheet_exists as $t_exists) {
+			//echo "that timesheet already exists. Update it, please.";
+			$t_exists->updateTimesheet($t_exists->getValueEncoded("timesheet_id"));	
+			for ($y=0; $y<7; $y++) {
+				//print_r($timesheet_detail[$i]->getValueEncoded("timesheet_date"));
+				$timesheet_detail_exists = $timesheet_detail[$y]->getTimesheetDetailByDate($t_exists->getValueEncoded("timesheet_id"), $timesheet_detail[$y]->getValueEncoded("timesheet_date"));
+				if ($timesheet_detail_exists) {
+					$i = 0;
+					foreach ($timesheet_detail_exists as $td_exists) {
+						//echo "timesheet detail exists and so does the timesheet, update it.";
+						//print_r($td_exists->getValueEncoded("timesheet_detail_id"));
+						//echo "<br>";
+						//echo $td_exists->getValueEncoded("timesheet_detail_id");
+						$timesheet_detail[$i]->updateTimesheetDetail($td_exists->getValueEncoded("timesheet_detail_id"));
+						$i++;
+					}
+				} else {
+					//echo "The timesheet exists, but the timesheet detail doesn't. Insert the timesheet detail.";
+					$timesheet_detail[$y]->insertTimesheetDetail($exists->getValue("timesheet_id"));
+					error_log("Here is the OBJECT");
+					error_log(print_r($timesheet_detail[$y], true));
+				}
+			}
+		}
+	}		
 	displayTimesheet($timesheet, $timesheet_detail);
 } 
 
-//echo "<Br>";
-//$mydate = "11-25";
-//echo date('Y-m-d', strtotime($mydate));
 ?>
 <footer id="site-footer" class="site-footer">
 
