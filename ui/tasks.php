@@ -15,23 +15,22 @@
 		//checkLogin();
 
 		
+	$processType = "A";
+	if (isset($_GET["task_id"]) && $_GET["task_id"] == "") {
 		$processType = "A";
-		if (isset($_GET["task_id"]) && $_GET["task_id"] == "") {
-			$processType = "A";
-		} elseif (isset($_GET["task_id"])) {
-			$processType = "E";
-		}
-				
-		if (isset($_POST["action"])) {
-			$processType = $_POST["action"];
-			processTask($processType);
-		} else {	
-			displayTaskInsertForm(array(), array(), new Task(array()), $processType);
-		} 
+	} elseif (isset($_GET["task_id"])) {
+		$processType = "E";
+	}
+			
+	if (isset($_POST["action"])) {
+		$processType = $_POST["action"];
+		processTask($processType);
+	} else {	
+		displayTaskInsertForm(array(), array(), new Task(array()), $processType);
+	} 
 
 function displayTaskInsertForm($errorMessages, $missingFields, $task, $processType) {
 	include('header.php'); //add header.php to page
-
 ?>
 
 <div id="page-content" class="page-content">
@@ -44,15 +43,15 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 			</ul>
 		</nav>
 	</header>
-		<?php 
-		//this is the add task UI (IT IS NOT SEPARATE IN THIS MODULE!!!)?>
+	<?php 
+	//this is the add task UI (IT IS NOT SEPARATE IN THIS MODULE!!!)?>
 	<!-- <a class="client-info-contact-link" href="tasks.php?task_id=" title="View contact details">Add Task</a> -->
 
 	<div id="add-task-modal" class="entity-detail" title="Add/Edit Task">
 		<form action="tasks.php" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="action" value="<?php echo $processType ?>"/>
-			<fieldset class="entity-details-entry">
-				<header class="entity-details-header project">
+			<fieldset class="entity-details-entry  modal">
+				<header class="entity-details-header task">
 					<h1 class="entity-details-title">Enter task details:</h1>
 					<h4 class="required">= Required</h4>
 				</header>
@@ -103,58 +102,81 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 							<label for="task_common" class="entity-details-label">Task common to all future projects:</label>
 							<input id="task-common" name="task_common" class="task-common-input" type="checkbox" tabindex="5" value="1" <?php setChecked($thisTask, "task_common", 1) ?>/>
 						</li>
-						<li class="entity-details-item">
-							<label for="save_task" class="entity-details-label">All done?</label>
-							<!-- <a class="" href="#">+ Save Task</a> -->
-							<input id="task-save-btn" name="task_save_btn" class="save-btn" type="submit" value="+ Save Task" tabindex="12" /> or <a class="" href="projects.php" tabindex="13">Cancel</a>
-							<!-- <input id="client-add-btn" name="task-add-btn" class="client-add-btn" type="submit" value="+ Save Task" tabindex="11"/> -->
-							<?php
-	                        //this is here to expose when we get here.
-	                        //<input id="client-add-btn" name="task-add-to-all-btn" class="client-add-btn" type="submit" value="+ Add Task To All Current Projects" tabindex="11"/> 
-	                        ?>
-						</li>
 					</ul>
 				</section>
 			</fieldset>
 		</form>
 	</div>
-
 		
-		<?php
-		//this is the display of all tasks.
-			//1. Get out the task types, this is ugly but it works. Could have called a bunch of functions to get this right but NAAAAAH!!
-			list($tasks) = Task::getTasks(0); 
-				//common tasks here 
-				?>
-				<li style="background-color:lightblue;" class="client-info-contact">Tasks common to all projects</li>
-				<!--billable tasks-->
-				<li style="background-color:lightgray;" class="client-info-contact">Task billable by default</li>
-			<?php foreach($tasks as $task) {
-				if ($task->getValue("task_common")) {
-						if ($task->getValue("task_bill_by_default")) {
-							$task_id = Task::getTaskId($task->getValue("task_name"));
-						?>
-							<section class="content">
-							<ul id="client-list" class="client-list">
-							<li class="client-list-item l-col-33">
-							<ul class="client-info-list">
-							<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
-							<br/><hr/>
-							</ul>		
-							</li>
-							</ul>
-							</section>
-						<?php }
-				}
-			}?>
+	<?php
+	//this is the display of all tasks.
+	//1. Get out the task types, this is ugly but it works. Could have called a bunch of functions to get this right but NAAAAAH!!
+	list($tasks) = Task::getTasks(0);
+	//common tasks here 
+	?>
+	<table id="tasks-list" class="entity-table projects tablesorter">
+	<thead>
+		<tr>
+			<th class="filter-false">Edit</th>
+			<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Task</th>
+			<th data-placeholder="Try >=33">Rate</th><!-- add class="filter-false" to disable the filter in this column -->
+			<th data-placeholder="Try <N">Billable</th>
+			<th data-placeholder="Try <N">Common</th>
+			<!-- <th data-placeholder="" class="filter-false"><input id="select-project" name="select-project" type="checkbox" value="all" title="Select project" /><th> -->
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach($tasks as $task) {
+		$yesno_toggle = array( "No", "Yes"); ?>
+			<tr>
+				<td><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details">Edit</a></td>
+				<td><?php echo ($task->getValue("task_name")); ?></td>
+				<td>$<?php echo $task->getValue("task_hourly_rate"); ?></td>
+				<td><?php echo $yesno_toggle[$task->getValue("task_bill_by_default")]; ?></td>
+				<td><?php echo $yesno_toggle[$task->getValue("task_common")]; ?></td>
+			</tr>
+		<?php } ?>
+	</tbody>
+	</table>
+	
+			<!-- <li style="background-color:lightblue;" class="client-info-contact">Tasks common to all projects</li> -->
+			<!--billable tasks-->
+			<!-- <li style="background-color:lightgray;" class="client-info-contact">Task billable by default</li> -->
+		<?php /*
+foreach($tasks as $task) {
+			if ($task->getValue("task_common")) {
+				if ($task->getValue("task_bill_by_default")) {
+					$task_id = Task::getTaskId($task->getValue("task_name"));
+				
+*/?>
+				<!--
+<section class="content">
+					<ul id="client-list" class="client-list">
+						<li class="client-list-item l-col-33">
+						<ul class="client-info-list">
+						<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
+						<br/><hr/>
+						</ul>		
+						</li>
+					</ul>
+				</section>
+-->
+				<?php /*
+}
+			}
+		}
+*/?>
 				<!--non billable tasks-->
-				<li style="background-color:lightgray;" class="client-info-contact">Non-billable by default</li>
-			<?php foreach($tasks as $task) {
+				<!-- <li style="background-color:lightgray;" class="client-info-contact">Non-billable by default</li> -->
+			<?php /*
+foreach($tasks as $task) {
 				if ($task->getValue("task_common")) {
 						if (!$task->getValue("task_bill_by_default")) {
 							$task_id = Task::getTaskId($task->getValue("task_name"));
-						?>
-							<section class="content">
+						
+*/?>
+							<!--
+<section class="content">
 							<ul id="client-list" class="client-list">
 							<li class="client-list-item l-col-33">
 							<ul class="client-info-list">
@@ -164,20 +186,26 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 							</li>
 							</ul>
 							</section>
-					<?php }
+-->
+					<?php /*
+}
 				}
 			}
+*/
 				//other tasks here
 				?>
-				<li style="background-color:lightblue;" class="client-info-contact">Other tasks</li>
+				<!-- <li style="background-color:lightblue;" class="client-info-contact">Other tasks</li> -->
 				<!--billable tasks-->
-				<li style="background-color:lightgray;" class="client-info-contact">Task billable by default</li>
-			<?php foreach($tasks as $task) {
+				<!-- <li style="background-color:lightgray;" class="client-info-contact">Task billable by default</li> -->
+			<?php /*
+foreach($tasks as $task) {
 				if (!$task->getValue("task_common")) {
 						if ($task->getValue("task_bill_by_default")) {
 							$task_id = Task::getTaskId($task->getValue("task_name"));
-						?>
-							<section class="content">
+						
+*/?>
+							<!--
+<section class="content">
 							<ul id="client-list" class="client-list">
 							<li class="client-list-item l-col-33">
 							<ul class="client-info-list">
@@ -187,17 +215,23 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 							</li>
 							</ul>
 							</section>
-						<?php }
+-->
+						<?php /*
+}
 				}
-			}?>
+			}
+*/?>
 				<!--non billable tasks-->
-				<li style="background-color:lightgray;" class="client-info-contact">Non-billable by default</li>
-			<?php foreach($tasks as $task) {
+				<!-- <li style="background-color:lightgray;" class="client-info-contact">Non-billable by default</li> -->
+			<?php /*
+foreach($tasks as $task) {
 				if (!$task->getValue("task_common")) {
 						if (!$task->getValue("task_bill_by_default")) {
 						$task_id = Task::getTaskId($task->getValue("task_name"));
-						?>
-							<section class="content">
+						
+*/?>
+							<!--
+<section class="content">
 							<ul id="client-list" class="client-list">
 							<li class="client-list-item l-col-33">
 							<ul class="client-info-list">
@@ -207,12 +241,27 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 							</li>
 							</ul>
 							</section>
-						<?php }
+-->
+						<?php /*
+}
 				}
 			}
+*/
+?>
 
-}
+	
+	
+	</div>
+	
+	<footer id="site-footer" class="site-footer">
+	
+	</footer>
+	<script src="task-controls.js"></script>
+	</body>
+	</html>
+<?php } ?>
 
+<?php
 function processTask($processType) {
 echo "processtype is " . $processType;
 
@@ -284,11 +333,3 @@ echo "processtype is " . $processType;
 } 
 
 ?>
-</div>
-
-<footer id="site-footer" class="site-footer">
-
-</footer>
-<script src="task-controls.js"></script>
-</body>
-</html>

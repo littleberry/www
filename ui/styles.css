@@ -81,6 +81,9 @@ fieldset {
 	padding: 0 1em 1em 1em;
 	margin: 0;
 }
+fieldset.modal {
+	background: none;
+}
 legend {
 	
 }
