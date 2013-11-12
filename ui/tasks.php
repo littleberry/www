@@ -21,13 +21,21 @@
 	} elseif (isset($_GET["task_id"])) {
 		$processType = "E";
 	}
-			
-	if (isset($_POST["action"])) {
-		$processType = $_POST["action"];
-		processTask($processType);
-	} else {	
-		displayTaskInsertForm(array(), array(), new Task(array()), $processType);
-	} 
+	if (isset($_POST["func"])) {
+		if ($_POST["func"] == "processTask") {
+			if (isset($_POST["proc_type"])) {
+				$processType = $_POST["proc_type"];
+				echo processTask($processType);
+			}
+		}
+	} else {
+		if (isset($_POST["action"])) {
+			$processType = $_POST["action"];
+			processTask($processType);
+		} else {	
+			displayTaskInsertForm(array(), array(), new Task(array()), $processType);
+		}
+	}		
 
 function displayTaskInsertForm($errorMessages, $missingFields, $task, $processType) {
 	include('header.php'); //add header.php to page
@@ -47,9 +55,9 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 	//this is the add task UI (IT IS NOT SEPARATE IN THIS MODULE!!!)?>
 	<!-- <a class="client-info-contact-link" href="tasks.php?task_id=" title="View contact details">Add Task</a> -->
 
-	<div id="add-task-modal" class="entity-detail" title="Add/Edit Task">
-		<form action="tasks.php" method="post" enctype="multipart/form-data">
-			<input type="hidden" name="action" value="<?php echo $processType ?>"/>
+	<div id="add-task-modal" class="entity-detail" title="Add Task">
+		<form id="task-input-form" action="tasks.php" method="post" enctype="multipart/form-data">
+			<input id="proc-type" type="hidden" name="action" value="<?php echo $processType ?>"/>
 			<fieldset class="entity-details-entry  modal">
 				<header class="entity-details-header task">
 					<h1 class="entity-details-title">Enter task details:</h1>
@@ -65,7 +73,8 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 							if ($processType == 'A') {
 								$taskName = $task->getValueEncoded("task_name");
 								$thisTask = $task;
-							} else {
+							}/*
+ else {
 							//the user came in from edit, so get the task ID off of the get.
 								if (isset($_GET["task_id"])) {
 									$tasker = $_GET["task_id"];
@@ -78,6 +87,7 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 								//get the task name.
 								$taskName = $thisTask->getValue("task_name");
 							}
+*/
 							//so, in the end, we have a list of tasks with their names and their IDs. All of this so we can put it back in the UI.
 							?>
 							<input id="task-name" name="task_name" class="task-name-input" type="text" tabindex="1" value="<?php echo $taskName ?>" />
@@ -120,8 +130,8 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 			<th class="filter-false">Edit</th>
 			<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Task</th>
 			<th data-placeholder="Try >=33">Rate</th><!-- add class="filter-false" to disable the filter in this column -->
-			<th data-placeholder="Try <N">Billable</th>
-			<th data-placeholder="Try <N">Common</th>
+			<th data-placeholder="Try Y">Billable</th>
+			<th data-placeholder="Try N">Common</th>
 			<!-- <th data-placeholder="" class="filter-false"><input id="select-project" name="select-project" type="checkbox" value="all" title="Select project" /><th> -->
 		</tr>
 	</thead>
@@ -129,11 +139,12 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 		<?php foreach($tasks as $task) {
 		$yesno_toggle = array( "No", "Yes"); ?>
 			<tr>
-				<td><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details">Edit</a></td>
-				<td><?php echo ($task->getValue("task_name")); ?></td>
-				<td>$<?php echo $task->getValue("task_hourly_rate"); ?></td>
-				<td><?php echo $yesno_toggle[$task->getValue("task_bill_by_default")]; ?></td>
-				<td><?php echo $yesno_toggle[$task->getValue("task_common")]; ?></td>
+				<td data-task_id="<?php echo $task_id[0]; ?>"><a class="task-link" href="#" title="View task details">Edit</a></td>
+				<!-- <td data-task_id="<?php echo $task_id[0]; ?>"><a class="task-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View task details">Edit</a></td> -->
+				<td data-task_name="<?php echo $task->getValue("task_name"); ?>"><?php echo ($task->getValue("task_name")); ?></td>
+				<td data-task_hourly_rate="<?php echo $task->getValue("task_hourly_rate"); ?>">$<?php echo $task->getValue("task_hourly_rate"); ?></td>
+				<td data-task_bill_by_default="<?php echo $task->getValue("task_bill_by_default"); ?>"><?php echo $yesno_toggle[$task->getValue("task_bill_by_default")]; ?></td>
+				<td data-task_common="<?php echo $task->getValue("task_common"); ?>"><?php echo $yesno_toggle[$task->getValue("task_common")]; ?></td>
 			</tr>
 		<?php } ?>
 	</tbody>
@@ -263,7 +274,7 @@ foreach($tasks as $task) {
 
 <?php
 function processTask($processType) {
-echo "processtype is " . $processType;
+	//echo "processtype is " . $processType;
 
  	//these are the required task fields in this form
 	$requiredFields = array("task_name");
@@ -274,15 +285,15 @@ echo "processtype is " . $processType;
 	$task = new Task( array(
 		//CHECK REG SUBS!!
 		"task_id"=>isset($_POST["task_id"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task_id"]) : "",
-		"task_name" => isset($_POST["task-name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task-name"]) : "",
-		"task_hourly_rate" => isset($_POST["task-hourly-rate"]) ? preg_replace("/[^ \$\.\-\_a-zA-Z0-9]/", "", $_POST["task-hourly-rate"]) : "",
-		"task_bill_by_default" => isset($_POST["task-bill-by-default"]) ? preg_replace("/[^ \_0-9]/", "", $_POST["task-bill-by-default"]) : "",
-		"task_common" => isset($_POST["task-common"])? preg_replace("/[^ \_0-9]/", "", $_POST["task-common"]) : "",
-		"task_archived"=>isset($_POST["task-archived"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task-archived"]) : "",
+		"task_name" => isset($_POST["task_name"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task_name"]) : "",
+		"task_hourly_rate" => isset($_POST["task_hourly_rate"]) ? preg_replace("/[^ \$\.\-\_a-zA-Z0-9]/", "", $_POST["task_hourly_rate"]) : "",
+		"task_bill_by_default" => isset($_POST["task_bill_by_default"]) ? preg_replace("/[^ \_0-9]/", "", $_POST["task_bill_by_default"]) : "",
+		"task_common" => isset($_POST["task_common"])? preg_replace("/[^ \_0-9]/", "", $_POST["task_common"]) : "",
+		"task_archived"=>isset($_POST["task_archived"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["task_archived"]) : "",
 	));
+	//print_r($task);
 	
-	
-//error messages and validation script
+	//error messages and validation script
 	foreach($requiredFields as $requiredField) {
 		if ( !$task->getValue($requiredField)) {
 			$missingFields[] = $requiredField;
@@ -316,11 +327,13 @@ echo "processtype is " . $processType;
 				if ($processType == "A") {
 					error_log("You want to ADD this task.");
 					$task->insertTask();
-					echo("Task " . $task->getValue('task_name') . " has been successfully added to the database.");
+					//echo("Task " . $task->getValue('task_name') . " has been successfully added to the database.");
+					return json_encode($task->getTaskId($task_name));
 				} elseif ($processType == "E") {
 					error_log("YOU WANT TO UPDATE THIS TASK: " . $_POST["task_id"]);
 					$task->updateTask($_POST["task_id"]);
-					echo("Task " . $task->getValue('task_name') . " has been successfully updated to the database.");
+					//echo("Task " . $task->getValue('task_name') . " has been successfully updated to the database.");
+					return json_encode($task);
 				}
 			} catch (Error $e) {
 				echo "Something went terribly wrong.";
@@ -328,7 +341,7 @@ echo "processtype is " . $processType;
 			
 		}
 		//headers already sent, call the page back with blank attributes.
-		displayTaskInsertForm(array(), array(), $task, $processType);
+		//displayTaskInsertForm(array(), array(), $task, $processType);
 	}
 } 
 

@@ -1,4 +1,49 @@
 ;
+var yesNoToggle = ["No", "Yes"];
+var updateRowCB = function( elem ) {
+	console.log(elem);
+	var $new = $( elem ).find( '.new' );
+	$new.children('td').css({ 
+		"background-color": '#A9BFF5'
+	})
+	.animate({
+		"background-color": '#FAF9FF'
+	}, 1000)
+	$new.removeClass( 'new' );
+}
+
+function saveData( dataObj ) {
+	var sendData = {};
+	for (item in dataObj) {
+		sendData[item] = dataObj[item];
+	}
+	sendData["func"] = "processTask";
+	console.log(sendData);
+	$.post( "tasks.php", sendData )
+		.done( function( getData ) {
+			console.log("done");
+		})
+		.fail( function( getData ) {
+			console.log("fail");
+		})
+		.success( function( getData ) {
+			var taskId = $.parseJSON( getData )["task_id"];
+			var $row = $( '<tr>' )
+				.addClass( 'new' )
+				.append( '<td data-task_id="' + taskId + '"><a class="client-info-contact-link" href="#" title="Edit task details">Edit</a>')
+				.append( '<td data-task_name="' + dataObj["task_name"] + '">' + dataObj["task_name"] + '</td>' )
+				.append( '<td data-task_hourly_rate="' + dataObj["task_hourly_rate"] + '">$' + Number(dataObj["task_hourly_rate"]).toFixed(2) + '</td>' )
+				.append( '<td data-task_bill_by_default="' + dataObj["task_bill_by_default"] + '">' + yesNoToggle[dataObj["task_bill_by_default"]] + '</td>' )
+				.append( '<td data-task_common="' + dataObj["task_common"] + '">' + yesNoToggle[dataObj["task_common"]] + '</td>' );
+			var resort = true;
+			$( '#tasks-list' )
+				.find( 'tbody' )
+				.append( $row )
+				.trigger( 'addRows', [ $row, resort, updateRowCB ]);
+			//console.log("task saved" +  );
+		});
+}
+
 $( function() {
 	$( '#add-task-modal' ).dialog({
 		autoOpen: false,
@@ -8,7 +53,16 @@ $( function() {
 		modal: true,
 		buttons: {
 			"+ Save Task": function() {
-				console.log("task saved");
+				var task = {
+					task_id: "",
+					task_name: $( '#task-name' ).val(),
+					task_hourly_rate: $( '#task-hourly-rate' ).val(),
+					task_bill_by_default: $( '#task-billable' ).prop( 'checked' ) ? $( '#task-billable' ).val() : 0,
+					task_common: $( '#task-common' ).prop( 'checked' ) ? $( '#task-common' ).val() : 0,
+					proc_type: 'A' //$( '#proc-type' ).val()
+				}
+				saveData( task );
+				$( this ).dialog( "close" );
 			},
 			Cancel: function() {
 				$( this ).dialog( "close" );	
@@ -16,7 +70,7 @@ $( function() {
 		},
 		close: function() {
 	        console.log("close modal");
-	      }
+	    }
 	});
 	
 	$( '#add-task-btn')
@@ -29,7 +83,7 @@ $( function() {
 
 $( function() { //table display/sorter with filter/search for projects.php
 	$( "#tasks-list" ).tablesorter({
-		sortList: [[4,0], [1,0], [2,0]],
+		sortList: [[3,1], [1,0]],
 		widgets: ["filter"],
 		widgetOptions : {
 			
