@@ -138,13 +138,19 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 	<tbody>
 		<?php foreach($tasks as $task) {
 		$yesno_toggle = array( "No", "Yes"); ?>
-			<tr>
-				<td data-task_id="<?php echo $task_id[0]; ?>"><a class="task-link" href="#" title="View task details">Edit</a></td>
+			<tr data-options='{
+				"task_id": "<?php echo $task->getValue("task_id"); ?>",
+				"task_name": "<?php echo $task->getValue("task_name"); ?>",
+				"task_hourly_rate": "<?php echo $task->getValue("task_hourly_rate"); ?>",
+				"task_bill_by_default": "<?php echo $task->getValue("task_bill_by_default"); ?>",
+				"task_common": "<?php echo $task->getValue("task_common"); ?>"
+			}'>
+				<td><a class="task-link" href="#" title="View task details">Edit</a></td>
 				<!-- <td data-task_id="<?php echo $task_id[0]; ?>"><a class="task-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View task details">Edit</a></td> -->
-				<td data-task_name="<?php echo $task->getValue("task_name"); ?>"><?php echo ($task->getValue("task_name")); ?></td>
-				<td data-task_hourly_rate="<?php echo $task->getValue("task_hourly_rate"); ?>">$<?php echo $task->getValue("task_hourly_rate"); ?></td>
-				<td data-task_bill_by_default="<?php echo $task->getValue("task_bill_by_default"); ?>"><?php echo $yesno_toggle[$task->getValue("task_bill_by_default")]; ?></td>
-				<td data-task_common="<?php echo $task->getValue("task_common"); ?>"><?php echo $yesno_toggle[$task->getValue("task_common")]; ?></td>
+				<td><?php echo ($task->getValue("task_name")); ?></td>
+				<td>$<?php echo $task->getValue("task_hourly_rate"); ?></td>
+				<td><?php echo $yesno_toggle[$task->getValue("task_bill_by_default")]; ?></td>
+				<td><?php echo $yesno_toggle[$task->getValue("task_common")]; ?></td>
 			</tr>
 		<?php } ?>
 	</tbody>
@@ -332,8 +338,8 @@ function processTask($processType) {
 				} elseif ($processType == "E") {
 					error_log("YOU WANT TO UPDATE THIS TASK: " . $_POST["task_id"]);
 					$task->updateTask($_POST["task_id"]);
-					//echo("Task " . $task->getValue('task_name') . " has been successfully updated to the database.");
-					return json_encode($task);
+					//echo ("Task " . $task->getValue('task_name') . " has been successfully updated to the database.");
+					return "Task '" . $task->getValue('task_name') . "' successfully updated.";
 				}
 			} catch (Error $e) {
 				echo "Something went terribly wrong.";

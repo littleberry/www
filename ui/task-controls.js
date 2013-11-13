@@ -1,5 +1,9 @@
 ;
 var yesNoToggle = ["No", "Yes"];
+var $message = $( '<p></p>' )
+		.insertAfter( '.page-header' )
+		.hide();
+		
 var updateRowCB = function( elem ) {
 	console.log(elem);
 	var $new = $( elem ).find( '.new' );
@@ -12,34 +16,82 @@ var updateRowCB = function( elem ) {
 	$new.removeClass( 'new' );
 }
 
-function saveData( dataObj ) {
+function saveData( dataObj, $editRow ) {
+	//console.log(editRow);
 	var sendData = {};
 	for (item in dataObj) {
 		sendData[item] = dataObj[item];
 	}
 	sendData["func"] = "processTask";
+	
 	console.log(sendData);
 	$.post( "tasks.php", sendData )
 		.done( function( getData ) {
 			console.log("done");
 		})
 		.fail( function( getData ) {
+			$message.html( "Error saving task '" + dataObj["task_name"] + ".'" )
+				.removeClass()
+				.addClass( 'error' )
+				.fadeIn()
+				.delay( 1200 )
+				.fadeOut()
+				.removeClass()
+				.hide();
 			console.log("fail");
 		})
 		.success( function( getData ) {
-			var taskId = $.parseJSON( getData )["task_id"];
-			var $row = $( '<tr>' )
-				.addClass( 'new' )
-				.append( '<td data-task_id="' + taskId + '"><a class="client-info-contact-link" href="#" title="Edit task details">Edit</a>')
-				.append( '<td data-task_name="' + dataObj["task_name"] + '">' + dataObj["task_name"] + '</td>' )
-				.append( '<td data-task_hourly_rate="' + dataObj["task_hourly_rate"] + '">$' + Number(dataObj["task_hourly_rate"]).toFixed(2) + '</td>' )
-				.append( '<td data-task_bill_by_default="' + dataObj["task_bill_by_default"] + '">' + yesNoToggle[dataObj["task_bill_by_default"]] + '</td>' )
-				.append( '<td data-task_common="' + dataObj["task_common"] + '">' + yesNoToggle[dataObj["task_common"]] + '</td>' );
 			var resort = true;
-			$( '#tasks-list' )
-				.find( 'tbody' )
-				.append( $row )
-				.trigger( 'addRows', [ $row, resort, updateRowCB ]);
+			if ( getData.indexOf( "update" ) && $editRow ) {
+				$( $editRow ).children( 'td:first-child' )
+					.next( 'td' ).text( dataObj["task_name"] )
+					.next( 'td' ).text( dataObj["task_hourly_rate"] )
+					.next( 'td' ).text( yesNoToggle[dataObj["task_bill_by_default"]] )
+					.next( 'td' ).text( yesNoToggle[dataObj["task_common"]] );
+				
+				$( $editRow ).addClass( 'new' );
+				
+				$( "#add-task-modal" )
+					.trigger( "update", [ resort, updateRowCB ]);
+				
+				$message.text( getData )
+					.removeClass()
+					.addClass( 'success' )
+					.fadeIn()
+					.delay( 1200 )
+					.fadeOut()
+					.removeClass()
+					.hide();
+					
+			} else {
+				var taskId = dataObj["task_id"];
+				var $row = $( '<tr>' )
+					.data( "options", {
+						task_id: taskId,
+						task_name: dataObj["task_name"],
+						task_hourly_rate: dataObj["task_hourly_rate"],
+						task_bill_by_default: dataObj["task_bill_by_default"],
+						task_common: dataObj["task_common"]
+					})
+					.addClass( 'new' )
+					.append( '<td><a class="client-info-contact-link" href="#" title="Edit task details">Edit</a>')
+					.append( '<td>' + dataObj["task_name"] + '</td>' )
+					.append( '<td>$' + Number(dataObj["task_hourly_rate"]).toFixed(2) + '</td>' )
+					.append( '<td>' + yesNoToggle[dataObj["task_bill_by_default"]] + '</td>' )
+					.append( '<td>' + yesNoToggle[dataObj["task_common"]] + '</td>' );
+				$( '#tasks-list' )
+					.find( 'tbody' )
+					.append( $row )
+					.trigger( 'addRows', [ $row, resort, updateRowCB ]);
+				$message.html( "Task '" + dataObj["task_name"] + "' successfully added." )
+					.removeClass()
+					.addClass( 'success' )
+					.fadeIn()
+					.delay( 1200 )
+					.fadeOut()
+					.removeClass()
+					.hide();
+			}
 			//console.log("task saved" +  );
 		});
 }
@@ -53,15 +105,23 @@ $( function() {
 		modal: true,
 		buttons: {
 			"+ Save Task": function() {
-				var task = {
-					task_id: "",
-					task_name: $( '#task-name' ).val(),
-					task_hourly_rate: $( '#task-hourly-rate' ).val(),
-					task_bill_by_default: $( '#task-billable' ).prop( 'checked' ) ? $( '#task-billable' ).val() : 0,
-					task_common: $( '#task-common' ).prop( 'checked' ) ? $( '#task-common' ).val() : 0,
-					proc_type: 'A' //$( '#proc-type' ).val()
+				var task = {};
+				if ( $( this ).data( 'edit' ) ) {
+					console.log("edit task");
+					var taskId = $( this ).data( 'edit' );
+										
+					task["task_id"] = taskId;
+					task["proc_type"] = 'E' //$( '#proc-type' ).val()
+				} else {
+					task["task_id"] = "";					
+					task["proc_type"] = 'A'; //$( '#proc-type' ).val()
 				}
-				saveData( task );
+				task["task_name"] = $( '#task-name' ).val();
+				task["task_hourly_rate"] = $( '#task-hourly-rate' ).val();
+				task["task_bill_by_default"] = $( '#task-billable' ).prop( 'checked' ) ? $( '#task-billable' ).val() : 0;
+				task["task_common"] = $( '#task-common' ).prop( 'checked' ) ? $( '#task-common' ).val() : 0;
+			
+				saveData( task, $( this ).data( 'row' ) );
 				$( this ).dialog( "close" );
 			},
 			Cancel: function() {
@@ -73,12 +133,30 @@ $( function() {
 	    }
 	});
 	
-	$( '#add-task-btn')
-		.click( function( evt ) {
-			$( '#add-task-modal' ).dialog( "open" );
-			evt.preventDefault();
-		});
+	$( '#add-task-btn').click( function( evt ) {
+		$( '#add-task-modal' ).dialog( "open" );
+		evt.preventDefault();
+	});
 	
+	$( '.task-link' ).click( function( evt ) {
+		var $row = $( this ).parents( 'tr' );
+		var data = $row.data( "options" );
+		//console.log(data);
+		
+		$( '#add-task-modal' )
+			.find( '#task-name' ).val( data["task_name"] ).end()
+			.find( '#task-hourly-rate' ).val( data["task_hourly_rate"] ).end()
+			.find( '#task-billable' ).prop( "checked", data["task_bill_by_default"] ).end()
+			.find( '#task-common' ).prop( "checked", data["task_common"] );
+
+
+		$( '#add-task-modal' )
+			.data( 'edit', data["task_id"] )
+			.data( 'row', $( this ).parents( 'tr' ) )
+			.dialog( "option", "title", "Edit Task" )
+			.dialog( 'open' );
+		evt.preventDefault();
+	});
 });
 
 $( function() { //table display/sorter with filter/search for projects.php
