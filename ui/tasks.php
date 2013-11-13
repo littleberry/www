@@ -101,16 +101,14 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 							<label for="task_bill_by_default" class="entity-details-label">Billable By Default:</label>
 							<input id="task-billable" name="task_bill_by_default" class="task-billable-input" type="checkbox" tabindex="3" value="1" <?php setChecked($thisTask, "task_bill_by_default", 1) ?>/>
 						</li>
-						<li class="entity-details-item archived task">
-							<?php //only show the archive button if we are editing.
-							if ($processType == "E") { ?>
-								<button id="client-add-btn" name="task-archived" class="client-add-btn" value="1" tabindex="4"/>Archive Task</button>
-							<?php } ?>
-						</li>
 						<li class="entity-details-item common task">
 							<?php //this is here to expose when we get there.?>
 							<label for="task_common" class="entity-details-label">Task common to all future projects:</label>
 							<input id="task-common" name="task_common" class="task-common-input" type="checkbox" tabindex="5" value="1" <?php setChecked($thisTask, "task_common", 1) ?>/>
+						</li>
+						<li class="entity-details-item archived task">
+							<label for="task_archived" class="entity-details-label">Archive Task?</label>
+							<input id="task-archived" name="task_archived" class="task-archived-input" type="checkbox" tabindex="6" value="1" <?php setChecked($thisTask, "task_common", 1) ?>/>
 						</li>
 					</ul>
 				</section>
@@ -122,7 +120,6 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 	//this is the display of all tasks.
 	//1. Get out the task types, this is ugly but it works. Could have called a bunch of functions to get this right but NAAAAAH!!
 	list($tasks) = Task::getTasks(0);
-	//common tasks here 
 	?>
 	<table id="tasks-list" class="entity-table projects tablesorter">
 	<thead>

@@ -1,11 +1,21 @@
 ;
 var yesNoToggle = ["No", "Yes"];
-var $message = $( '<p></p>' )
+
+var giveFeedbackMessage = function( content, messageType ) {
+	$( '<p></p>' )
+		.html( content )
+		.addClass( messageType )
 		.insertAfter( '.page-header' )
-		.hide();
+		.hide()
+		.fadeIn()
+		.delay( 1200 )
+		.fadeOut()
+		/*.removeClass()
+		 .remove() */;
+}
+
 		
 var updateRowCB = function( elem ) {
-	console.log(elem);
 	var $new = $( elem ).find( '.new' );
 	$new.children('td').css({ 
 		"background-color": '#A9BFF5'
@@ -24,45 +34,45 @@ function saveData( dataObj, $editRow ) {
 	}
 	sendData["func"] = "processTask";
 	
-	console.log(sendData);
+	console.log(dataObj["task_archived"]);
 	$.post( "tasks.php", sendData )
 		.done( function( getData ) {
 			console.log("done");
 		})
 		.fail( function( getData ) {
-			$message.html( "Error saving task '" + dataObj["task_name"] + ".'" )
-				.removeClass()
-				.addClass( 'error' )
-				.fadeIn()
-				.delay( 1200 )
-				.fadeOut()
-				.removeClass()
-				.hide();
+			giveFeedbackMessage( "Error saving task '" + dataObj["task_name"] + ".'", 'error' )
 			console.log("fail");
 		})
 		.success( function( getData ) {
 			var resort = true;
+			
 			if ( getData.indexOf( "update" ) && $editRow ) {
-				$( $editRow ).children( 'td:first-child' )
-					.next( 'td' ).text( dataObj["task_name"] )
-					.next( 'td' ).text( dataObj["task_hourly_rate"] )
-					.next( 'td' ).text( yesNoToggle[dataObj["task_bill_by_default"]] )
-					.next( 'td' ).text( yesNoToggle[dataObj["task_common"]] );
-				
-				$( $editRow ).addClass( 'new' );
-				
-				$( "#add-task-modal" )
-					.trigger( "update", [ resort, updateRowCB ]);
-				
-				$message.text( getData )
-					.removeClass()
-					.addClass( 'success' )
-					.fadeIn()
-					.delay( 1200 )
-					.fadeOut()
-					.removeClass()
-					.hide();
+				if ( dataObj["task_archived"] == 1 ) {
+					console.log("archive");
+					$editRow.fadeOut()
+						.remove();
+						
+					$( "#tasks-list" )
+						.trigger( "updateRow", [ resort, updateRowCB ]);
+					giveFeedbackMessage( getData, 'success' );
 					
+				} else {
+					console.log(getData);
+					$( $editRow ).children( 'td:first-child' )
+						.next( 'td' ).text( dataObj["task_name"] )
+						.next( 'td' ).text( dataObj["task_hourly_rate"] )
+						.next( 'td' ).text( yesNoToggle[dataObj["task_bill_by_default"]] )
+						.next( 'td' ).text( yesNoToggle[dataObj["task_common"]] );
+					
+					$( $editRow ).addClass( 'new' );
+					
+					$( "#tasks-list" )
+						.trigger( "updateRow", [ resort, updateRowCB ]);
+					updateRowCB( $( '#tasks-list' ) );
+					
+					giveFeedbackMessage( getData.replace( "updated.", "updated and archived." ), 'success' );
+				}
+
 			} else {
 				var taskId = dataObj["task_id"];
 				var $row = $( '<tr>' )
@@ -83,14 +93,7 @@ function saveData( dataObj, $editRow ) {
 					.find( 'tbody' )
 					.append( $row )
 					.trigger( 'addRows', [ $row, resort, updateRowCB ]);
-				$message.html( "Task '" + dataObj["task_name"] + "' successfully added." )
-					.removeClass()
-					.addClass( 'success' )
-					.fadeIn()
-					.delay( 1200 )
-					.fadeOut()
-					.removeClass()
-					.hide();
+				giveFeedbackMessage( "Task '" + dataObj["task_name"] + "' successfully added.", 'success' )
 			}
 			//console.log("task saved" +  );
 		});
@@ -100,7 +103,7 @@ $( function() {
 	$( '#add-task-modal' ).dialog({
 		autoOpen: false,
 		resizable: false,
-		height: 340,
+		height: 360,
 		width: 775,
 		modal: true,
 		buttons: {
@@ -120,7 +123,8 @@ $( function() {
 				task["task_hourly_rate"] = $( '#task-hourly-rate' ).val();
 				task["task_bill_by_default"] = $( '#task-billable' ).prop( 'checked' ) ? $( '#task-billable' ).val() : 0;
 				task["task_common"] = $( '#task-common' ).prop( 'checked' ) ? $( '#task-common' ).val() : 0;
-			
+				task["task_archived"] = $( '#task-archived' ).prop( 'checked' ) ? $( '#task-archived' ).val() : 0;
+				
 				saveData( task, $( this ).data( 'row' ) );
 				$( this ).dialog( "close" );
 			},
@@ -147,7 +151,8 @@ $( function() {
 			.find( '#task-name' ).val( data["task_name"] ).end()
 			.find( '#task-hourly-rate' ).val( data["task_hourly_rate"] ).end()
 			.find( '#task-billable' ).prop( "checked", data["task_bill_by_default"] ).end()
-			.find( '#task-common' ).prop( "checked", data["task_common"] );
+			.find( '#task-common' ).prop( "checked", data["task_common"] )
+			.find( '#task-archived' ).prop( "checked", data["task_archived"] );
 
 
 		$( '#add-task-modal' )
