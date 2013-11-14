@@ -18,6 +18,13 @@ require_once("../classes/Task.class.php");
 <h2>JSON Object Creation in JavaScript</h2>
 <?php 
 
+$part_1 = "hello";
+$part_2 = "Cathy";
+
+$totalPart = "heck__$part_1" . "_$part_2";
+echo $totalPart;
+echo "<br>";
+
 
 //get each object out from the returned list
 list($objects) = Person::getPeople();
