@@ -58,6 +58,26 @@ class Timesheet extends DataObject {
 		}
 	}
 	
+	//get all of the timesheet ids for a specific person
+	public function getTimesheetIds($person_id) {
+		$conn=parent::connect();
+		$sql="SELECT distinct(timesheet_id) FROM " . TBL_TIMESHEET . " WHERE person_id = :person_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->execute();
+			$timesheet=array();
+			foreach ($st->fetchAll() as $row) {
+				$timesheet[] = new Timesheet($row);
+			}
+			parent::disconnect($conn);
+			return array($timesheet);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	
 	//get all of the timesheet info for a specific timesheet.
 	public function getTimesheetById($person_id, $task_id, $project_id) {
 		$conn=parent::connect();
@@ -79,6 +99,8 @@ class Timesheet extends DataObject {
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+	
+
 			
 	//function inserts new timesheet into db and returns the autoincrement field so we can update the timesheet_detail table. 	
 	public function insertTimesheet($person_id, $task_id, $project_id) {
