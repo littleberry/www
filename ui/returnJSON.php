@@ -69,7 +69,11 @@ if (isset($_GET["func"])) {
 		} else {
 			$collection = "";
 		}
-		echo returnTasksJSON($id, $collection);
+		if (isset($_GET["archiveFlag"])) {
+			$archiveFlag = $_GET["archiveFlag"];
+		} else {
+			$archiveFlag = "";
+		}echo returnTasksJSON($id, $collection, $archiveFlag);
 		
 	}
 
@@ -219,7 +223,7 @@ function returnPeopleJSON($id, $collection) {
 	return json_encode($peopleJSON);
 }
 
-function returnTasksJSON($id, $collection) {
+function returnTasksJSON($id, $collection, $archiveFlag ) {
 	//Returns Task object as JSON encoded object for jQuery to use
 	if ($collection == "project") {
 		if ($id != "") {
@@ -245,7 +249,12 @@ function returnTasksJSON($id, $collection) {
 		$tasks[] = Task::getTask($id);
 		//print_r(Task::getTask($id));
 	} else {
-		$tasks = Task::getTasks(0);
+		if ( $archiveFlag != "" ) {
+			$tasks = Task::getTasks($archiveFlag);
+		} else {
+			$tasks = Task::getTasks(0);
+		}
+		
 		$tasks = $tasks[0];
 	}
 	

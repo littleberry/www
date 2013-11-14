@@ -51,7 +51,7 @@
 		$select = "";
 		//get the clients out to populate the drop down.
 		list($clients) = Client::getClients();
-		$select .= '<select name="client-id" id="project-client-select" size="1">';
+		$select .= '<select name="client_id" id="project-client-select" size="1">';
 		
 		foreach ($clients as $client) {
 			$select .= '<option value="' . $client->getValue("client_id") . '">' . $client->getValue("client_name") .'</option>';
@@ -132,9 +132,7 @@ function showBudgetFields(f) {
 		<h2 class="page-sub-title"><a href="client-detail.php?client_id=<?php echo $project->getValueEncoded("client_id")?>" class="" title="View client's details"><?php echo $client_name["client_name"]?></a></h2>
 		<nav class="page-controls-nav">
 			<ul class="page-controls-list project">
-				<li class="page-controls-item link-btn">
-				<a class="view-all-link" href="#">Save Project</a></li>
-				<!-- <a class="view-all-link" href="project-edit.php?project_id=<?php //echo $project_id?>">Save Project</a> --></li>
+				<li class="page-controls-item link-btn"><a class="save-link" href="#">Save Project</a></li>
 				<li class="page-controls-item"><a class="view-archive-link" href="projects.php?archives=1">View Archives</a></li>
 				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 			</ul>
@@ -166,7 +164,7 @@ function showBudgetFields(f) {
 							</li>
 							<li class="entity-details-item project-client project">
 								<label for="client_id" class="entity-details-label">Select the client:</label>
-		                  <select name="client_id" id="project-client-select" size="1">    
+								<select name="client_id" id="project-client-select" size="1">    
 									<?php 
 										//get the clients out to populate the drop down.
 										list($clients) = Client::getClients();
@@ -466,7 +464,7 @@ function editProject() {
 		"project_send_email_percentage" => isset($_POST["project_send_email_percentage"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_send_email_percentage"]) : "",
 		"project_show_budget" => isset($_POST["project_show_budget"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_show_budget"]) : "",
 		"project_budget_includes_expenses" => isset($_POST["project_budget_includes_expenses"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_budget_includes_expenses"]) : "",
-		"project_notes" => isset($_POST["project-notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project-notes"]) : "",
+		"project_notes" => isset($_POST["project_notes"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_notes"]) : "",
 		"project_archived" => isset($_POST["project_archived"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["project_archived"]) : "",
 	));
 

@@ -190,10 +190,10 @@
 			<section id="project-info" class="entity-detail">
 				<h2 class="entity-sub-title">Project Info</h2>
 				<ul class="entity-list entity-details-list">
-					<li class="entity-details-item">Name: <span class="edit project_name"><?php echo $project_details->getValue("project_name")?></span></li>
+					<li class="entity-details-item">Name: <span class="edit project_name required"><?php echo $project_details->getValue("project_name")?></span></li>
 					<li class="entity-details-item">Client: <span class="select client_id"><a href="<?php echo "client-detail.php?client_id=" . $project_details->getValue("client_id")?>" class="" title="View client's details"><?php echo $client_details->getValue("client_name")?></a></span></li>
 					<li class="entity-details-item">Project code: <span class="edit project_code"><?php echo $project_details->getValue("project_code")?></span></li>
-					<li class="entity-details-item">Status: <span class="checkbox project_archived">
+					<li class="entity-details-item">Status: <span class="checkbox project_archived" data-status-toggle="Active:Archived">
 					<?php if ($project_details->getValue("project_archived")) {
 						echo "Archived";
 					} else {
@@ -206,9 +206,7 @@
 			</section>
 			<section id="project-notes" class="entity-detail">
 				<h2 class="entity-sub-title">Project Notes</h2>
-				<p class="entity-list entity-details-block textarea project_notes">
-					<?php echo $project_details->getValue("project_notes")?>
-				</p>
+				<p class="entity-list entity-details-block textarea project_notes"><?php echo $project_details->getValue("project_notes")?></p>
 				<ul class="page-controls-list team">
 					<li class="page-controls-item link-btn"><a id="edit-project-notes-btn" href="#">Edit Project Notes</a></li>
 				</ul>
@@ -220,7 +218,7 @@
 					<li class="entity-details-item">Project hourly rate: <?php echo $project_details->getValue("project_hourly_rate")?></li>
 				</ul>
 				<ul class="page-controls-list team">
-					<li class="page-controls-item link-btn"><a class="" href="#">Edit Invoice Settings</a></li>
+					<li class="page-controls-item link-btn"><a class="edit-invoicing-btn" href="#">Edit Invoice Settings</a></li>
 				</ul>
 			</section>
 			<section id="project-budget" class="entity-detail">
