@@ -93,7 +93,7 @@ function saveData( dataObj, $editRow ) {
 					.find( 'tbody' )
 					.append( $row )
 					.trigger( 'addRows', [ $row, resort, updateRowCB ]);
-				giveFeedbackMessage( "Task '" + dataObj["task_name"] + "' successfully added.", 'success' )
+				giveFeedbackMessage( "Task '" + dataObj["task_name"] + "' successfully added.", 'success' );
 			}
 			//console.log("task saved" +  );
 		});
@@ -162,6 +162,69 @@ $( function() {
 			.dialog( 'open' );
 		evt.preventDefault();
 	});
+});
+
+$( function() {
+	$( '.view-archive-link' ).click( function( evt ) {
+		var $taskList = $( '#tasks-list' );
+		var tasks;
+		var resort = true;
+		$.tablesorter.clearTableBody( $taskList );
+		
+		$.get( "returnJSON.php", {
+			func: "returnTasksJSON" ,
+			id: "",
+			collection: "tasks",
+			archiveFlag: 1
+		}).done( function( data ) {
+				//console.log("done: " + data);
+			})
+			.fail( function( data ) {
+				console.log("fail: " + data);
+			})
+			.success( function( data ) {
+				tasks = $.parseJSON(data);
+				
+				for ( var i = 0; i < tasks.length; i++ ) {
+					var taskId = tasks[i]["task_id"];
+					console.log(taskId);
+					var $row = $( '<tr>' )
+						.data( "options", {
+							task_id: taskId,
+							task_name: tasks[i]["task_name"],
+							task_hourly_rate: tasks[i]["task_hourly_rate"],
+							task_bill_by_default: tasks[i]["task_bill_by_default"],
+							task_common: tasks[i]["task_common"]
+						})
+						.append( '<td><a class="client-info-contact-link" href="#" title="Edit task details">Edit</a>')
+						.append( '<td>' + tasks[i]["task_name"] + '</td>' )
+						.append( '<td>$' + Number(tasks[i]["task_hourly_rate"]).toFixed(2) + '</td>' )
+						.append( '<td>' + yesNoToggle[tasks[i]["task_bill_by_default"]] + '</td>' )
+						.append( '<td>' + yesNoToggle[tasks[i]["task_common"]] + '</td>' );
+					$( '#tasks-list' )
+						.find( 'tbody' )
+						.append( $row )
+					//giveFeedbackMessage( "Task '" + dataObj["task_name"] + "' successfully added.", 'success' )
+				}
+				$( '.page-title' ).text( "View Archived Tasks" );
+				$( '#tasks-list' ).trigger( 'update', [ resort ]);
+				
+
+				console.log(tasks);
+			});
+		$( this ).text( "View Active Tasks" )
+			.removeClass( "view-archive-link" )
+			.addClass( "view-active-link" )
+			.attr( 'href', 'tasks.php' );
+		
+		$taskList.trigger( "update" );
+		evt.preventDefault();
+	});
+	
+	$( '.view-active-link' ).click( function( evt ){
+		location.href = "tasks.php";
+	})
+	
 });
 
 $( function() { //table display/sorter with filter/search for projects.php
