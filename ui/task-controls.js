@@ -54,7 +54,7 @@ function saveData( dataObj, $editRow ) {
 						
 					$( "#tasks-list" )
 						.trigger( "updateRow", [ resort, updateRowCB ]);
-					giveFeedbackMessage( getData, 'success' );
+					giveFeedbackMessage( getData.replace( "updated.", "updated and archived." ), 'success' );
 					
 				} else {
 					//console.log(getData);
@@ -69,8 +69,8 @@ function saveData( dataObj, $editRow ) {
 					$( "#tasks-list" )
 						.trigger( "updateRow", [ resort, updateRowCB ]);
 					updateRowCB( $( '#tasks-list' ) );
+					giveFeedbackMessage( getData, 'success' );
 					
-					giveFeedbackMessage( getData.replace( "updated.", "updated and archived." ), 'success' );
 				}
 
 			} else {
