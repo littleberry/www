@@ -34,21 +34,21 @@ function saveData( dataObj, $editRow ) {
 	}
 	sendData["func"] = "processTask";
 	
-	console.log(dataObj["task_archived"]);
+	//console.log(dataObj["task_archived"]);
 	$.post( "tasks.php", sendData )
 		.done( function( getData ) {
-			console.log("done");
+			//console.log("done");
 		})
 		.fail( function( getData ) {
 			giveFeedbackMessage( "Error saving task '" + dataObj["task_name"] + ".'", 'error' )
-			console.log("fail");
+			//console.log("fail");
 		})
 		.success( function( getData ) {
 			var resort = true;
 			
 			if ( getData.indexOf( "update" ) && $editRow ) {
 				if ( dataObj["task_archived"] == 1 ) {
-					console.log("archive");
+					//console.log("archive");
 					$editRow.fadeOut()
 						.remove();
 						
@@ -57,7 +57,7 @@ function saveData( dataObj, $editRow ) {
 					giveFeedbackMessage( getData, 'success' );
 					
 				} else {
-					console.log(getData);
+					//console.log(getData);
 					$( $editRow ).children( 'td:first-child' )
 						.next( 'td' ).text( dataObj["task_name"] )
 						.next( 'td' ).text( dataObj["task_hourly_rate"] )
@@ -110,7 +110,7 @@ $( function() {
 			"+ Save Task": function() {
 				var task = {};
 				if ( $( this ).data( 'edit' ) ) {
-					console.log("edit task");
+					//console.log("edit task");
 					var taskId = $( this ).data( 'edit' );
 										
 					task["task_id"] = taskId;
@@ -133,7 +133,7 @@ $( function() {
 			}
 		},
 		close: function() {
-	        console.log("close modal");
+	        //console.log("close modal");
 	    }
 	});
 	
@@ -165,7 +165,15 @@ $( function() {
 });
 
 $( function() {
-	$( '.view-archive-link' ).click( function( evt ) {
+	var $viewArchives = $( '.view-archive-link' );
+	var $viewActive = $viewArchives.clone()
+		.text( "View Active Tasks" )
+		.removeClass( "view-archive-link" )
+		.addClass( "view-active-link" )
+		.attr( 'href', 'tasks.php' );
+		
+		
+	$viewArchives.click( function( evt ) {
 		var $taskList = $( '#tasks-list' );
 		var tasks;
 		var resort = true;
@@ -187,7 +195,7 @@ $( function() {
 				
 				for ( var i = 0; i < tasks.length; i++ ) {
 					var taskId = tasks[i]["task_id"];
-					console.log(taskId);
+					//console.log(taskId);
 					var $row = $( '<tr>' )
 						.data( "options", {
 							task_id: taskId,
@@ -203,25 +211,20 @@ $( function() {
 						.append( '<td>' + yesNoToggle[tasks[i]["task_common"]] + '</td>' );
 					$( '#tasks-list' )
 						.find( 'tbody' )
-						.append( $row )
-					//giveFeedbackMessage( "Task '" + dataObj["task_name"] + "' successfully added.", 'success' )
+						.append( $row );
 				}
 				$( '.page-title' ).text( "View Archived Tasks" );
 				$( '#tasks-list' ).trigger( 'update', [ resort ]);
-				
-
-				console.log(tasks);
 			});
-		$( this ).text( "View Active Tasks" )
-			.removeClass( "view-archive-link" )
-			.addClass( "view-active-link" )
-			.attr( 'href', 'tasks.php' );
 		
+		$( this ).replaceWith( $viewActive );
 		$taskList.trigger( "update" );
 		evt.preventDefault();
 	});
 	
-	$( '.view-active-link' ).click( function( evt ){
+	$viewActive.click( function( evt ) {
+		$( this ).replaceWith( $viewArchives );
+		
 		location.href = "tasks.php";
 	})
 	
