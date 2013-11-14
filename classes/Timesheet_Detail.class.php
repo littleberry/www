@@ -90,23 +90,22 @@ class Timesheet_Detail extends DataObject {
 		}	
 	}
 	
-	public function updateTimesheetDetail($timesheet_detail_id) {
+	public function updateTimesheetDetail($timesheet_id, $timesheet_date) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_TIMESHEET_DETAIL . " SET
-			timesheet_date = :timesheet_date,
 			timesheet_start_time = :timesheet_start_time,
 			timesheet_end_time = :timesheet_end_time,
 			timesheet_number_of_hours = :timesheet_number_of_hours,
 			timesheet_approved = :timesheet_approved
-			WHERE timesheet_detail_id = :timesheet_detail_id";
+			WHERE timesheet_id = :timesheet_id and timesheet_date = :timesheet_date";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($this->data["timesheet_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_date", $timesheet_date, PDO::PARAM_STR);
 			$st->bindValue(":timesheet_start_time", $this->data["timesheet_start_time"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_end_time", $this->data["timesheet_end_time"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_number_of_hours", $this->data["timesheet_number_of_hours"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_approved", $this->data["timesheet_approved"], PDO::PARAM_INT);
-			$st->bindValue(":timesheet_detail_id", $timesheet_detail_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
 			$st->execute();	
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
