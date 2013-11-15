@@ -68,30 +68,14 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 						<li class="entity-details-item name task">
 							<label for="task_name" <?php validateField("task_name", $missingFields)?> class="entity-details-label">Task Name:</label>
 							<?php 
-							$tasker = "";
-							//the user wants to add this task, so get the task name off the object that was sent with the post.
-							if ($processType == 'A') {
-								$taskName = $task->getValueEncoded("task_name");
-								$thisTask = $task;
-							}/*
- else {
-							//the user came in from edit, so get the task ID off of the get.
-								if (isset($_GET["task_id"])) {
-									$tasker = $_GET["task_id"];
-								//this is just a safety thing.
-								} elseif (isset($_POST["task_id"])) {
-									$tasker = $_POST["task_id"];
+								$tasker = "";
+								//the user wants to add this task, so get the task name off the object that was sent with the post.
+								if ($processType == 'A') {
+									$taskName = $task->getValueEncoded("task_name");
+									$thisTask = $task;
 								}
-								//dude, tasker is the task_id, but this is at least funny, reminds me of Disney.
-								$thisTask = $task->getTaskById($tasker);
-								//get the task name.
-								$taskName = $thisTask->getValue("task_name");
-							}
-*/
-							//so, in the end, we have a list of tasks with their names and their IDs. All of this so we can put it back in the UI.
 							?>
 							<input id="task-name" name="task_name" class="task-name-input" type="text" tabindex="1" value="<?php echo $taskName ?>" />
-							<input type="hidden" name="task_id" value="<?php echo $tasker; ?>">
 						</li>
 						<li class="entity-details-item hourly-rate task">
 							<label for="task_hourly_rate" <?php validateField("task_hourly_rate", $missingFields)?> class="entity-details-label">Hourly Rate:</label>
@@ -118,161 +102,47 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 		
 	<?php
 	//this is the display of all tasks.
-	//1. Get out the task types, this is ugly but it works. Could have called a bunch of functions to get this right but NAAAAAH!!
 	list($tasks) = Task::getTasks(0);
 	?>
 	<table id="tasks-list" class="entity-table projects tablesorter">
-	<thead>
-		<tr>
-			<th class="filter-false">Edit</th>
-			<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Task</th>
-			<th data-placeholder="Try >=33">Rate</th><!-- add class="filter-false" to disable the filter in this column -->
-			<th data-placeholder="Try Y">Billable</th>
-			<th data-placeholder="Try N">Common</th>
-			<!-- <th data-placeholder="" class="filter-false"><input id="select-project" name="select-project" type="checkbox" value="all" title="Select project" /><th> -->
-		</tr>
-	</thead>
-	<tbody>
-		<?php foreach($tasks as $task) {
-		$yesno_toggle = array( "No", "Yes"); ?>
-			<tr data-options='{
-				"task_id": "<?php echo $task->getValue("task_id"); ?>",
-				"task_name": "<?php echo $task->getValue("task_name"); ?>",
-				"task_hourly_rate": "<?php echo $task->getValue("task_hourly_rate"); ?>",
-				"task_bill_by_default": "<?php echo $task->getValue("task_bill_by_default"); ?>",
-				"task_common": "<?php echo $task->getValue("task_common"); ?>"
-			}'>
-				<td><a class="task-link" href="#" title="View task details">Edit</a></td>
-				<!-- <td data-task_id="<?php echo $task_id[0]; ?>"><a class="task-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View task details">Edit</a></td> -->
-				<td><?php echo ($task->getValue("task_name")); ?></td>
-				<td>$<?php echo $task->getValue("task_hourly_rate"); ?></td>
-				<td><?php echo $yesno_toggle[$task->getValue("task_bill_by_default")]; ?></td>
-				<td><?php echo $yesno_toggle[$task->getValue("task_common")]; ?></td>
+		<thead>
+			<tr>
+				<th class="filter-false">Edit</th>
+				<th data-placeholder="Try B*{space} or alex|br*|c" class="filter-match">Task</th>
+				<th data-placeholder="Try >=33">Rate</th><!-- add class="filter-false" to disable the filter in this column -->
+				<th data-placeholder="Try Y">Billable</th>
+				<th data-placeholder="Try N">Common</th>
+				<!-- <th data-placeholder="" class="filter-false"><input id="select-project" name="select-project" type="checkbox" value="all" title="Select project" /><th> -->
 			</tr>
-		<?php } ?>
-	</tbody>
+		</thead>
+		<tbody>
+			<?php foreach($tasks as $task) {
+			$yesno_toggle = array( "No", "Yes"); ?>
+				<tr data-options='{
+					"task_id": "<?php echo $task->getValue("task_id"); ?>",
+					"task_name": "<?php echo $task->getValue("task_name"); ?>",
+					"task_hourly_rate": "<?php echo $task->getValue("task_hourly_rate"); ?>",
+					"task_bill_by_default": "<?php echo $task->getValue("task_bill_by_default"); ?>",
+					"task_common": "<?php echo $task->getValue("task_common"); ?>"
+				}'>
+					<td><a class="task-link" href="#" title="View task details">Edit</a></td>
+					<td><?php echo ($task->getValue("task_name")); ?></td>
+					<td>$<?php echo $task->getValue("task_hourly_rate"); ?></td>
+					<td><?php echo $yesno_toggle[$task->getValue("task_bill_by_default")]; ?></td>
+					<td><?php echo $yesno_toggle[$task->getValue("task_common")]; ?></td>
+				</tr>
+			<?php } ?>
+		</tbody>
 	</table>
 	
-			<!-- <li style="background-color:lightblue;" class="client-info-contact">Tasks common to all projects</li> -->
-			<!--billable tasks-->
-			<!-- <li style="background-color:lightgray;" class="client-info-contact">Task billable by default</li> -->
-		<?php /*
-foreach($tasks as $task) {
-			if ($task->getValue("task_common")) {
-				if ($task->getValue("task_bill_by_default")) {
-					$task_id = Task::getTaskId($task->getValue("task_name"));
-				
-*/?>
-				<!--
-<section class="content">
-					<ul id="client-list" class="client-list">
-						<li class="client-list-item l-col-33">
-						<ul class="client-info-list">
-						<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
-						<br/><hr/>
-						</ul>		
-						</li>
-					</ul>
-				</section>
--->
-				<?php /*
-}
-			}
-		}
-*/?>
-				<!--non billable tasks-->
-				<!-- <li style="background-color:lightgray;" class="client-info-contact">Non-billable by default</li> -->
-			<?php /*
-foreach($tasks as $task) {
-				if ($task->getValue("task_common")) {
-						if (!$task->getValue("task_bill_by_default")) {
-							$task_id = Task::getTaskId($task->getValue("task_name"));
-						
-*/?>
-							<!--
-<section class="content">
-							<ul id="client-list" class="client-list">
-							<li class="client-list-item l-col-33">
-							<ul class="client-info-list">
-							<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
-							<br/><hr/>
-							</ul>		
-							</li>
-							</ul>
-							</section>
--->
-					<?php /*
-}
-				}
-			}
-*/
-				//other tasks here
-				?>
-				<!-- <li style="background-color:lightblue;" class="client-info-contact">Other tasks</li> -->
-				<!--billable tasks-->
-				<!-- <li style="background-color:lightgray;" class="client-info-contact">Task billable by default</li> -->
-			<?php /*
-foreach($tasks as $task) {
-				if (!$task->getValue("task_common")) {
-						if ($task->getValue("task_bill_by_default")) {
-							$task_id = Task::getTaskId($task->getValue("task_name"));
-						
-*/?>
-							<!--
-<section class="content">
-							<ul id="client-list" class="client-list">
-							<li class="client-list-item l-col-33">
-							<ul class="client-info-list">
-							<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
-							<br/><hr/>
-							</ul>		
-							</li>
-							</ul>
-							</section>
--->
-						<?php /*
-}
-				}
-			}
-*/?>
-				<!--non billable tasks-->
-				<!-- <li style="background-color:lightgray;" class="client-info-contact">Non-billable by default</li> -->
-			<?php /*
-foreach($tasks as $task) {
-				if (!$task->getValue("task_common")) {
-						if (!$task->getValue("task_bill_by_default")) {
-						$task_id = Task::getTaskId($task->getValue("task_name"));
-						
-*/?>
-							<!--
-<section class="content">
-							<ul id="client-list" class="client-list">
-							<li class="client-list-item l-col-33">
-							<ul class="client-info-list">
-							<li class="client-info-contact"><a class="client-info-contact-link" href="tasks.php?task_id=<?php echo $task_id[0]; ?>" title="View contact details"><button>Edit</button></a>  <?php echo ($task->getValue("task_name")); ?></li>
-							<br/><hr/>
-							</ul>		
-							</li>
-							</ul>
-							</section>
--->
-						<?php /*
-}
-				}
-			}
-*/
-?>
+</div>
+	
+<footer id="site-footer" class="site-footer">
 
-	
-	
-	</div>
-	
-	<footer id="site-footer" class="site-footer">
-	
-	</footer>
-	<script src="task-controls.js"></script>
-	</body>
-	</html>
+</footer>
+<script src="task-controls.js"></script>
+</body>
+</html>
 <?php } ?>
 
 <?php

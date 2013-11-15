@@ -7,6 +7,8 @@ require_once("../classes/Person.class.php");
 require_once("../classes/Project_Person.class.php");
 require_once("../classes/Project_Task.class.php");
 require_once("../classes/Task.class.php");
+require_once("../classes/Timesheet.class.php");
+require_once("../classes/Timesheet_Detail.class.php");
 
 
 if (isset($_GET["func"])) {
@@ -73,7 +75,11 @@ if (isset($_GET["func"])) {
 			$archiveFlag = $_GET["archiveFlag"];
 		} else {
 			$archiveFlag = "";
-		}echo returnTasksJSON($id, $collection, $archiveFlag);
+		}
+		echo returnTasksJSON($id, $collection, $archiveFlag);
+		
+	} else if ($_GET["func"] == "returnTimesheetJSON") {
+		
 		
 	}
 
