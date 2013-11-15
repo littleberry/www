@@ -273,7 +273,8 @@ function returnTasksJSON($id, $collection, $archiveFlag ) {
 			"task_name" => $task->getValue("task_name"),
 			"task_hourly_rate" => $task->getValue("task_hourly_rate"),
 			"task_bill_by_default" => $task->getValue("task_bill_by_default"),
-			"task_common" => $task->getValue("task_common")
+			"task_common" => $task->getValue("task_common"),
+			"task_archived" => $task->getValue("task_archived")
 		);
 	}
 	return json_encode($taskJSON);
