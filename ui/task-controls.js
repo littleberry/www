@@ -7,9 +7,10 @@ var giveFeedbackMessage = function( content, messageType ) {
 		.addClass( messageType )
 		.insertAfter( '.page-header' )
 		.hide()
-		.fadeIn()
-		.delay( 1200 )
-		.fadeOut()
+		.delay( 1000 )
+		.slideToggle( 'slow' )
+		.delay( 1500 )
+		.slideToggle( 'slow' )
 		/*.removeClass()
 		 .remove() */;
 }
@@ -60,7 +61,7 @@ function saveData( dataObj, $editRow ) {
 					//console.log(getData);
 					$( $editRow ).children( 'td:first-child' )
 						.next( 'td' ).text( dataObj["task_name"] )
-						.next( 'td' ).text( dataObj["task_hourly_rate"] )
+						.next( 'td' ).text( '$' + Number( dataObj["task_hourly_rate"] ).toFixed( 2 ) )
 						.next( 'td' ).text( yesNoToggle[dataObj["task_bill_by_default"]] )
 						.next( 'td' ).text( yesNoToggle[dataObj["task_common"]] );
 					
