@@ -92,7 +92,7 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 						</li>
 						<li class="entity-details-item archived task">
 							<label for="task_archived" class="entity-details-label">Archive Task?</label>
-							<input id="task-archived" name="task_archived" class="task-archived-input" type="checkbox" tabindex="6" value="1" <?php setChecked($thisTask, "task_common", 1) ?>/>
+							<input id="task-archived" name="task_archived" class="task-archived-input" type="checkbox" tabindex="6" value="1" <?php //setChecked($thisTask, "task_common", 1) ?>/>
 						</li>
 					</ul>
 				</section>
@@ -123,7 +123,8 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 					"task_name": "<?php echo $task->getValue("task_name"); ?>",
 					"task_hourly_rate": "<?php echo $task->getValue("task_hourly_rate"); ?>",
 					"task_bill_by_default": "<?php echo $task->getValue("task_bill_by_default"); ?>",
-					"task_common": "<?php echo $task->getValue("task_common"); ?>"
+					"task_common": "<?php echo $task->getValue("task_common"); ?>",
+					"task_archived": "<?php echo $task->getValue("task_archived"); ?>"
 				}'>
 					<td><a class="task-link" href="#" title="View task details">Edit</a></td>
 					<td><?php echo ($task->getValue("task_name")); ?></td>

@@ -7,11 +7,14 @@ var giveFeedbackMessage = function( content, messageType ) {
 		.addClass( messageType )
 		.insertAfter( '.page-header' )
 		.hide()
-		.fadeIn()
-		.delay( 1200 )
-		.fadeOut()
-		/*.removeClass()
-		 .remove() */;
+		.delay( 750 )
+		.slideToggle( 'slow' )
+		.delay( 1500 )
+		.slideToggle( 'fast', function() {
+			$( this )
+				.removeClass()
+				.remove();
+			})
 }
 
 		
@@ -47,8 +50,8 @@ function saveData( dataObj, $editRow ) {
 			var resort = true;
 			
 			if ( getData.indexOf( "update" ) && $editRow ) {
-				if ( dataObj["task_archived"] == 1 ) {
-					//console.log("archive");
+				if ( ( dataObj["task_archived"] == 1 ) && ( $( '.page-title' ).text().indexOf( 'Archive' ) < 0 ) ) {
+					console.log("archive task");
 					$editRow.fadeOut()
 						.remove();
 						
@@ -57,10 +60,10 @@ function saveData( dataObj, $editRow ) {
 					giveFeedbackMessage( getData.replace( "updated.", "updated and archived." ), 'success' );
 					
 				} else {
-					//console.log(getData);
+					console.log("edit task");
 					$( $editRow ).children( 'td:first-child' )
 						.next( 'td' ).text( dataObj["task_name"] )
-						.next( 'td' ).text( dataObj["task_hourly_rate"] )
+						.next( 'td' ).text( '$' + Number( dataObj["task_hourly_rate"] ).toFixed( 2 ) )
 						.next( 'td' ).text( yesNoToggle[dataObj["task_bill_by_default"]] )
 						.next( 'td' ).text( yesNoToggle[dataObj["task_common"]] );
 					
@@ -81,10 +84,11 @@ function saveData( dataObj, $editRow ) {
 						task_name: dataObj["task_name"],
 						task_hourly_rate: dataObj["task_hourly_rate"],
 						task_bill_by_default: dataObj["task_bill_by_default"],
-						task_common: dataObj["task_common"]
+						task_common: dataObj["task_common"],
+						task_archived: dataObj["task_archived"]
 					})
 					.addClass( 'new' )
-					.append( '<td><a class="client-info-contact-link" href="#" title="Edit task details">Edit</a>')
+					.append( '<td><a class="tasks-link" href="#" title="Edit task details">Edit</a>')
 					.append( '<td>' + dataObj["task_name"] + '</td>' )
 					.append( '<td>$' + Number(dataObj["task_hourly_rate"]).toFixed(2) + '</td>' )
 					.append( '<td>' + yesNoToggle[dataObj["task_bill_by_default"]] + '</td>' )
@@ -137,32 +141,48 @@ $( function() {
 	    }
 	});
 	
-	$( '#add-task-btn').click( function( evt ) {
-		$( '#add-task-modal' ).dialog( "open" );
-		evt.preventDefault();
-	});
-	
-	$( '.task-link' ).click( function( evt ) {
+	function openEditModal( evt ) {
 		var $row = $( this ).parents( 'tr' );
 		var data = $row.data( "options" );
-		console.log(data);
-		
-		$( '#add-task-modal' )
-			.find( '#task-name' ).val( data["task_name"] ).end()
-			.find( '#task-hourly-rate' ).val( data["task_hourly_rate"] ).end()
-			.find( '#task-billable' ).prop( "checked", data["task_bill_by_default"] ).end()
-			.find( '#task-common' ).prop( "checked", data["task_common"] )
-			.find( '#task-archived' ).prop( "checked", data["task_archived"] );
+		if ( $( evt.currentTarget ).is( '#add-task-btn' ) ) {
+			
+			$( '#add-task-modal' )
+				.find( '#task-name' ).val( "" ).end()
+				.find( '#task-hourly-rate' ).val( "" ).end()
+				.find( '#task-billable' ).prop( "checked", false ).end()
+				.find( '#task-common' ).prop( "checked", false ).end()
+				.find( '#task-archived' ).prop( "checked", false );
 
+		} else {
+			console.log($( '#task-archived' ).prop( "checked" ));
+			console.log(parseInt(data["task_archived"]));
+			if (parseInt(data["task_archived"])) {
+				console.log("true");
+			} else {
+				console.log("false");
+			}
+			
+			$( '#add-task-modal' )
+				.find( '#task-name' ).val( data["task_name"] ).end()
+				.find( '#task-hourly-rate' ).val( data["task_hourly_rate"] ).end()
+				.find( '#task-billable' ).prop( "checked", parseInt( data["task_bill_by_default"] ) ).end()
+				.find( '#task-common' ).prop( "checked", parseInt( data["task_common"] ) ).end()
+				.find( '#task-archived' ).prop( "checked", parseInt( data["task_archived"] ) );
+			
+			$( '#add-task-modal' )
+				.data( 'edit', data["task_id"] )
+				.data( 'row', $( this ).parents( 'tr' ) )
+				.dialog( "option", "title", "Edit Task" );
+				
+		}
+		$( '#add-task-modal' ).dialog( 'open' );
 
-		$( '#add-task-modal' )
-			.data( 'edit', data["task_id"] )
-			.data( 'row', $( this ).parents( 'tr' ) )
-			.dialog( "option", "title", "Edit Task" )
-			.dialog( 'open' );
 		evt.preventDefault();
-	});
-
+	}
+		
+	$( '.task-link' ).click( openEditModal );
+	$( '#add-task-btn' ).click( openEditModal );
+	
 	var $viewArchives = $( '.view-archive-link' );
 	var $viewActive = $viewArchives.clone()
 		.text( "View Active Tasks" )
@@ -190,8 +210,8 @@ $( function() {
 			})
 			.success( function( data ) {
 				tasks = $.parseJSON(data);
-				
 				for ( var i = 0; i < tasks.length; i++ ) {
+					
 					var taskId = tasks[i]["task_id"];
 					//console.log(taskId);
 					var $row = $( '<tr>' )
@@ -200,13 +220,22 @@ $( function() {
 							task_name: tasks[i]["task_name"],
 							task_hourly_rate: tasks[i]["task_hourly_rate"],
 							task_bill_by_default: tasks[i]["task_bill_by_default"],
-							task_common: tasks[i]["task_common"]
+							task_common: tasks[i]["task_common"],
+							task_archived: tasks[i]["task_archived"]
 						})
-						.append( '<td><a class="task-link" href="#" title="Edit task details">Edit</a></td>')
+						.append( function( elem ) {
+							var $a = $( '<a class="task-link" href="#" title="Edit task details">Edit</a>' )
+								.click( openEditModal );
+							return $( '<td>' )	
+								.append( $a );
+							})
 						.append( '<td>' + tasks[i]["task_name"] + '</td>' )
 						.append( '<td>$' + Number(tasks[i]["task_hourly_rate"]).toFixed(2) + '</td>' )
 						.append( '<td>' + yesNoToggle[tasks[i]["task_bill_by_default"]] + '</td>' )
 						.append( '<td>' + yesNoToggle[tasks[i]["task_common"]] + '</td>' );
+						
+						console.log($row.data( "options" ));
+						
 					$( '#tasks-list' )
 						.find( 'tbody' )
 						.append( $row );
@@ -224,7 +253,7 @@ $( function() {
 		$( this ).replaceWith( $viewArchives );
 		
 		location.href = "tasks.php";
-	})
+	});
 	
 });
 
