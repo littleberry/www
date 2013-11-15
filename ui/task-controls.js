@@ -145,7 +145,7 @@ $( function() {
 	$( '.task-link' ).click( function( evt ) {
 		var $row = $( this ).parents( 'tr' );
 		var data = $row.data( "options" );
-		//console.log(data);
+		console.log(data);
 		
 		$( '#add-task-modal' )
 			.find( '#task-name' ).val( data["task_name"] ).end()
@@ -162,9 +162,7 @@ $( function() {
 			.dialog( 'open' );
 		evt.preventDefault();
 	});
-});
 
-$( function() {
 	var $viewArchives = $( '.view-archive-link' );
 	var $viewActive = $viewArchives.clone()
 		.text( "View Active Tasks" )
@@ -204,7 +202,7 @@ $( function() {
 							task_bill_by_default: tasks[i]["task_bill_by_default"],
 							task_common: tasks[i]["task_common"]
 						})
-						.append( '<td><a class="client-info-contact-link" href="#" title="Edit task details">Edit</a>')
+						.append( '<td><a class="task-link" href="#" title="Edit task details">Edit</a></td>')
 						.append( '<td>' + tasks[i]["task_name"] + '</td>' )
 						.append( '<td>$' + Number(tasks[i]["task_hourly_rate"]).toFixed(2) + '</td>' )
 						.append( '<td>' + yesNoToggle[tasks[i]["task_bill_by_default"]] + '</td>' )
