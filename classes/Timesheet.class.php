@@ -7,9 +7,8 @@ class Timesheet extends DataObject {
 	protected $data = array(
 		//these fields are in the timesheet table.
 		"timesheet_id"=>"",
-		"timesheet_notes"=>"",
-		"task_id"=>"",
-		"project_id"=>"",
+		"timesheet_approved"=>"",
+		"timesheet_submitted"=>"",
 		"person_id"=>""
 	);
 	
@@ -21,17 +20,17 @@ class Timesheet extends DataObject {
 		//$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_id = :timesheet_id";
 		//We're going to need the aggregate at some point so I'll stick it here.
 		//SELECT timesheet.*, sum(timesheet_detail.timesheet_number_of_hours)  as totalhours FROM timesheet, timesheet_detail where timesheet_detail.timesheet_id = timesheet.timesheet_id group by timesheet.timesheet_id;
-		$sql = "SELECT ts.*, td.* FROM " . TBL_TIMESHEET . " as ts, " . TBL_TIMESHEET_DETAIL . " as td WHERE ts.timesheet_id = td.timesheet_id AND ts.person_id = :person_id";
+		$sql = "SELECT ts.*, td.* FROM " . TBL_TIMESHEET . " as ts, " . TBL_TIMESHEET_ITEM . " as td WHERE ts.timesheet_id = td.timesheet_id AND ts.person_id = :person_id";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->execute();
 			$timesheet_details=array();
 			foreach ($st->fetchAll() as $row) {
-				$timesheet_details[] = $row;
+				$timesheet_item[] = $row;
 			}
 			parent::disconnect($conn);
-			return array($timesheet_details);
+			return array($timesheet_item);
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed getting the timesheets for this person: " . $e->getMessage() . "query is " . $sql);
@@ -41,7 +40,7 @@ class Timesheet extends DataObject {
 	//get all of the timesheets for a specific person
 	public function getTimesheetByPerson($person_id) {
 		$conn=parent::connect();
-		$sql="SELECT distinct(timesheet_id), project_id, task_id FROM " . TBL_TIMESHEET . " WHERE person_id = :person_id";
+		$sql="SELECT distinct(timesheet_id) FROM " . TBL_TIMESHEET . " WHERE person_id = :person_id";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
@@ -79,14 +78,12 @@ class Timesheet extends DataObject {
 	}
 	
 	//get all of the timesheet info for a specific timesheet.
-	public function getTimesheetById($person_id, $task_id, $project_id) {
+	public function getTimesheetById($timesheet_id) {
 		$conn=parent::connect();
-		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE project_id = :project_id and person_id = :person_id and task_id = :task_id";
+		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_id = :timesheet_id";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
-			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
-			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
 			$st->execute();
 			$timesheet=array();
 			foreach ($st->fetchAll() as $row) {
@@ -102,29 +99,30 @@ class Timesheet extends DataObject {
 	
 
 			
-	//function inserts new timesheet into db and returns the autoincrement field so we can update the timesheet_detail table. 	
-	public function insertTimesheet($person_id, $task_id, $project_id) {
+	//function inserts new timesheet into db and returns the autoincrement field so we can update the timesheet_item table with the key 	
+	public function insertTimesheet($person_id) {
+				error_log("LKJHKJH");
+				error_log("here is the person id: ") . $person_id;
+
 		$conn=parent::connect();
 		$sql = "INSERT INTO " . TBL_TIMESHEET . " (
 			timesheet_id,
-			timesheet_notes,
-			task_id,
-			project_id,
+			timesheet_approved,
+			timesheet_submitted,
 			person_id
 			) VALUES (
 			:timesheet_id,
-			:timesheet_notes,
-			:task_id,
-			:project_id,
+			:timesheet_approved,
+			:timesheet_submitted,
 			:person_id
 			)";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":timesheet_id", 'auto', PDO::PARAM_STR);
-			$st->bindValue(":timesheet_notes", $this->data["timesheet_notes"], PDO::PARAM_INT);
-			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
-			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
-			$st->bindValue(":person_id", $person_id, PDO::PARAM_STR);
+			$st->bindValue(":timesheet_id", 'auto', PDO::PARAM_INT);
+			$st->bindValue(":timesheet_approved", $this->data["timesheet_approved"], PDO::PARAM_INT);
+			$st->bindValue(":timesheet_submitted", $this->data["timesheet_submitted"], PDO::PARAM_INT);
+			error_log("here is the person id: ") . $person_id;
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->execute();
 			$sql = "SELECT LAST_INSERT_ID() FROM " . TBL_TIMESHEET;
 			$st = $conn->prepare($sql);
@@ -158,17 +156,15 @@ class Timesheet extends DataObject {
 	public function updateTimesheet($timesheet_id) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_TIMESHEET . " SET
-			timesheet_notes = :timesheet_notes,
-			task_id = :task_id,
-			project_id = :project_id,
-			person_id = :person_id
+			person_id = :person_id,
+			timesheet_approved = :timesheet_approved,
+			timesheet_submitted = :timesheet_submitted
 			WHERE timesheet_id = :timesheet_id";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":timesheet_notes", $this->data["timesheet_notes"], PDO::PARAM_STR);
-			$st->bindValue(":task_id", $this->data["task_id"], PDO::PARAM_INT);
-			$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_STR);
-			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_INT);
+			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_STR);
+			$st->bindValue(":timesheet_approved", $this->data["timesheet_approved"], PDO::PARAM_STR);
+			$st->bindValue(":timesheet_submitted", $this->data["timesheet_submitted"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
 			$st->execute();
 			parent::disconnect($conn);
