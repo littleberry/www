@@ -16,7 +16,7 @@ class Timesheet_Item extends DataObject {
 	);
 	
 	//display all information about a timesheet returned as an array.
-	public function getTimesheetItems($timesheet_item_id) {
+	public function getTimesheetDates($timesheet_item_id) {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_TIMESHEET_ITEM . " WHERE timesheet_item_id = :timesheet_item_id";
 		try {
@@ -28,12 +28,37 @@ class Timesheet_Item extends DataObject {
 				$timesheet_item[] = new Timesheet_Item($row);
 			}
 			parent::disconnect($conn);
-			return array($timesheet_item);
+			if (count($timesheet_item) > 0) {
+				return array($timesheet_item);
+			} else {
+				return 0;
+			}
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+		//display all information about a timesheet returned as an array.
+	public function getTimesheetItems($timesheet_item_id, $timesheet_date) {
+		$conn=parent::connect();
+		$sql="SELECT * FROM " . TBL_TIMESHEET_ITEM . " WHERE timesheet_item_id = :timesheet_item_id and timesheet_date = :timesheet_date";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_item_id", $timesheet_item_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($timesheet_date)), PDO::PARAM_STR);
+			$st->execute();
+			$timesheet_item=array();
+			foreach ($st->fetchAll() as $row) {
+				$timesheet_item[] = new Timesheet_Item($row);
+			}
+			parent::disconnect($conn);
+			if (count($timesheet_item) > 0) return array($timesheet_item);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	
 	
 	//display all information about a timesheet for a specific date returned as an array.
 	public function getTimesheetItem($timesheet_date, $person_id, $project_id, $task_id) {
@@ -103,12 +128,13 @@ class Timesheet_Item extends DataObject {
 			timesheet_hours = :timesheet_hours,
 			timesheet_date = :timesheet_date,
 			project_id = :project_id
-			WHERE timesheet_item_id = :timesheet_item_id";
+			WHERE project_id = :project_id and person_id = :person_id and task_id = :task_id and timesheet_date = :timesheet_date";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":timesheet_item_id", $timesheet_item_id, PDO::PARAM_INT);
-			$st->bindValue(":timesheet_date", $date('y-m-d', strtotime($this->data["timesheet_date"])), PDO::PARAM_INT);
+			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($this->data["timesheet_date"])), PDO::PARAM_STR);
 			$st->bindValue(":task_id", $this->data["task_id"], PDO::PARAM_INT);
+			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_hours", $this->data["timesheet_hours"], PDO::PARAM_INT);
 			$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
 			$st->execute();	
