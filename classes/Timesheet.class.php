@@ -90,7 +90,11 @@ class Timesheet extends DataObject {
 				$timesheet[] = new Timesheet($row);
 			}
 			parent::disconnect($conn);
-			return $timesheet;
+			if (count($timesheet) > 0) {
+				return $timesheet;
+			} else {
+				return 0;
+			}
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed here: " . $e->getMessage() . "query is " . $sql);
@@ -130,6 +134,7 @@ class Timesheet extends DataObject {
 			$row=$st->fetch();
 			parent::disconnect($conn);
 			if ($row) return $row;
+			error_log("Here is the last insert id:" . $row);
 		} catch (PDOException $e) {
 			parent::disconnect($conn);
 			die("Query failed on insert of timesheet, sql is $sql " . $e->getMessage());
