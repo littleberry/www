@@ -29,10 +29,14 @@ function displayTimesheet($timesheet, $timesheet_item) {
 //the correct timesheet out of the database. Right now it just returns the current date.
 if (isset($_GET["timesheet_date"])) {
 	$timesheet_date = $_GET["timesheet_date"];
+} elseif (isset ($_POST["timesheet_date"])) {
+	$timesheet_date = $_POST["timesheet_date"];
 } else {
 	$timesheet_date = date('d-m-Y');
-}
+} 
 $d = strtotime($timesheet_date);
+
+
 
 ?>
 
@@ -40,7 +44,7 @@ $d = strtotime($timesheet_date);
 <div id="page-content" class="page-content">
 	<header class="page-header">
 		<?php //show the date as an H1.?>
-		<h1 class="page-title"><?php echo date("M d Y");?></h1>
+		<h1 class="page-title"><?php echo date("M d Y", $d);?></h1>
 		<nav class="page-controls-nav">
 			<ul class="page-controls-list project">
 				<li class="page-controls-item link-btn">
@@ -67,6 +71,7 @@ $d = strtotime($timesheet_date);
 						<?//php knows nothing about the client so stick the person_id field in a hidden field. Do the same for
 						//project_id, task_id and notes. These are the values that came in from the horrid window. ?>
 						<input type="hidden" name="person_id" value="<?php echo $person->getValueEncoded("person_id");?>">
+						<input type="hidden" name="timesheet_date" value="<?php echo $timesheet_date?>">
 						<input type="hidden" name="project_id" value="<?php 
 	//if (isset($_GET["project_id"])) {
 	//	$projectName = $_GET["project_id"];
@@ -102,7 +107,7 @@ $d = strtotime($timesheet_date);
 
 //get out all of the user's current timesheets because we need to display them in the UI.
 //this is calling direct functions and ONLY displays the items that are already stored in the DB.
-list($current_timesheets) = Timesheet::getTimesheetByPerson($person->getValueEncoded("person_id"));
+list($current_timesheets) = Timesheet::getTimesheetByPersonForDate($person->getValueEncoded("person_id"), $timesheet_date);
 
 //get the timesheet_item information for the user's current timesheets
 foreach ($current_timesheets as $current_timesheet) {
@@ -170,6 +175,7 @@ foreach ($current_timesheets as $current_timesheet) {
 
 
 <?if (isset($_GET["project_id"])) {
+//$i here should be configurable.
 	for ($i=0; $i<7; $i++) {
 		?><td><?php echo date("D M d", strtotime('sunday this week -1 week + ' . $i . ' days', $d))?>
 		<input type="hidden" name="timesheet_date_#_<?php echo $i?>" value="<?php echo date("D M d", strtotime('sunday this week -1 week + ' . $i . ' days', $d))?>">
@@ -190,7 +196,7 @@ foreach ($current_timesheets as $current_timesheet) {
 </tr>
 </table>
 			<?php //OK, all of the timesheets should be in the UI. ?>
-			<input type="button" name="add_row_button" value="Add Row" onclick="javascript:window.open('add_timesheet_row.php?person_id=<?php echo $person->getValueEncoded("person_id")?>','myWindow','width=300,height=200,left=250%,right=250%,scrollbars=no')">
+			<input type="button" name="add_row_button" value="Add Row" onclick="javascript:window.open('add_timesheet_row.php?person_id=<?php echo $person->getValueEncoded("person_id")?>&timesheet_date=<?php echo $timesheet_date?>','myWindow','width=300,height=200,left=250%,right=250%,scrollbars=no')">
 			<input type="submit" name="save_timesheet_button" value="Save Timesheet">
 		</form>
 
@@ -201,13 +207,12 @@ foreach ($current_timesheets as $current_timesheet) {
 
  
 function saveTimesheet() {
+
 	//CREATE THE TIMESHEET OBJECTS ($timesheet).
 	//put each timesheet and its data into an array labeled with the timesheet ID.
 	$person=Person::getByEmailAddress($_SESSION["logged_in"]);
 	list($timesheet_ids) = Timesheet::getTimesheetIds($person->getValueEncoded("person_id"));
-	
-	$tid = "#";
-		
+			
 	//GET OUT THE STORED TIMESHEETS AND CREATE THE item OBJECTS TO DISPLAY IN THE UI.	
 	//in this world, we're getting the values from the database, so task_id, project_id and person_id follow the field_name_$tid_$i style here.
 	
@@ -239,13 +244,20 @@ function saveTimesheet() {
 			$timesheet_item_aggregate[] = $timesheet_item[$tid][$i];
 		}
 	} 
+		error_log("timesheet aggregate here");
+		error_log(print_r($timesheet_aggregate,true));
+		error_log("timesheet item aggregate here");
+		error_log(print_r($timesheet_item_aggregate, true));
+
 	
 	//USER IS ADDING A TIMESHEET FOR THE FIRST TIME, or they have no timesheets at all, so we don't have a timesheet id to put in the field
 	//in the UI. Instead, use "#".
 	//I am not going to fight the UI anymore. It is inconsistent, but the task_id, the project_id and the person_id all are based on the field_name_$tid style
 	//and not field_name_$tid_$i style. If we keep this UI in any way, I will fight it later. 11/16
 	
-	if	(!$timesheet_ids || $tid == "#"){
+	
+	if	(isset($_POST["person_id_#"])) {
+		$tid = "#";
 		$timesheet[$tid] = new Timesheet( array(
 		//CHECK REG SUBS!!
 		"timesheet_id" => isset($_POST["timesheet_id_$tid"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_id_$tid"]) : "",
@@ -277,6 +289,7 @@ function saveTimesheet() {
 	error_log(print_r($_POST,true));
 	error_log("here is the timesheet aggregate");
 	error_log(print_r($timesheet_aggregate,true));
+	error_log(print_r($timesheet_item_aggregate, true));
 	
 
 		//timesheet aggregate has all the timesheets
@@ -287,8 +300,8 @@ function saveTimesheet() {
 				$timesheet_exists = $timesheet_object->getTimesheetById($timesheet_object->getValueEncoded("timesheet_id"));	
 				
 				if ($timesheet_exists == 0) {
-					//echo "<br><br>timesheet doesn't exist.<br><br>";
-					//print_r($timesheet_object);
+					echo "<br><br>timesheet doesn't exist.<br><br>";
+					print_r($timesheet_object);
 					//echo "PERSON VALUE IS";
 					$timesheet_object->getValueEncoded("person_id");
 					//echo $timesheet_object->getValueEncoded("person_id");
