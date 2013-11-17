@@ -65,7 +65,7 @@ function displayTimesheet($timesheet_aggregate) {
 					</header>
 					<section id="timesheet-info" class="entity-detail">
 						<ul class="details-list entity-details-list timesheet">
-							<li class="entity-details-item name task">
+							<li class="entity-details-item name project">
 								<label for="project_name" <?php validateField("project_name", $missingFields)?> class="entity-details-label">Project:</label>
 								<select id="project-name" name="project_name" class="project-name-select" tabindex="1">
 									<?php //this may be moved to JS
