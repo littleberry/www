@@ -1,5 +1,6 @@
 <?php
 	require_once("../common/common.inc.php");
+	require_once("../classes/Client.class.php");
 	require_once("../classes/Project.class.php");
 	require_once("../classes/Project_Person.class.php");
 	require_once("../classes/Project_Task.class.php");
@@ -12,6 +13,7 @@
 	checklogin();
 	
 	include('header.php'); //add header.php to page
+
 	if (isset($_POST["save_timesheet_button"]) and $_POST["save_timesheet_button"] == "Save Timesheet") {
 		error_log("THE USER WANTS TO SAVE THE TIMESHEET");
 		saveTimesheet();
@@ -19,168 +21,104 @@
 		displayTimesheet(new Timesheet(array()));
 	}
 	
-
+	
 
 function displayTimesheet($timesheet_aggregate) {
-error_log("HERE IS THE POST!!!!!!!!!!!!!!!!!!");
-error_log(print_r($_POST, true));
-if (isset($_GET["timesheet_date"])) {
-	$timesheet_date = $_GET["timesheet_date"];
-} else {
-	$timesheet_date = date('d-m-Y');
-}
-$d = strtotime($timesheet_date);
-//echo "here is timesheet aggregate when you first come in.";
-//print_r($timesheet_aggregate);
-//exit;
-?>
+	error_log("HERE IS THE POST!!!!!!!!!!!!!!!!!!");
+	//error_log(print_r($_POST, true));
+	if (isset($_GET["timesheet_date"])) {
+		$timesheet_date = $_GET["timesheet_date"];
+	} else {
+		$timesheet_date = date('d-m-Y');
+	}
+	$d = strtotime($timesheet_date);
+	//echo "here is timesheet aggregate when you first come in.";
+	//print_r($timesheet_aggregate);
+	//exit;
+	if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
+		$person = Person::getByEmailAddress($_SESSION["logged_in"]);
+	} else {
+		error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
+		exit();
+	}
 
-<div id="page-content" class="page-content">
-	<header class="page-header">
-		<h1 class="page-title"><?php echo date("M d Y");?></h1>
-		<nav class="page-controls-nav">
-			<ul class="page-controls-list project">
-				<li class="page-controls-item link-btn">
-				<a class="view-all-link" href="project-add.php">+ Add Timesheet</a></li>
-				<li class="page-controls-item"><a class="view-archive-link" href="projects.php?archives=1">View Archives</a></li>
-				<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
-			</ul>
-		</nav>
-	</header>
-	<div class="content">
-		<!--BEGIN FORM-->
-		<form action="timesheet.php" method="post">
-		
-						<?php
-						if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
-							$person=Person::getByEmailAddress($_SESSION["logged_in"]);
-						} else {
-							echo "Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.";
-							exit();
-						}
-						?>
-						<input type="hidden" name="person_id_#" value="<?php echo $person->getValueEncoded("person_id");?>">
-						<input type="hidden" name="project_id_#" value="<?php 
-	if (isset($_GET["project_id"])) {
-		echo $_GET["project_id"];
-	} 
-	?>">
+	?>
 	
-	<img class="client-logo-img small" style="height:100px; width:100px;" src="<?php echo "images/" . $person->getValue("person_logo_link")?>" title="Person Logo" alt="Person logo" />
-	<?php echo  "Adding Timesheet for Project " . Project::getProjectName($_GET["project_id"])[0] ?>	
-	<input type="hidden" name="task_id_#" value="<?php 
-	if (isset($_GET["task_id"]))	 {
-		echo $_GET["task_id"];
-	} 
-	?>"><?php echo "<br>Adding Timesheet for Task " . Task::getTaskName($_GET["task_id"])[0]?>
-	<input type="hidden" name="timesheet_notes_#" value="<?php 
-	if (isset($_GET["timesheet_notes"]))	 {
-		echo $_GET["timesheet_notes"];
-	}
-	?>">
-						
-<table style="width:100%; border:1px solid;">
-<?php
-
-list($timesheets) = Timesheet::getTimesheetByPerson($person->getValueEncoded("person_id"));
-
-//get the general timesheet information
-foreach ($timesheets as $timesheet) {
-	//get out the details for a particular timesheet
-	list($timesheet_details) = Timesheet_Detail::getTimesheetDetail($timesheet->getValueEncoded("timesheet_id"));
-	
-	?><tr>
-	<td style="color:orange;border:1px solid;">Person ID:<?php echo $person->getValueEncoded("person_id");?>
-	<input type="hidden" name="person_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $person->getValueEncoded("person_id");?>"></td>
-	<td style="color:blue;border:1px solid;">Timesheet ID:<?php echo $timesheet->getValueEncoded("timesheet_id");?>
-	<input type="hidden" name="timesheet_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("timesheet_id");?>"></td>
-	<td style="color:green;border:1px solid;">Task:<?php echo $timesheet->getValueEncoded("task_id");?>
-	<input type="hidden" name="task_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("task_id");?>"></td>
-	<td style="color:pink;border:1px solid;">Project:<?php echo $timesheet->getValueEncoded("project_id");?>
-	<input type="hidden" name="project_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("project_id");?>">
-	<input type="hidden" name="timesheet_notes_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("timesheet_notes");?>"></td></tr><tr>
-	<?php 
-	//yeah, not going to fight tables that will be gone eventually anyway. 
-	$i = 0;
-	foreach ($timesheet_details as $timesheet_detail) {
-		?>
-		<input type="hidden" name="timesheet_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("timesheet_id");?>">
-		<td style="border:1px solid;"><input type="input" name="timesheet_date_<?php echo $timesheet->getValueEncoded("timesheet_id");?>_<?php echo $i?>" value="<?php echo $timesheet_detail->getValueEncoded("timesheet_date");?>"></td>
-	<?php $i++; 
-	} ?>
-	</tr>
-	<tr>
-	<?php
-	$i = 0;
-	foreach ($timesheet_details as $timesheet_detail) {
-		?><td style="border:1px solid;"><input name="timesheet_number_of_hours_<?php echo $timesheet->getValueEncoded("timesheet_id");?>_<?php echo $i ?>" value="<?php echo $timesheet_detail->getValueEncoded("timesheet_number_of_hours");?>"></td>
-	<?php $i++;
-	} ?>
-	</tr>
-<?php }
-
-
-
-//add the timesheet to the UI if the person wanted to add a new timesheet.
-//we don't have the timesheet ID yet.
-//if (isset($_GET["project_id"])) {
-?>
-<tr>
-
-	<input type="hidden" name="person_id_#" value="<?php echo $person->getValueEncoded("person_id");?>">
-	<input type="hidden" name="project_id_#" value="<?php 
-	if (isset($_GET["project_id"])) {
-		echo $_GET["project_id"];
-	} elseif (isset($timesheet)) {
-		echo $timesheet->getValueEncoded("project_id");
-	} else {
-			echo "";
-	}
-	?>"><?php //echo  Project::getProjectName($_GET["project_id"])[0] ?>	
-	<input type="hidden" name="task_id_#" value="<?php 
-	if (isset($_GET["task_id"]))	 {
-		echo $_GET["task_id"];
-	} elseif (isset($timesheet)) {
-		echo $timesheet->getValueEncoded("task_id");
-	} else {
-		echo "";
-	}
-	?>"><?php //echo Task::getTaskName($_GET["task_id"])[0]?>
-	<input type="hidden" name="timesheet_notes_#" value="<?php 
-	if (isset($_GET["timesheet_notes"]))	 {
-		echo $_GET["timesheet_notes"];
-	} elseif (isset($timesheet)) {
-		echo $timesheet->getValueEncoded("timesheet_notes");
-	} else {
-		echo "";
-	}
-	?>">
-
-<?if (isset($_GET["project_id"])) {
-	for ($i=0; $i<7; $i++) {
-		?><td><?php echo date("D M d", strtotime('sunday this week -1 week + ' . $i . ' days', $d))?>
-		<input type="input" name="timesheet_date_#_<?php echo $i?>" value="<?php echo date("D M d", strtotime('sunday this week -1 week + ' . $i . ' days', $d))?>"></td>
-		<?php } ?>
-		</td></tr><tr>
-		<?php 
-			for ($i=0; $i<7; $i++) {
-			?><td><input name="timesheet_number_of_hours_#_<?php echo $i ?>"></td>
-	<?php } 
-}
-	?>	
-
-</tr>
-</table>
-</tr>
-</tbody>
-<?php //} ?>
-</table>
-			<input type="button" name="add_row_button" value="Add Row" onclick="javascript:window.open('add_timesheet_row.php?person_id=<?php echo $person->getValueEncoded("person_id")?>','myWindow','width=300,height=200,left=250%,right=250%,scrollbars=no')">
-			<input type="submit" name="save_timesheet_button" value="Save Timesheet">
-		</form>
+	<div id="page-content" class="page-content">
+		<header class="page-header">
+			<h1 class="page-title"><?php echo date("F j, Y");?></h1>
+			<nav class="page-controls-nav">
+				<ul class="page-controls-list timesheet">
+					<li class="page-controls-item link-btn"><a class="view-all-link" href="project-add.php">+ Add Timesheet</a></li>
+					<li class="page-controls-item"><a class="view-archive-link" href="projects.php?archives=1">View Archives</a></li>
+					<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
+				</ul>
+			</nav>
+		</header>
+		<div id="add-ts-entry-modal" class="entity-detail" title="Add Time Entry">
+			<form id="ts-entry-input-form" action="timesheets.php" method="post" enctype="multipart/form-data">
+				<input id="proc-type" type="hidden" name="action" value="<?php echo $processType ?>"/>
+				<fieldset class="entity-details-entry  modal">
+					<header class="entity-details-header timesheet">
+						<h1 class="entity-details-title">Enter time entry details:</h1>
+						<h4 class="required">= Required</h4>
+					</header>
+					<section id="timesheet-info" class="entity-detail">
+						<ul class="details-list entity-details-list timesheet">
+							<li class="entity-details-item name task">
+								<label for="project_name" <?php validateField("project_name", $missingFields)?> class="entity-details-label">Project:</label>
+								<select id="project-name" name="project_name" class="project-name-select" tabindex="1">
+									<?php //this may be moved to JS
+										list($projectsForPerson) = Project_Person::getProjectsForPerson($person->getValue("person_id"));
+										//$first = 31;
+										foreach ($projectsForPerson as $projectPerson) {
+											$client = Client::getClient( $projectPerson->getValue("client_id") ); ?>
+											<option value="<?php echo $projectPerson->getValue("project_id"); ?>"><span><?php echo $projectPerson->getValue("project_name"); ?></span> (<?php echo $client->getValue("client_name"); ?>)</option>
+									<?php }	?> 
+								</select>
+							</li>
+							<li class="entity-details-item hourly-rate task">
+								<label for="task_name" <?php validateField("task_name", $missingFields)?> class="entity-details-label">Task:</label>
+								<select id="task-name" name="task_name" class="task-name-select" tabindex="1">
+									<?php //this may be moved to JS
+										list($tasksForProject) = Project_Task::getTasksForProject(1);
+										foreach ($tasksForProject as $projectTask) { ?>
+											<option value="<?php echo $projectTask->getValue("task_id"); ?>"><?php echo $projectTask->getValue("task_name"); ?></option>
+									<?php }	?> 
+								</select>
+							</li>
+						</ul>
+					</section>
+				</fieldset>
+			</form>
+		</div>
+		<table id="timesheet-tasks-list" class="entity-table timesheet tablesorter">
+			<thead>
+				<tr>
+					<th class="task-name"></th>
+					<th data-sorter="false" class="day">M</th>
+					<th data-sorter="false" class="day">T</th>
+					<th data-sorter="false" class="day">W</th>
+					<th data-sorter="false" class="day">Th</th>
+					<th data-sorter="false" class="day">F<th>
+					<th data-sorter="false" class="day">Sa<th>
+					<th data-sorter="false" class="day">Su<th>
+					<th data-sorter="false" class="total"></th>
+					<th data-sorter="false" class="delete"></th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
 
 	</div>
-</div>
+	<footer id="site-footer" class="site-footer">
+	
+	</footer>
+<script src="timesheet-controls.js" type="text/javascript"></script>
+</body>
+</html>		
+
 <?php
 }
 
@@ -310,9 +248,3 @@ function saveTimesheet() {
 }
 
 ?>
-<footer id="site-footer" class="site-footer">
-
-</footer>
-<script src="project-controls.js" type="text/javascript"></script>
-</body>
-</html>
