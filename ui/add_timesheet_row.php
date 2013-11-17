@@ -42,9 +42,10 @@ function go_to_timesheet() {
 	task_id = document.getElementById('task_id').value;
 	project_id = document.getElementById('project_id').value; 
 	timesheet_notes = document.getElementById('timesheet_notes').value;
+	timesheet_date = document.getElementById('timesheet_date').value;
 	//alert(task_id);
 	//alert(project_id);
-	window.open('timesheet.php?task_id=' + task_id + '&project_id=' + project_id + '&timesheet_notes=' + timesheet_notes);
+	window.open('timesheet.php?task_id=' + task_id + '&project_id=' + project_id + '&timesheet_notes=' + timesheet_notes +"action=add_row&timesheet_date=" + timesheet_date);
 	window.close();
 }
 </script>
@@ -89,6 +90,7 @@ Choose Project/Task
 				<button onclick="go_to_timesheet();">Add Row</button>
 <input name="task_id" id="task_id">
 <input name="project_id" id="project_id">
+<input type="hidden" id="timesheet_date" value="<?php echo $_GET["timesheet_date"] ?>">
 </form>
 
 		</nav>
