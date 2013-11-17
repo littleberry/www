@@ -7,6 +7,8 @@ require_once("../classes/Person.class.php");
 require_once("../classes/Project_Person.class.php");
 require_once("../classes/Project_Task.class.php");
 require_once("../classes/Task.class.php");
+require_once("../classes/Timesheet.class.php");
+require_once("../classes/Timesheet_Detail.class.php");
 
 
 if (isset($_GET["func"])) {
@@ -73,7 +75,11 @@ if (isset($_GET["func"])) {
 			$archiveFlag = $_GET["archiveFlag"];
 		} else {
 			$archiveFlag = "";
-		}echo returnTasksJSON($id, $collection, $archiveFlag);
+		}
+		echo returnTasksJSON($id, $collection, $archiveFlag);
+		
+	} else if ($_GET["func"] == "returnTimesheetJSON") {
+		
 		
 	}
 
@@ -267,7 +273,8 @@ function returnTasksJSON($id, $collection, $archiveFlag ) {
 			"task_name" => $task->getValue("task_name"),
 			"task_hourly_rate" => $task->getValue("task_hourly_rate"),
 			"task_bill_by_default" => $task->getValue("task_bill_by_default"),
-			"task_common" => $task->getValue("task_common")
+			"task_common" => $task->getValue("task_common"),
+			"task_archived" => $task->getValue("task_archived")
 		);
 	}
 	return json_encode($taskJSON);
