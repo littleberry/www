@@ -49,7 +49,7 @@ function displayTimesheet($timesheet_aggregate) {
 			<h1 class="page-title"><?php echo date("F j, Y");?></h1>
 			<nav class="page-controls-nav">
 				<ul class="page-controls-list timesheet">
-					<li class="page-controls-item link-btn"><a class="view-all-link" href="project-add.php">+ Add Timesheet</a></li>
+					<!-- <li class="page-controls-item link-btn"><a class="view-all-link" href="project-add.php">+ Add Timesheet</a></li> --> <!-- We probably don't need this -->
 					<li class="page-controls-item"><a class="view-archive-link" href="projects.php?archives=1">View Archives</a></li>
 					<li class="page-controls-item"><a class="view-all-link" href="projects.php">View All</a></li>
 				</ul>
@@ -81,10 +81,10 @@ function displayTimesheet($timesheet_aggregate) {
 								<label for="task_name" <?php validateField("task_name", $missingFields)?> class="entity-details-label">Task:</label>
 								<select id="task-name" name="task_name" class="task-name-select" tabindex="1">
 									<?php //this may be moved to JS
-										list($tasksForProject) = Project_Task::getTasksForProject(1);
-										foreach ($tasksForProject as $projectTask) { ?>
-											<option value="<?php echo $projectTask->getValue("task_id"); ?>"><?php echo $projectTask->getValue("task_name"); ?></option>
-									<?php }	?> 
+										//list($tasksForProject) = Project_Task::getTasksForProject(1);
+										//foreach ($tasksForProject as $projectTask) { ?>
+											<!-- <option value="<?php //echo $projectTask->getValue("task_id"); ?>"><?php //echo $projectTask->getValue("task_name"); ?></option> -->
+									<?php //}	?> 
 								</select>
 							</li>
 						</ul>
@@ -92,25 +92,55 @@ function displayTimesheet($timesheet_aggregate) {
 				</fieldset>
 			</form>
 		</div>
-		<table id="timesheet-tasks-list" class="entity-table timesheet tablesorter">
-			<thead>
-				<tr>
-					<th class="task-name"></th>
-					<th data-sorter="false" class="day">M</th>
-					<th data-sorter="false" class="day">T</th>
-					<th data-sorter="false" class="day">W</th>
-					<th data-sorter="false" class="day">Th</th>
-					<th data-sorter="false" class="day">F<th>
-					<th data-sorter="false" class="day">Sa<th>
-					<th data-sorter="false" class="day">Su<th>
-					<th data-sorter="false" class="total"></th>
-					<th data-sorter="false" class="delete"></th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-
+		<div id="timesheet" class="entity-detail">
+			<nav class="timesheet-controls">
+				<span id="time-period">
+					<a href="#" class="ui-button previous-date">Previous week</a>
+					<a href="#" class="ui-button current-date">This week</a>
+					<a href="#" class="ui-button next-date">Next week</a>
+				</span>
+				<!-- <input id="date-picker" type="hidden" title="Select date" value="" /> -->
+				
+				<!-- <span id="date-picker"></span> -->
+				<span id="time-display">
+					<input id="day-view" type="radio" name="time-view" class="ui-button time-view-button" title="Day" value="Day" /><label for="day-view">Day</label>
+					<input id="week-view" type="radio" name="time-view" class="ui-button time-view-button" title="Week" value="Week" checked="checked" /><label for="week-view">Week</label>
+				</span>
+				
+			</nav>
+			<table id="timesheet-tasks-list" class="entity-table timesheet tablesorter">
+				<thead>
+					<tr>
+						<th class="task-name"></th>
+						<th data-sorter="false" class="day">M</th>
+						<th data-sorter="false" class="day">T</th>
+						<th data-sorter="false" class="day">W</th>
+						<th data-sorter="false" class="day">Th</th>
+						<th data-sorter="false" class="day">F</th>
+						<th data-sorter="false" class="day">Sa</th>
+						<th data-sorter="false" class="day">Su</th>
+						<th data-sorter="false" class="total day"></th>
+						<th data-sorter="false" class="delete"></th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td><a href="#" class="ui-button new-time-entry add-row ">+ Add Row</a> <a href="#" class="ui-button save">Save</a> <span class="last-saved"></span></td>
+						<td class="day total"></td>
+						<td class="day total"></td>
+						<td class="day total"></td>
+						<td class="day total"></td>
+						<td class="day total"></td>
+						<td class="day total"></td>
+						<td class="day total"></td>
+						<td class="week-total"></td>
+						<td></td>
+					</tr>
+				</tfoot>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
 	</div>
 	<footer id="site-footer" class="site-footer">
 	
