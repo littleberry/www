@@ -1,0 +1,125 @@
+	<div class="content">
+		<!--BEGIN FORM-->
+		<form action="timesheet.php" method="post">
+						<input type="hidden" name="person_id_#" value="<?php echo $person->getValueEncoded("person_id");?>">
+						<input type="hidden" name="project_id_#" value="<?php 
+	if (isset($_GET["project_id"])) {
+		echo $_GET["project_id"];
+	} 
+	?>">
+	
+	<img class="client-logo-img small" style="height:100px; width:100px;" src="<?php echo "images/" . $person->getValue("person_logo_link")?>" title="Person Logo" alt="Person logo" />
+	<?php echo  "Adding Timesheet for Project " . Project::getProjectName($_GET["project_id"])[0] ?>	
+	<input type="hidden" name="task_id_#" value="<?php 
+	if (isset($_GET["task_id"]))	 {
+		echo $_GET["task_id"];
+	} 
+	?>"><?php echo "<br>Adding Timesheet for Task " . Task::getTaskName($_GET["task_id"])[0]?>
+	<input type="hidden" name="timesheet_notes_#" value="<?php 
+	if (isset($_GET["timesheet_notes"]))	 {
+		echo $_GET["timesheet_notes"];
+	}
+	?>">
+						
+<table style="width:100%; border:1px solid;">
+<?php
+
+list($timesheets) = Timesheet::getTimesheetByPerson($person->getValueEncoded("person_id"));
+
+//get the general timesheet information
+foreach ($timesheets as $timesheet) {
+	//get out the details for a particular timesheet
+	list($timesheet_details) = Timesheet_Detail::getTimesheetDetail($timesheet->getValueEncoded("timesheet_id"));
+	
+	?><tr>
+	<td style="color:orange;border:1px solid;">Person ID:<?php echo $person->getValueEncoded("person_id");?>
+	<input type="hidden" name="person_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $person->getValueEncoded("person_id");?>"></td>
+	<td style="color:blue;border:1px solid;">Timesheet ID:<?php echo $timesheet->getValueEncoded("timesheet_id");?>
+	<input type="hidden" name="timesheet_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("timesheet_id");?>"></td>
+	<td style="color:green;border:1px solid;">Task:<?php echo $timesheet->getValueEncoded("task_id");?>
+	<input type="hidden" name="task_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("task_id");?>"></td>
+	<td style="color:pink;border:1px solid;">Project:<?php echo $timesheet->getValueEncoded("project_id");?>
+	<input type="hidden" name="project_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("project_id");?>">
+	<input type="hidden" name="timesheet_notes_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("timesheet_notes");?>"></td></tr><tr>
+	<?php 
+	//yeah, not going to fight tables that will be gone eventually anyway. 
+	$i = 0;
+	foreach ($timesheet_details as $timesheet_detail) {
+		?>
+		<input type="hidden" name="timesheet_id_<?php echo $timesheet->getValueEncoded("timesheet_id");?>" value="<?php echo $timesheet->getValueEncoded("timesheet_id");?>">
+		<td style="border:1px solid;"><input type="input" name="timesheet_date_<?php echo $timesheet->getValueEncoded("timesheet_id");?>_<?php echo $i?>" value="<?php echo $timesheet_detail->getValueEncoded("timesheet_date");?>"></td>
+	<?php $i++; 
+	} ?>
+	</tr>
+	<tr>
+	<?php
+	$i = 0;
+	foreach ($timesheet_details as $timesheet_detail) {
+		?><td style="border:1px solid;"><input name="timesheet_number_of_hours_<?php echo $timesheet->getValueEncoded("timesheet_id");?>_<?php echo $i ?>" value="<?php echo $timesheet_detail->getValueEncoded("timesheet_number_of_hours");?>"></td>
+	<?php $i++;
+	} ?>
+	</tr>
+<?php }
+
+
+
+//add the timesheet to the UI if the person wanted to add a new timesheet.
+//we don't have the timesheet ID yet.
+//if (isset($_GET["project_id"])) {
+?>
+<tr>
+
+	<input type="hidden" name="person_id_#" value="<?php echo $person->getValueEncoded("person_id");?>">
+	<input type="hidden" name="project_id_#" value="<?php 
+	if (isset($_GET["project_id"])) {
+		echo $_GET["project_id"];
+	} elseif (isset($timesheet)) {
+		echo $timesheet->getValueEncoded("project_id");
+	} else {
+			echo "";
+	}
+	?>"><?php //echo  Project::getProjectName($_GET["project_id"])[0] ?>	
+	<input type="hidden" name="task_id_#" value="<?php 
+	if (isset($_GET["task_id"]))	 {
+		echo $_GET["task_id"];
+	} elseif (isset($timesheet)) {
+		echo $timesheet->getValueEncoded("task_id");
+	} else {
+		echo "";
+	}
+	?>"><?php //echo Task::getTaskName($_GET["task_id"])[0]?>
+	<input type="hidden" name="timesheet_notes_#" value="<?php 
+	if (isset($_GET["timesheet_notes"]))	 {
+		echo $_GET["timesheet_notes"];
+	} elseif (isset($timesheet)) {
+		echo $timesheet->getValueEncoded("timesheet_notes");
+	} else {
+		echo "";
+	}
+	?>">
+
+<?if (isset($_GET["project_id"])) {
+	for ($i=0; $i<7; $i++) {
+		?><td><?php echo date("D M d", strtotime('sunday this week -1 week + ' . $i . ' days', $d))?>
+		<input type="input" name="timesheet_date_#_<?php echo $i?>" value="<?php echo date("D M d", strtotime('sunday this week -1 week + ' . $i . ' days', $d))?>"></td>
+		<?php } ?>
+		</td></tr><tr>
+		<?php 
+			for ($i=0; $i<7; $i++) {
+			?><td><input name="timesheet_number_of_hours_#_<?php echo $i ?>"></td>
+	<?php } 
+}
+	?>	
+
+</tr>
+</table>
+</tr>
+</tbody>
+<?php //} ?>
+</table>
+			<input type="button" name="add_row_button" value="Add Row" onclick="javascript:window.open('add_timesheet_row.php?person_id=<?php echo $person->getValueEncoded("person_id")?>','myWindow','width=300,height=200,left=250%,right=250%,scrollbars=no')">
+			<input type="submit" name="save_timesheet_button" value="Save Timesheet">
+		</form>
+
+	</div>
+</div>
