@@ -30,7 +30,7 @@ define("TBL_PROJECT_PERSON", "project_person");
 define("TBL_PROJECT_TASK", "project_task");
 //table definitions for timesheets
 define("TBL_TIMESHEET", "timesheet");
-define("TBL_TIMESHEET_DETAIL", "timesheet_detail");
+define("TBL_TIMESHEET_ITEM", "timesheet_item");
 
 //This is a security risk! Login and PW should be stored outside of the file in a prod env.
 ?>

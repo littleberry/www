@@ -25,7 +25,7 @@ function displayForm($errorMessages, $missingFields, $person) {
 	<section id="page-content" class="page-content">
 
         <p>Thanks for joining us at Time Tracker!</p>
-        <p>To register, please fill in your details below and click Send Details.</p>
+        <p>To register, please fill in your user details below and click Send Details.</p>
         <p class="required">= required.</p>
  	<?php
 	}
