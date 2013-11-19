@@ -1,14 +1,14 @@
 ;
 
-var Timesheet = function ( id, startDate, endDate ) {
+var Timesheet = function ( id, week ) {
 	var timesheet = {};
 
 	var getData = {
 		func: "returnTimesheetJSON",
 		id: id,
 		collection: "person",
-		startDate: startDate,
-		endDate: endDate
+		startDate: week.start,
+		endDate: week.end
 	}
 	$.get( "returnJSON.php", getData )
 		.done( function( data ) {
@@ -143,21 +143,37 @@ function calculateTotals( elem ) {
 		
 		
 	}
+}
+
+function getWeekBookends( date ) {
+	var bookends = {};
+	var workWeekStart = 1; //Work week starts on Monday
+	var workWeekLength = 6; //Last day of the week (0..7);
+	var weekStart = new Date();
+	var weekEnd = new Date();
+
+	if ( date ) {
+		weekStart.setDate( date.getDate() - date.getDay() + workWeekStart );
+		weekEnd.setDate( weekStart.getDate() + workWeekLength );
+		
+	} else {
+		var today = new Date();
+		
+		weekStart.setDate( today.getDate() - today.getDay() + workWeekStart );
+		weekEnd.setDate( weekStart.getDate() + workWeekLength );
 	
-	
+		//console.log ( weekStart + ", " + today + ", " + weekEnd );
+	}
+	bookends["start"] = weekStart;
+	bookends["end"] = weekEnd;
+
+	return bookends;
 }
 
 $( function() {
-	var today = new Date();
-	console.log( today );
-	var weekStart = new Date( today - 1 );
-	console.log ( weekStart );
-	var thisWeek = {
-		start: function() {
-			return new Date();
-		}
-	}
-	//var timesheet = new Timesheet( $( "#timesheet-tasks-list" ).data( "person_id" ) );
+	var thisWeek = getWeekBookends(); //leave blank to get current week
+	
+	var timesheet = new Timesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), thisWeek );
 
 	getTasksForProject( $( "#project-name" ).val() );
 	$( "#project-name" )
