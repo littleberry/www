@@ -319,7 +319,7 @@ function saveTimesheet() {
 		foreach ($timesheet_aggregate as $timesheet_object) {
 			//insert or update the timesheet(s).
 			if ((get_class($timesheet_object)) == "Timesheet") {
-				$timesheet_exists = $timesheet_object->getTimesheetById($timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));
+				$timesheet_exists = $timesheet_object->getTimesheetById($timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));
 				//this will work temporarily until we decide what to do with the start and end date.
 				//this won't work!!!
 				//$timesheet_item_exists = Timesheet_Item::getTimesheetItem($timesheet_object->getValueEncoded("timesheet_date"), $timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("project_id"), $timesheet_object->getValueEncoded("task_id"));	
@@ -329,6 +329,7 @@ function saveTimesheet() {
 					$timesheet_object->getValueEncoded("person_id");
 					//error_log $timesheet_object->getValueEncoded("person_id");
 					$lastInsertId = $timesheet_object->insertTimesheet($timesheet_object->getValueEncoded("person_id"));
+					
 					//put the timesheet id into the object, so we'll have it later.
 					$timesheet_object->setValue("timesheet_id", $lastInsertId[0]);
 					//error_log("<br><br>LAST INSERT ID IS ");
@@ -336,6 +337,9 @@ function saveTimesheet() {
 					//error_log("<br><br><br>");
 				} else {
 					error_log("<br><br>timesheet exists.<br><br>");
+					if (!$lastInsertId) {
+						$lastInsertId = $timesheet_object->getLastInsert();
+					}
 					//error_log(print_r($timesheet_object),true);
 					//timesheet exists, update it.
 					$timesheet_object->updateTimesheet($timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));	
@@ -360,6 +364,7 @@ function saveTimesheet() {
 					//error_log(print_r($lastInsertId[0]), true);
 					//error_log("<br><br><br>here is what we're trying to insert: ");
 					error_log(print_r($timesheet_object), true);
+					
 					error_log("checking value of lastInsertId:" . $lastInsertId[0]);
 					$timesheet_object->insertTimesheetItem($timesheet_object->getValueEncoded("person_id"), $lastInsertId[0]);
 				} else {
