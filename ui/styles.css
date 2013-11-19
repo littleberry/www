@@ -603,57 +603,9 @@ legend.client-logo-title {
 	margin-bottom: -1em;
 }
 
-
-/*
-.client-details-header {
-	position: relative;
-	margin: 0 0 1em 0;
-}
-.client-details-title {
-	font-size: 1.25em;
-	font-weight: 700;
-}
-legend.client-details-title {
-	position: relative;
-	visibility: hidden;
-	margin-bottom: -1em;
-}
-.client-details-entry {
-	padding: .5em 1em 1em 1em;
-}
-.client-details-item {
-	margin: .325em 0;
-}
-
-.client-details-item.address {
-	margin: 1.125em 0;
-}
-.client-details-item.address .client-streetAddress-input {
-	vertical-align: text-top;
-	margin: .5em 0;
-	width: 60%;
-}
-*/
 .client-state-select {
 	margin: .5em 0;
 }
-/*
-.client-details-label {
-	position: relative;
-	display: inline-block;
-	width: 25%;
-	text-align: right;
-	margin: 0 .5em 0 0;
-}
-*/
-/*
-.client-details-item.submit-client {
-	margin: 1.125em 0;
-}
-input[type=button].client-delete-btn:hover {
-	background-color: #D22F12;
-}
-*/
 .contact-detail {
 	position: relative;
 	margin: 1.5em 0 3em 0;
@@ -710,6 +662,34 @@ legend.contact-details-title {
 .client-projects-list {
 	margin: 0 0 0em 3em;
 }
+
+/* !Timesheet modules */
+.entity-table {
+	position: relative;
+	width: 100%;
+	margin: 2em auto;
+	border: 0;
+}
+.entity-table thead th {
+	position: relative;
+	height: 2em;
+	background-color: #A9BFF5;
+	margin: .5em .25em;
+	padding: 0;
+	border: 0;
+}
+
+.timesheet .day {
+	position: relative;
+	width: 8%;
+	text-align: right;
+	vertical-align: text-top;
+}
+input[type=text].time-entry-input {
+	position: relative;
+	width: 4em;
+}
+
 
 
 
