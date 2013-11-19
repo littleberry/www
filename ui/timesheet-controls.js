@@ -2,10 +2,13 @@
 
 var Timesheet = function ( id, startDate, endDate ) {
 	var timesheet = {};
+
 	var getData = {
 		func: "returnTimesheetJSON",
 		id: id,
-		collection: "person"
+		collection: "person",
+		startDate: startDate,
+		endDate: endDate
 	}
 	$.get( "returnJSON.php", getData )
 		.done( function( data ) {
@@ -145,7 +148,16 @@ function calculateTotals( elem ) {
 }
 
 $( function() {
-	var timesheet = new Timesheet( $( "#timesheet-tasks-list" ).data( "person_id" ) );
+	var today = new Date();
+	console.log( today );
+	var weekStart = new Date( today - 1 );
+	console.log ( weekStart );
+	var thisWeek = {
+		start: function() {
+			return new Date();
+		}
+	}
+	//var timesheet = new Timesheet( $( "#timesheet-tasks-list" ).data( "person_id" ) );
 
 	getTasksForProject( $( "#project-name" ).val() );
 	$( "#project-name" )
