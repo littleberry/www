@@ -81,13 +81,14 @@ class Timesheet extends DataObject {
 	}
 	
 	//get all of the timesheet info for a specific timesheet.
-	public function getTimesheetById($timesheet_start_date, $timesheet_end_date) {
+	public function getTimesheetById($person_id, $timesheet_start_date, $timesheet_end_date) {
 		$conn=parent::connect();
-		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_start_date = :timesheet_start_date and timesheet_end_date = :timesheet_end_date";
+		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE person_id = :person_id and timesheet_start_date = :timesheet_start_date and timesheet_end_date = :timesheet_end_date";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($this->data["timesheet_start_date"])), PDO::PARAM_STR);
 			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($this->data["timesheet_end_date"])), PDO::PARAM_STR);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->execute();
 			$timesheet=array();
 			foreach ($st->fetchAll() as $row) {
@@ -151,9 +152,12 @@ class Timesheet extends DataObject {
 	//this is old, the last insert ID is retrieved using MySQL now.
 	public function getLastInsert() {
 		$conn=parent::connect();
-		$sql = "SELECT LAST_INSERT_ID() FROM " . TBL_TIMESHEET;
+		$sql = "SELECT timesheet_id FROM " . TBL_TIMESHEET . " WHERE timesheet_start_date = :timesheet_start_date and timesheet_end_date = :timesheet_end_date and person_id = :person_id";
 		try {
 			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($this->data["timesheet_start_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($this->data["timesheet_end_date"])), PDO::PARAM_STR);
+			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_INT);
 			$st->execute();
 			$row=$st->fetch();
 			parent::disconnect($conn);
