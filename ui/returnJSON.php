@@ -8,7 +8,7 @@ require_once("../classes/Project_Person.class.php");
 require_once("../classes/Project_Task.class.php");
 require_once("../classes/Task.class.php");
 require_once("../classes/Timesheet.class.php");
-require_once("../classes/Timesheet_Detail.class.php");
+require_once("../classes/Timesheet_Item.class.php");
 
 
 if (isset($_GET["func"])) {
@@ -79,8 +79,17 @@ if (isset($_GET["func"])) {
 		echo returnTasksJSON($id, $collection, $archiveFlag);
 		
 	} else if ($_GET["func"] == "returnTimesheetJSON") {
-		
-		
+		if (isset($_GET["id"])) {
+			$id = $_GET["id"];
+		} else {
+			$id = "";
+		}
+		if (isset($_GET["collection"])) {
+			$collection = $_GET["collection"];
+		} else {
+			$collection = "";
+		}
+		echo returnTimesheetsJSON($id, $collection);
 	}
 
 }
@@ -205,6 +214,7 @@ function returnPeopleJSON($id, $collection) {
 	} else if (($collection == "person") && ($id != "")) {
 		$people = array();
 		$people[] = Person::getPersonById($id);
+		error_log(">>>>" . print_r($people));
 	} else {
 		$people = Person::getPeople();
 	}
@@ -229,7 +239,7 @@ function returnPeopleJSON($id, $collection) {
 	return json_encode($peopleJSON);
 }
 
-function returnTasksJSON($id, $collection, $archiveFlag ) {
+function returnTasksJSON($id, $collection, $archiveFlag) {
 	//Returns Task object as JSON encoded object for jQuery to use
 	if ($collection == "project") {
 		if ($id != "") {
@@ -280,6 +290,41 @@ function returnTasksJSON($id, $collection, $archiveFlag ) {
 	return json_encode($taskJSON);
 }
 
+function returnTimesheetsJSON($id, $collection) {
+	if ($collection == "person") {
+		if ($id != "") {
+			$timesheets = Timesheet::getTimesheetByPerson($id);
+		} else {
+			//$timesheets = Timesheet::getTasks(0);
+		}
+
+	} else if ($collection == "timesheet") {
+		if ($id != "") {
+			$timesheets = Timesheet::getTimesheetById($id);
+		} else {
+			//$timesheets = Timesheet::getPeople(); //should be a way to get all timesheets for a project?
+		}
+	
+	}
+	$timesheets = $timesheets[0];
+
+	error_log("++++");
+	error_log(print_r($timesheets));
+	$timesheetJSON = array();
+	foreach ($timesheets as $timesheet) {
+		$timesheetJSON[] = array(
+			"timesheet_id" => $timesheet->getValue("timesheet_id"),
+			"timesheet_approved" => $timesheet->getValue("timesheet_approved"),
+			"timesheet_submitted" => $timesheet->getValue("timesheet_submitted"),
+			"person_id" => $timesheet->getValue("person_id")
+		);
+	}
+	if ($timesheetJSON) {
+		return json_encode($timesheetJSON);
+	} else {
+		return 0;
+	}
+}
 
 
 ?>

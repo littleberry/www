@@ -1,5 +1,31 @@
 ;
 
+var Timesheet = function ( id, startDate, endDate ) {
+	var timesheet = {};
+	var getData = {
+		func: "returnTimesheetJSON",
+		id: id,
+		collection: "person"
+	}
+	$.get( "returnJSON.php", getData )
+		.done( function( data ) {
+			console.log("done: " + data);
+		})
+		.fail( function( data ) {
+			console.log("fail: " + data);
+		})
+		.success( function( data ) {
+			//ts = $.parseJSON( data );
+			console.log("success: " + data);
+			
+			
+		})
+	
+	return timesheet;
+}
+
+
+
 function getTasksForProject( id ) {
 	$.get( "returnJSON.php", {
 			func: "returnTasksJSON" ,
@@ -119,6 +145,8 @@ function calculateTotals( elem ) {
 }
 
 $( function() {
+	var timesheet = new Timesheet( $( "#timesheet-tasks-list" ).data( "person_id" ) );
+
 	getTasksForProject( $( "#project-name" ).val() );
 	$( "#project-name" )
 		.change( function( evt ) {
@@ -126,31 +154,31 @@ $( function() {
 		})
 		
 	$( '#add-ts-entry-modal' )
-	.dialog({
-		autoOpen: false,
-		resizable: false,
-		height: 360,
-		width: 600,
-		modal: true,
-		buttons: {
-			"+ Add Row": function() {
-				var rowInfo = {
-					task_id: $( "#task-name" ).val(),
-					task_name: $( "#task-name option:selected" ).text(),
-					project_id: $( "#project-name" ).val(),
-					project_name: $( "#project-name option:selected" ).text()
+		.dialog({
+			autoOpen: false,
+			resizable: false,
+			height: 360,
+			width: 600,
+			modal: true,
+			buttons: {
+				"+ Add Row": function() {
+					var rowInfo = {
+						task_id: $( "#task-name" ).val(),
+						task_name: $( "#task-name option:selected" ).text(),
+						project_id: $( "#project-name" ).val(),
+						project_name: $( "#project-name option:selected" ).text()
+					}
+					addTimesheetRow( rowInfo );
+					$( this ).dialog( "close" );
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );	
 				}
-				addTimesheetRow( rowInfo );
-				$( this ).dialog( "close" );
 			},
-			Cancel: function() {
-				$( this ).dialog( "close" );	
-			}
-		},
-		close: function() {
-	        //console.log("close modal");
-	    }
-	});
+			close: function() {
+		        //console.log("close modal");
+		    }
+		});
 	
 	$( '.new-time-entry' ).click( function ( evt ) {
 		
@@ -173,28 +201,33 @@ $( function() {
 
 $( function() {
 	$( ".ui-button" )
-      .button()
-      .click( function( evt ) {
-		  evt.preventDefault();
-      });
+		.button()
+		.click( function( evt ) {
+			evt.preventDefault();
+		});
+		
+	$( ".ui-button.save" )
+		.button( "option", "disabled", true );
+		
 	$( "#time-display" )
 		.buttonset();
+		
 	$( "#time-period" )
 		.buttonset()
 		.find( ".previous-date" )
-			.button({
-		 		icons: {
-		     		primary: "ui-icon-triangle-1-w"
-		 		},
-		 		text: false
-			}).end()
+		.button({
+			icons: {
+			primary: "ui-icon-triangle-1-w"
+		},
+			text: false
+		}).end()
 		.find( ".next-date" )
-			.button({
-		 		icons: {
-		     		primary: "ui-icon-triangle-1-e"
-		 		},
-		 		text: false
-			});
+		.button({
+			icons: {
+			primary: "ui-icon-triangle-1-e"
+		},
+			text: false
+		});
 		
 			
 	/*

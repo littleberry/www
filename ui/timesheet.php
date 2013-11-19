@@ -108,7 +108,7 @@ function displayTimesheet($timesheet_aggregate) {
 				</span>
 				
 			</nav>
-			<table id="timesheet-tasks-list" class="entity-table timesheet tablesorter">
+			<table id="timesheet-tasks-list" class="entity-table timesheet tablesorter" data-person_id="<?php echo $person->getValue('person_id'); ?>">
 				<thead>
 					<tr>
 						<th class="task-name"></th>
