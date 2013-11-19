@@ -9,6 +9,8 @@ class Timesheet extends DataObject {
 		"timesheet_id"=>"",
 		"timesheet_approved"=>"",
 		"timesheet_submitted"=>"",
+		"timesheet_start_date"=>"",
+		"timesheet_end_date"=>"",
 		"person_id"=>""
 	);
 	
@@ -79,12 +81,13 @@ class Timesheet extends DataObject {
 	}
 	
 	//get all of the timesheet info for a specific timesheet.
-	public function getTimesheetById($timesheet_id) {
+	public function getTimesheetById($timesheet_start_date, $timesheet_end_date) {
 		$conn=parent::connect();
-		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_id = :timesheet_id";
+		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_start_date = :timesheet_start_date and timesheet_end_date = :timesheet_end_date";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($this->data["timesheet_start_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($this->data["timesheet_end_date"])), PDO::PARAM_STR);
 			$st->execute();
 			$timesheet=array();
 			foreach ($st->fetchAll() as $row) {
@@ -111,11 +114,15 @@ class Timesheet extends DataObject {
 			timesheet_id,
 			timesheet_approved,
 			timesheet_submitted,
+			timesheet_start_date,
+			timesheet_end_date,
 			person_id
 			) VALUES (
 			:timesheet_id,
 			:timesheet_approved,
 			:timesheet_submitted,
+			:timesheet_start_date,
+			:timesheet_end_date,
 			:person_id
 			)";
 		try {
@@ -123,7 +130,10 @@ class Timesheet extends DataObject {
 			$st->bindValue(":timesheet_id", 'auto', PDO::PARAM_INT);
 			$st->bindValue(":timesheet_approved", $this->data["timesheet_approved"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_submitted", $this->data["timesheet_submitted"], PDO::PARAM_INT);
-			error_log("here is the person id: ") . $person_id;
+			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($this->data["timesheet_start_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($this->data["timesheet_end_date"])), PDO::PARAM_STR);
+			//error_log("here is the END DATE: ") . date('y-m-d', strtotime($this->data["timesheet_end_date"]));
+			//error_log("here is the START DATE: ") . date('y-m-d', strtotime($this->data["timesheet_start_date"]));
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->execute();
 			$sql = "SELECT LAST_INSERT_ID() FROM " . TBL_TIMESHEET;
@@ -132,7 +142,6 @@ class Timesheet extends DataObject {
 			$row=$st->fetch();
 			parent::disconnect($conn);
 			if ($row) return $row;
-			error_log("Here is the last insert id:" . $row);
 		} catch (PDOException $e) {
 			parent::disconnect($conn);
 			die("Query failed on insert of timesheet, sql is $sql " . $e->getMessage());
@@ -156,19 +165,22 @@ class Timesheet extends DataObject {
 	}
 	
 	//update the timesheet data.
-	public function updateTimesheet($timesheet_id) {
+	public function updateTimesheet($timesheet_start_date, $timesheet_end_date) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_TIMESHEET . " SET
 			person_id = :person_id,
 			timesheet_approved = :timesheet_approved,
-			timesheet_submitted = :timesheet_submitted
-			WHERE timesheet_id = :timesheet_id";
+			timesheet_submitted = :timesheet_submitted,
+			timesheet_start_date = :timesheet_start_date,
+			timesheet_end_date = :timesheet_end_date
+			WHERE timesheet_start_date = :timesheet_start_date and timesheet_end_date = :timesheet_end_date";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_STR);
 			$st->bindValue(":timesheet_approved", $this->data["timesheet_approved"], PDO::PARAM_STR);
 			$st->bindValue(":timesheet_submitted", $this->data["timesheet_submitted"], PDO::PARAM_INT);
-			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($this->data["timesheet_start_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($this->data["timesheet_end_date"])), PDO::PARAM_STR);
 			$st->execute();
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
