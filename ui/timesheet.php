@@ -13,7 +13,6 @@
 	checklogin();
 	
 	include('header.php'); //add header.php to page
-
 	if (isset($_POST["save_timesheet_button"]) and $_POST["save_timesheet_button"] == "Save Timesheet") {
 		saveTimesheet();
 	} else {
@@ -41,6 +40,7 @@ function displayTimesheet($timesheet_aggregate) {
 		error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
 		exit();
 	}
+	
 	?>
 	
 	<div id="page-content" class="page-content">
@@ -153,30 +153,34 @@ function displayTimesheet($timesheet_aggregate) {
 
  
 function saveTimesheet() {
+
 	//CREATE THE TIMESHEET OBJECTS ($timesheet).
-	//put each timesheet and its data into an array labeled with the timesheet ID.
+	//get out each timesheet for this person put each timesheet and its data into an array labeled with the timesheet ID.
+	//this code only deals with timesheets the user has stored.
+	//BUG FIX 3: we already have this, don't call the session again.
 	$person=Person::getByEmailAddress($_SESSION["logged_in"]);
-	list($timesheet_ids) = Timesheet::getTimesheetIds($person->getValueEncoded("person_id"));
-	
-	$tid = "#";
-		
-	//GET OUT THE STORED TIMESHEETS AND CREATE THE item OBJECTS TO DISPLAY IN THE UI.	
-	//in this world, we're getting the values from the database, so task_id, project_id and person_id follow the field_name_$tid_$i style here.
+	//list($timesheet_ids) = Timesheet::getTimesheetIds($person->getValueEncoded("person_id"));
+	list($timesheet_ids) = Timesheet::getTimesheetByPersonForDate($person->getValueEncoded("person_id"), $timesheet_date);
+			
+	//We're getting the values from the database, so task_id, project_id and person_id follow the field_name_$tid_$i style here.
 	
 	foreach ($timesheet_ids as $timesheet_id) {
 		$tid = $timesheet_id->getValueEncoded("timesheet_id");
 		$timesheet[$tid] = new Timesheet( array(
-			//CHECK REG SUBS!!
-			"timesheet_id" => isset($_POST["timesheet_id_$tid"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_id_$tid"]) : "",
-			"timesheet_approved" => isset($_POST["timesheet_approved_$tid"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_approved_$tid"]) : "",
-			"timesheet_submitted" => isset($_POST["timesheet_submitted_$tid"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_submitted_$tid"]) : "",
-			"person_id" => isset($_POST["person_id_$tid"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person_id_$tid"]) : ""
+		//CHECK REG SUBS!!
+		"timesheet_id" => isset($_POST["timesheet_id_$tid"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_id_$tid"]) : "",
+		"timesheet_approved" => isset($_POST["timesheet_approved_$tid"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_approved_$tid"]) : "",
+		"timesheet_submitted" => isset($_POST["timesheet_submitted_$tid"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_submitted_$tid"]) : "",
+		"timesheet_start_date" => isset($_POST["timesheet_start_date_$tid"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_start_date_$tid"]) : "",
+		"timesheet_end_date" => isset($_POST["timesheet_end_date_$tid"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_end_date_$tid"]) : "",
+		"person_id" => isset($_POST["person_id_$tid"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person_id_$tid"]) : ""
 		));
 			
+		//store the timesheet fields in an array
 		$timesheet_aggregate[] = $timesheet[$tid];
-		//print_r($timesheet_aggregate);
 
-		//create the timesheet detail object ($timesheet_detail)
+
+		//create the timesheet item objects ($timesheet_items)
 		for ($i=0; $i<7; $i++) {
 			$timesheet_item[$tid][$i] = new Timesheet_Item( array(
 				//CHECK REG SUBS!!
@@ -188,22 +192,34 @@ function saveTimesheet() {
 				"timesheet_hours" => isset($_POST["timesheet_hours_$tid"."_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_hours_$tid"."_$i"]) : "",
 				"timesheet_notes" => isset($_POST["timesheet_notes_$tid"."_$i"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_notes_$tid"."_$i"]) : ""
 			));
+			//store the timesheet items in an array.
 			$timesheet_item_aggregate[] = $timesheet_item[$tid][$i];
 		}
 	} 
+		//debug code to check arrays after the values have been pulled
+		//error_log("timesheet aggregate");
+		//error_log(print_r($timesheet_aggregate,true));
+		//error_log("timesheet item aggregate");
+		//error_log(print_r($timesheet_item_aggregate, true));
+
 	
 	//USER IS ADDING A TIMESHEET FOR THE FIRST TIME, or they have no timesheets at all, so we don't have a timesheet id to put in the field
 	//in the UI. Instead, use "#".
+	//BUG FIX 4 instructions:
 	//I am not going to fight the UI anymore. It is inconsistent, but the task_id, the project_id and the person_id all are based on the field_name_$tid style
 	//and not field_name_$tid_$i style. If we keep this UI in any way, I will fight it later. 11/16
 	
-	if	(!$timesheet_ids || $tid == "#") {
+	
+	if	(isset($_POST["person_id_#"])) {
+		$tid = "#";
 		$timesheet[$tid] = new Timesheet( array(
-			//CHECK REG SUBS!!
-			"timesheet_id" => isset($_POST["timesheet_id_$tid"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_id_$tid"]) : "",
-			"timesheet_approved" => isset($_POST["timesheet_approved_$tid"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_approved_$tid"]) : "",
-			"timesheet_submitted" => isset($_POST["timesheet_submitted_$tid"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_submitted_$tid"]) : "",
-			"person_id" => isset($_POST["person_id_$tid"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person_id_$tid"]) : ""
+		//CHECK REG SUBS!!
+		"timesheet_id" => isset($_POST["timesheet_id_$tid"]) ? preg_replace("/[^ 0-9]/", "", $_POST["timesheet_id_$tid"]) : "",
+		"timesheet_approved" => isset($_POST["timesheet_approved_$tid"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_approved_$tid"]) : "",
+		"timesheet_submitted" => isset($_POST["timesheet_submitted_$tid"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_submitted_$tid"]) : "",
+		"timesheet_start_date" => isset($_POST["timesheet_start_date_$tid"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_start_date_$tid"]) : "",
+		"timesheet_end_date" => isset($_POST["timesheet_end_date_$tid"])? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["timesheet_end_date_$tid"]) : "",
+		"person_id" => isset($_POST["person_id_$tid"]) ? preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $_POST["person_id_$tid"]) : ""
 		));
 		
 		$timesheet_aggregate[] = $timesheet[$tid];
@@ -227,8 +243,9 @@ function saveTimesheet() {
 	
 	error_log("here is the post");
 	error_log(print_r($_POST,true));
-	error_log("here is the timesheet aggregate");
+	error_log("here are the timesheet aggregate");
 	error_log(print_r($timesheet_aggregate,true));
+	error_log(print_r($timesheet_item_aggregate, true));
 	
 
 		//timesheet aggregate has all the timesheets
@@ -236,54 +253,58 @@ function saveTimesheet() {
 		foreach ($timesheet_aggregate as $timesheet_object) {
 			//insert or update the timesheet(s).
 			if ((get_class($timesheet_object)) == "Timesheet") {
-				$timesheet_exists = $timesheet_object->getTimesheetById($timesheet_object->getValueEncoded("timesheet_id"));	
+				$timesheet_exists = $timesheet_object->getTimesheetById($timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));
+				//this will work temporarily until we decide what to do with the start and end date.
+				//this won't work!!!
+				//$timesheet_item_exists = Timesheet_Item::getTimesheetItem($timesheet_object->getValueEncoded("timesheet_date"), $timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("project_id"), $timesheet_object->getValueEncoded("task_id"));	
 				
-				if ($timesheet_exists == 0) {
-					//echo "<br><br>timesheet doesn't exist.<br><br>";
-					//print_r($timesheet_object);
-					//echo "PERSON VALUE IS";
+				if ($timesheet_exists == 0 && $timesheet_item_exists == 0) {
+					error_log("<br><br>timesheet doesn't exist.");
 					$timesheet_object->getValueEncoded("person_id");
-					//echo $timesheet_object->getValueEncoded("person_id");
+					//error_log $timesheet_object->getValueEncoded("person_id");
 					$lastInsertId = $timesheet_object->insertTimesheet($timesheet_object->getValueEncoded("person_id"));
-					//put the timesheet id into the object, maybe we'll have it later.
+					
+					//put the timesheet id into the object, so we'll have it later.
 					$timesheet_object->setValue("timesheet_id", $lastInsertId[0]);
-					//echo "<br><br>LAST INSERT ID IS ";
-					//print_r($lastInsertId[0]);
-					//echo "<br><br><br>";
+					//error_log("<br><br>LAST INSERT ID IS ");
+					//error_log(print_r($lastInsertId[0]));
+					//error_log("<br><br><br>");
 				} else {
-					//echo "<br><br>timesheet exists.<br><br>";
-					//print_r($timesheet_object);
+					error_log("<br><br>timesheet exists.<br><br>");
+					if (!$lastInsertId) {
+						$lastInsertId = $timesheet_object->getLastInsert();
+					}
+					//error_log(print_r($timesheet_object),true);
 					//timesheet exists, update it.
-					$timesheet_object->updateTimesheet($timesheet_object->getValueEncoded("timesheet_id"));	
+					$timesheet_object->updateTimesheet($timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));	
 				}
 			} 
 		}
 		
 		
-		
+		//BUG FIX 5..these loops don't need to be separated this way.
 		//timesheet item aggregate has all the timesheet items.
 		//loop through the timesheet items in the aggregate and update or insert each based on the class.
 		foreach ($timesheet_item_aggregate as $timesheet_object) {
 			if ((get_class($timesheet_object)) == "Timesheet_Item") {
-				$timesheet_item_exists = $timesheet_object->getTimesheetItems($timesheet_object->getValueEncoded("timesheet_item_id"), $timesheet_object->getValueEncoded("timesheet_date"));
-				//echo "HERE!!";
-				//print_r($timesheet_item_exists);
+				$timesheet_object->setValue("timesheet_item_id", $lastInsertId[0]);
+				$timesheet_item_exists = $timesheet_object->getTimesheetItem($timesheet_object->getValueEncoded("timesheet_date"), $timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("project_id"), $timesheet_object->getValueEncoded("task_id"));
+				//error_log(print_r($timesheet_item_exists),true);
 				//no timesheet item, insert it.
 				if (!$timesheet_item_exists) {
-					//echo "this timesheet item doesn't exist.";
-					//print_r($timesheet_object);
-					//echo "<br><br>LAST sINSERT ID IS ";
-					//print_r($lastInsertId[0]);
-					//echo "<br><br><br>here is what we're trying to insert: ";
-					//echo print_r($timesheet_object);
+					error_log("LINE 341: this timesheet item doesn't exist.");
+					error_log(print_r($timesheet_object,true));
+					//error_log("<br><br>LAST sINSERT ID IS ");
+					//error_log(print_r($lastInsertId[0]), true);
+					//error_log("<br><br><br>here is what we're trying to insert: ");
+					error_log(print_r($timesheet_object), true);
+					
+					error_log("checking value of lastInsertId:" . $lastInsertId[0]);
 					$timesheet_object->insertTimesheetItem($timesheet_object->getValueEncoded("person_id"), $lastInsertId[0]);
 				} else {
-					//echo "<br><br>LAST sINSERT ID IS ";
-					//print_r($lastInsertId[0]);
-					//echo "<br><br><br>";
 					//timesheet item exists, update it.
 					$timesheet_object->updateTimesheetItem($timesheet_object->getValueEncoded("timesheet_item_id"));	
-					//echo "that timesheet info does exist.";
+					error_log("that timesheet info does exist.");
 				}
 			}
 				

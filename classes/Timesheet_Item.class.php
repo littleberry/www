@@ -39,6 +39,7 @@ class Timesheet_Item extends DataObject {
 		}
 	}
 		//display all information about a timesheet returned as an array.
+		//let's remove this if we can, it is a confusing name.
 	public function getTimesheetItems($timesheet_item_id, $timesheet_date) {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_TIMESHEET_ITEM . " WHERE timesheet_item_id = :timesheet_item_id and timesheet_date = :timesheet_date";
@@ -107,7 +108,7 @@ class Timesheet_Item extends DataObject {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":timesheet_item_id", $timesheet_item_id, PDO::PARAM_INT);
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
-			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($this->data["timesheet_date"])), PDO::PARAM_INT);
+			$st->bindValue(":timesheet_date", date('y/m/d', strtotime($this->data["timesheet_date"])), PDO::PARAM_INT);
 			$st->bindValue(":task_id", $this->data["task_id"], PDO::PARAM_INT);
 			$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_hours", $this->data["timesheet_hours"], PDO::PARAM_INT);
@@ -132,7 +133,7 @@ class Timesheet_Item extends DataObject {
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":timesheet_item_id", $timesheet_item_id, PDO::PARAM_INT);
-			$st->bindValue(":timesheet_date", date('y-m-d', strtotime($this->data["timesheet_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_date", date('y/m/d', strtotime($this->data["timesheet_date"])), PDO::PARAM_INT);
 			$st->bindValue(":task_id", $this->data["task_id"], PDO::PARAM_INT);
 			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_hours", $this->data["timesheet_hours"], PDO::PARAM_INT);
