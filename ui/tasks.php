@@ -63,7 +63,7 @@ function displayTaskInsertForm($errorMessages, $missingFields, $task, $processTy
 					<h1 class="entity-details-title">Enter task details:</h1>
 					<h4 class="required">= Required</h4>
 				</header>
-				<section id="project-info" class="entity-detail">
+				<section id="task-info" class="entity-detail">
 					<ul class="details-list entity-details-list task">
 						<li class="entity-details-item name task">
 							<label for="task_name" <?php validateField("task_name", $missingFields)?> class="entity-details-label">Task Name:</label>
