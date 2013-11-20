@@ -340,7 +340,7 @@ function returnTimesheetsJSON($id, $collection, $startDate, $endDate) {
 	$timesheetJSON = array();
 	foreach ($timesheets as $timesheet) {
 		//error_log("### " . $timesheet->getValue("timesheet_id"));
-		$timesheet_items = Timesheet_Item::getTimesheetDates($timesheet->getValue("timesheet_id"));
+		$timesheet_items = Timesheet_Item::getTimesheetItems($timesheet->getValue("timesheet_id"));
 		error_log("### " . print_r($timesheet_items));
 		if ($timesheet_items == 0) {
 			$timesheet_items = array();
