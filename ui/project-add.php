@@ -33,6 +33,9 @@
 ?>
 <!--DISPLAY PROJECT INSERT WEB FORM--->
 <?php function displayProjectInsertForm($errorMessages, $missingFields, $project) { 
+
+
+
 	
 	//if there are errors in the form display the message
 	if ($errorMessages) {
@@ -337,6 +340,13 @@ function showBudgetFields(f) {
 			}
 			//end checkbox cleanup
 			$client_id = $project->getValue("client_id");
+			//get out who is assigning this project.
+			if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
+				$person = Person::getByEmailAddress($_SESSION["logged_in"]);
+			} else {
+				error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
+				exit();
+			}
 			//insert the project into the project table.
 			$project->insertProject($client_id);
 			//insert the project and the associated people into the project_people table.
@@ -345,7 +355,7 @@ function showBudgetFields(f) {
 			foreach ($person_ids as $person_id) {
 			if ($person_id) {
 				//echo "inserting person id " . $person_id . " and " . "project id " . $project_id["project_id"]; 
-				$project_person->insertProjectPerson($person_id, $project_id["project_id"]);
+				$project_person->insertProjectPerson($person_id, $project_id["project_id"], $person->getValueEncoded("person_email"));
 			}
 			}
 			$task_ids = explode(',', $project_task->getValue("task_id"));
