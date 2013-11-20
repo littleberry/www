@@ -114,18 +114,20 @@ class Project_Person extends DataObject {
 		}	
 	}
 	
-	public function updateProjectPerson($person_id, $project_id) {
+	public function updateProjectPerson($person_id, $project_id, $project_assigned_by) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_PROJECT_PERSON . " SET
 				project_id = :project_id,
 				person_id = :person_id,
-				total_budget_hours = :total_budget_hours
+				total_budget_hours = :total_budget_hours,
+				project_assigned_by = :project_assigned_by,
 				WHERE project_id = :project_id";
 			try {
 				$st = $conn->prepare($sql);
 				$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_STR);
 				$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_STR);
 				$st->bindValue(":total_budget_hours", $this->data["total_budget_hours"], PDO::PARAM_INT);
+				$st->bindValue(":project_assigned_by", $project_assigned_by, PDO::PARAM_STR);
 				$st->execute();	
 				parent::disconnect($conn);
 			} catch (PDOException $e) {
