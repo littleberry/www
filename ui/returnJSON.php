@@ -303,10 +303,23 @@ function returnTasksJSON($id, $collection, $archiveFlag) {
 function returnTimesheetsJSON($id, $collection, $startDate, $endDate) {
 	if ($collection == "person") {
 		if ($id != "") {
-			$timesheets = Timesheet::getTimesheetByPersonForDate($id, $startDate);
-			error_log(">>> " . $timesheets);
-		} else {
-			//$timesheets = Timesheet::getTasks(0);
+			$timesheets = Timesheet::getTimesheetById($id, $startDate, $endDate);
+			if ( !$timesheets ) {
+				error_log(">>>>>> no timesheets. create new one.");
+				$timesheets= new Timesheet( array(
+					"timesheet_id"=>"",
+					"timesheet_approved"=>"",
+					"timesheet_submitted"=>"",
+					"timesheet_start_date"=>$startDate,
+					"timesheet_end_date"=>$endDate,
+					"person_id"=>$id
+			
+				));
+				$timesheets->insertTimesheet($id, $startDate, $endDate);
+				//$timesheet_items = array();
+			}
+ 		} else {
+			//$timesheet_items = Timesheet_Items::getTimesheetItems();
 		}
 
 	}/*
@@ -319,26 +332,32 @@ function returnTimesheetsJSON($id, $collection, $startDate, $endDate) {
 	
 	}
 */
-	$timesheets = $timesheets[0];
+	//$timesheets = $timesheets[0];
+	//error_log(">>> " . $timesheets);
 
-	error_log("++++");
-	error_log(print_r($timesheets));
+	//error_log("++++");
+	error_log(count($timesheets));
 	$timesheetJSON = array();
 	foreach ($timesheets as $timesheet) {
+		//error_log("### " . $timesheet->getValue("timesheet_id"));
+		$timesheet_items = Timesheet_Item::getTimesheetDates($timesheet->getValue("timesheet_id"));
+		error_log("### " . print_r($timesheet_items));
+		if ($timesheet_items == 0) {
+			$timesheet_items = array();
+		}
+		error_log("### " . print_r($timesheet_items));
 		$timesheetJSON[] = array(
 			"timesheet_id" => $timesheet->getValue("timesheet_id"),
 			"timesheet_approved" => $timesheet->getValue("timesheet_approved"),
 			"timesheet_submitted" => $timesheet->getValue("timesheet_submitted"),
 			"timesheet_start_date"=> $timesheet->getValue("timesheet_start_date"),
 			"timesheet_end_date"=> $timesheet->getValue("timesheet_end_date"),
-			"person_id" => $timesheet->getValue("person_id")
+			"person_id" => $timesheet->getValue("person_id"),
+			"timesheet_items" => $timesheet_items
 		);
 	}
-	if ($timesheetJSON) {
-		return json_encode($timesheetJSON);
-	} else {
-		return 0;
-	}
+	
+	return json_encode($timesheetJSON);
 }
 
 

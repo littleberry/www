@@ -12,14 +12,14 @@ var Timesheet = function ( id, week ) {
 	}
 	$.get( "returnJSON.php", getData )
 		.done( function( data ) {
-			console.log("done: " + data);
+			console.log("done");
 		})
 		.fail( function( data ) {
 			console.log("fail: " + data);
 		})
 		.success( function( data ) {
-			//ts = $.parseJSON( data );
-			console.log("success: " + data);
+			timesheet = $.parseJSON( data );
+			//console.log(ts);
 			
 			
 		})
