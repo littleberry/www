@@ -556,8 +556,15 @@ function editProject() {
 			Project_Person::deleteProjectPerson($project_id["project_id"]);
 			//add the new ones, since we don't know how many people will be deleted and how many will be added.
 			foreach ($person_ids as $person_id) {
+			//echo "inserting person id " . $person_id . " and " . "project id " . $project_id["project_id"]; 
+				if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
+						$project_assigned_by = Person::getByEmailAddress($_SESSION["logged_in"]);
+				} else {
+						error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
+						exit();
+				}
 			if ($person_id) {
-				$project_person->insertProjectPerson($person_id, $project_id["project_id"]);
+				$project_person->insertProjectPerson($person_id, $project_id["project_id"], $project_assigned_by->getValueEncoded("person_email"));
 			}
 			}
 			//do the same for tasks.
