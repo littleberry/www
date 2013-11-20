@@ -10,7 +10,7 @@ class Project_Person extends DataObject {
 		"project_id"=>"",
 		"person_id"=>"",
 		"total_budget_hours"=>"",
-		"project_assigned_by"=>
+		"project_assigned_by"=>""
 	);
 	
 	//function returns all of the people associated with a given project (archived and not).
