@@ -355,7 +355,13 @@ function showBudgetFields(f) {
 			foreach ($person_ids as $person_id) {
 			if ($person_id) {
 				//echo "inserting person id " . $person_id . " and " . "project id " . $project_id["project_id"]; 
-				$project_person->insertProjectPerson($person_id, $project_id["project_id"], $person->getValueEncoded("person_email"));
+				if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
+						$project_assigned_by = Person::getByEmailAddress($_SESSION["logged_in"]);
+				} else {
+						error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
+						exit();
+				}
+				$project_person->insertProjectPerson($person_id, $project_id["project_id"], $project_assigned_by->getValueEncoded("person_email"));
 			}
 			}
 			$task_ids = explode(',', $project_task->getValue("task_id"));
