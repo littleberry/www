@@ -303,10 +303,8 @@ function returnTasksJSON($id, $collection, $archiveFlag) {
 function returnTimesheetsJSON($id, $collection, $startDate, $endDate) {
 	if ($collection == "person") {
 		if ($id != "") {
-			$timesheets = Timesheet::getTimesheetById($id, $collection, $startDate, $endDate);
-			if ($timesheets == 0) {
-				$newsheet = Timesheet::insertTimesheet( $id );
-			}
+			$timesheets = Timesheet::getTimesheetByPersonForDate($id, $startDate);
+			error_log(">>> " . $timesheets);
 		} else {
 			//$timesheets = Timesheet::getTasks(0);
 		}
