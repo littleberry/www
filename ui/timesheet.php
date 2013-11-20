@@ -39,9 +39,9 @@ function displayTimesheet($timesheet_aggregate) {
 	} else {
 		error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
 		exit();
-	}
-	
-	?>
+}
+
+?>
 	
 	<div id="page-content" class="page-content">
 		<header class="page-header">

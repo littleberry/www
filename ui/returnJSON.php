@@ -89,7 +89,17 @@ if (isset($_GET["func"])) {
 		} else {
 			$collection = "";
 		}
-		echo returnTimesheetsJSON($id, $collection);
+		if (isset($_GET["startDate"])) {
+			$startDate = $_GET["startDate"];
+		} else {
+			$startDate = "";
+		}
+		if (isset($_GET["endDate"])) {
+			$endDate = $_GET["endDate"];
+		} else {
+			$endDate = "";
+		}
+		echo returnTimesheetsJSON($id, $collection, $startDate, $endDate);
 	}
 
 }
@@ -290,15 +300,19 @@ function returnTasksJSON($id, $collection, $archiveFlag) {
 	return json_encode($taskJSON);
 }
 
-function returnTimesheetsJSON($id, $collection) {
+function returnTimesheetsJSON($id, $collection, $startDate, $endDate) {
 	if ($collection == "person") {
 		if ($id != "") {
-			$timesheets = Timesheet::getTimesheetByPerson($id);
+			$timesheets = Timesheet::getTimesheetById($id, $collection, $startDate, $endDate);
+			if ($timesheets == 0) {
+				$newsheet = Timesheet::insertTimesheet( $id );
+			}
 		} else {
 			//$timesheets = Timesheet::getTasks(0);
 		}
 
-	} else if ($collection == "timesheet") {
+	}/*
+ else if ($collection == "timesheet") {
 		if ($id != "") {
 			$timesheets = Timesheet::getTimesheetById($id);
 		} else {
@@ -306,6 +320,7 @@ function returnTimesheetsJSON($id, $collection) {
 		}
 	
 	}
+*/
 	$timesheets = $timesheets[0];
 
 	error_log("++++");
@@ -316,6 +331,8 @@ function returnTimesheetsJSON($id, $collection) {
 			"timesheet_id" => $timesheet->getValue("timesheet_id"),
 			"timesheet_approved" => $timesheet->getValue("timesheet_approved"),
 			"timesheet_submitted" => $timesheet->getValue("timesheet_submitted"),
+			"timesheet_start_date"=> $timesheet->getValue("timesheet_start_date"),
+			"timesheet_end_date"=> $timesheet->getValue("timesheet_end_date"),
 			"person_id" => $timesheet->getValue("person_id")
 		);
 	}
