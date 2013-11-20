@@ -86,8 +86,8 @@ class Timesheet extends DataObject {
 		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE person_id = :person_id and timesheet_start_date = :timesheet_start_date and timesheet_end_date = :timesheet_end_date";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($this->data["timesheet_start_date"])), PDO::PARAM_STR);
-			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($this->data["timesheet_end_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($timesheet_start_date)), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($timesheet_end_date)), PDO::PARAM_STR);
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->execute();
 			$timesheet=array();
@@ -109,7 +109,7 @@ class Timesheet extends DataObject {
 
 			
 	//function inserts new timesheet into db and returns the autoincrement field so we can update the timesheet_item table with the key 	
-	public function insertTimesheet($person_id) {
+	public function insertTimesheet($person_id, $timesheet_start_date, $timesheet_end_date) {
 		$conn=parent::connect();
 		$sql = "INSERT INTO " . TBL_TIMESHEET . " (
 			timesheet_id,
@@ -131,8 +131,8 @@ class Timesheet extends DataObject {
 			$st->bindValue(":timesheet_id", 'auto', PDO::PARAM_INT);
 			$st->bindValue(":timesheet_approved", $this->data["timesheet_approved"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_submitted", $this->data["timesheet_submitted"], PDO::PARAM_INT);
-			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($this->data["timesheet_start_date"])), PDO::PARAM_STR);
-			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($this->data["timesheet_end_date"])), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($timesheet_start_date)), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($timesheet_end_date)), PDO::PARAM_STR);
 			//error_log("here is the END DATE: ") . date('y-m-d', strtotime($this->data["timesheet_end_date"]));
 			//error_log("here is the START DATE: ") . date('y-m-d', strtotime($this->data["timesheet_start_date"]));
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
