@@ -13,6 +13,16 @@
 	checklogin();
 	
 	include('header.php'); //add header.php to page
+	
+	//get the value off the url for timesheet_id
+	$processType = "A";
+	if (isset($_GET["timesheet_id"]) && $_GET["timesheet_id"] == "") {
+		$processType = "A";
+	} elseif (isset($_GET["timesheet_id"])) {
+		$processType = "E";
+	}
+	
+	
 	if (isset($_POST["save_timesheet_button"]) and $_POST["save_timesheet_button"] == "Save Timesheet") {
 		saveTimesheet();
 	} else {
@@ -39,9 +49,15 @@ function displayTimesheet($timesheet_aggregate) {
 	} else {
 		error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
 		exit();
+<<<<<<< HEAD
 }
 
 ?>
+=======
+	}
+	
+	?>
+>>>>>>> ccfc159b159475af30a3e04bb93f4af917e80ee6
 	
 	<div id="page-content" class="page-content">
 		<header class="page-header">
@@ -154,16 +170,31 @@ function displayTimesheet($timesheet_aggregate) {
  
 function saveTimesheet() {
 
+	//****************************************************************//
+	/*NOTE TO PATRICIA:
+	the way i used to do this is as follows (not sure if the line #s will translate here, but hopefully they will).
+	LINE 183: get out all of the timesheets for a given person. Can probably delete the code.
+	LINE 189: Loop through each timesheet in the array of timesheets in the database.
+	LINE 190: store the timesheet id as a "tid" variable. Use that variable to identify the values that were sent with the post.
+	LINE 191: store each value in the timesheet object in an array of objects labeled with the timesheet_id (TID) 
+	LINE 202: add the timesheet array to the timesheet_aggregate array, which put together all of the timesheets and all of the timesheet items so they could be inserted or updated later.
+	LINE 206: loop through the dates (0-6) and create timesheet items. These items were identified in the post in the form:
+	[name]_$tid_$i.
+	LINE 218: add the timesheet items to the the timesheet_aggregate array, 
+	
 	//CREATE THE TIMESHEET OBJECTS ($timesheet).
 	//get out each timesheet for this person put each timesheet and its data into an array labeled with the timesheet ID.
 	//this code only deals with timesheets the user has stored.
 	//BUG FIX 3: we already have this, don't call the session again.
 	$person=Person::getByEmailAddress($_SESSION["logged_in"]);
 	//list($timesheet_ids) = Timesheet::getTimesheetIds($person->getValueEncoded("person_id"));
+	//**WE CAN PEOBABLY REMOVE THIS, IT IS ONLY HERE SO THAT WE COULD LOOP THROUGH THE ARRAY.***/
 	list($timesheet_ids) = Timesheet::getTimesheetByPersonForDate($person->getValueEncoded("person_id"), $timesheet_date);
 			
 	//We're getting the values from the database, so task_id, project_id and person_id follow the field_name_$tid_$i style here.
 	
+	//**WE SHOULD ONLY NEED ONE LOOP HERE, SINCE WE DON'T HAVE TO DISTINGUISH BETWEEN THE UN-ADDED AND ADDED TIMESHEETS THIS WAY ANYMORE.
+	//**WE SHOULD BE ABLE TO COMMENT OUT THIS CODE.
 	foreach ($timesheet_ids as $timesheet_id) {
 		$tid = $timesheet_id->getValueEncoded("timesheet_id");
 		$timesheet[$tid] = new Timesheet( array(
@@ -209,7 +240,7 @@ function saveTimesheet() {
 	//I am not going to fight the UI anymore. It is inconsistent, but the task_id, the project_id and the person_id all are based on the field_name_$tid style
 	//and not field_name_$tid_$i style. If we keep this UI in any way, I will fight it later. 11/16
 	
-	
+	//**WE DON'T NEED A "#TID" VALUE ANYMORE. WE DO NEED THE TIMESHEET ID, OR SOME OTHER WAY TO SET THE PROCESSTYPE (IF WE STILL EVEN NEED TO DO THAT HERE**//
 	if	(isset($_POST["person_id_#"])) {
 		$tid = "#";
 		$timesheet[$tid] = new Timesheet( array(
@@ -248,68 +279,39 @@ function saveTimesheet() {
 	error_log(print_r($timesheet_item_aggregate, true));
 	
 
-		//timesheet aggregate has all the timesheets
-		//loop through the timesheets in the aggregate and update or insert each based on the class.
-		foreach ($timesheet_aggregate as $timesheet_object) {
-			//insert or update the timesheet(s).
-			if ((get_class($timesheet_object)) == "Timesheet") {
-				$timesheet_exists = $timesheet_object->getTimesheetById($timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));
-				//this will work temporarily until we decide what to do with the start and end date.
-				//this won't work!!!
-				//$timesheet_item_exists = Timesheet_Item::getTimesheetItem($timesheet_object->getValueEncoded("timesheet_date"), $timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("project_id"), $timesheet_object->getValueEncoded("task_id"));	
-				
-				if ($timesheet_exists == 0 && $timesheet_item_exists == 0) {
-					error_log("<br><br>timesheet doesn't exist.");
-					$timesheet_object->getValueEncoded("person_id");
-					//error_log $timesheet_object->getValueEncoded("person_id");
-					$lastInsertId = $timesheet_object->insertTimesheet($timesheet_object->getValueEncoded("person_id"));
-					
-					//put the timesheet id into the object, so we'll have it later.
-					$timesheet_object->setValue("timesheet_id", $lastInsertId[0]);
-					//error_log("<br><br>LAST INSERT ID IS ");
-					//error_log(print_r($lastInsertId[0]));
-					//error_log("<br><br><br>");
-				} else {
-					error_log("<br><br>timesheet exists.<br><br>");
-					if (!$lastInsertId) {
-						$lastInsertId = $timesheet_object->getLastInsert();
-					}
-					//error_log(print_r($timesheet_object),true);
-					//timesheet exists, update it.
-					$timesheet_object->updateTimesheet($timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));	
-				}
-			} 
-		}
+		//**ADD OR EDIT THE TIMESHEETS BASED ON THE PROCESS TYPE***//
 		
-		
-		//BUG FIX 5..these loops don't need to be separated this way.
-		//timesheet item aggregate has all the timesheet items.
-		//loop through the timesheet items in the aggregate and update or insert each based on the class.
-		foreach ($timesheet_item_aggregate as $timesheet_object) {
-			if ((get_class($timesheet_object)) == "Timesheet_Item") {
-				$timesheet_object->setValue("timesheet_item_id", $lastInsertId[0]);
-				$timesheet_item_exists = $timesheet_object->getTimesheetItem($timesheet_object->getValueEncoded("timesheet_date"), $timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("project_id"), $timesheet_object->getValueEncoded("task_id"));
-				//error_log(print_r($timesheet_item_exists),true);
-				//no timesheet item, insert it.
-				if (!$timesheet_item_exists) {
-					error_log("LINE 341: this timesheet item doesn't exist.");
-					error_log(print_r($timesheet_object,true));
-					//error_log("<br><br>LAST sINSERT ID IS ");
-					//error_log(print_r($lastInsertId[0]), true);
-					//error_log("<br><br><br>here is what we're trying to insert: ");
-					error_log(print_r($timesheet_object), true);
-					
-					error_log("checking value of lastInsertId:" . $lastInsertId[0]);
-					$timesheet_object->insertTimesheetItem($timesheet_object->getValueEncoded("person_id"), $lastInsertId[0]);
-				} else {
-					//timesheet item exists, update it.
-					$timesheet_object->updateTimesheetItem($timesheet_object->getValueEncoded("timesheet_item_id"));	
-					error_log("that timesheet info does exist.");
-				}
-			}
+		//**THIS WAS GETTING ALL THE OBJECTS AND FIGURING OUT WHAT THEY WERE, NOT SURE IF THIS MATTERS ANYMORE
+		//foreach ($timesheet_aggregate as $timesheet_object) {
+			//**THIS WAS DETERMINING WHAT OBJECT WE ARE WORKING WITH, BUT SINCE WE'RE NOT GETTING THE ITEMS OUT OF AN ARRAY LIKE THIS ANYMORE
+			//**WE CAN PROBABLY COMMENT OUT THIS IF STATEMENT.
+			//if ((get_class($timesheet_object)) == "Timesheet") {
+				//**WE CAN PROBABLY GET RID OF THIS SINCE WE ARE NOW ASSUMING WE ARE EITHER UPDATING OR ADDING**//
+				//$timesheet_exists = $timesheet_object->getTimesheetById($timesheet_object->getValueEncoded("person_id"), $timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));
 				
-		}	
-	displayTimesheet($timesheet_aggregate, $timesheet_item_aggregate);
+//**GET THE PROCESS TYPE IN ONE WAY OR ANOTHER
+//**I AM NOT 100% SURE HOW THIS WILL COME IN SO IT WILL BE JUST BASED ON THE GET HERE.
+//***TIMESHEET_OBJECT USED TO BE THE OBJECT WE WERE UPDATING OR ADDING WHEN IT WAS BROUGHT IN FROM THE UI WITH PHP.
+	if ($processType = "E") {
+		//UPDATE TIMESHEET
+		error_log("<br><br>timesheet doesn't exist.");
+		$timesheet_object->getValueEncoded("person_id");
+		//**ACTUALLY INSERT THE TIMESHEET
+		$lastInsertId = $timesheet_object->insertTimesheet($timesheet_object->getValueEncoded("person_id"));
+		//**THIS JUST PUTS THE LAST INSERT ID INTO THE OBJECT, AGAIN NOT SURE IF IT MATTERS ANYMORE
+		//SINCE THE INFORMATION ISN'T GOING THROUGH THE POST.
+		$timesheet_object->setValue("timesheet_id", $lastInsertId[0]);
+		//UPDATE TIMESHEET ITEM
+		$timesheet_object->updateTimesheetItem($timesheet_object->getValueEncoded("timesheet_item_id"));	
+		error_log("that timesheet info does exist.");
+	} elseif ($processType = "A") {
+
+		//*INSERT THE TIMESHEET (ADD IT TO THE DB)
+		$timesheet_object->updateTimesheet($timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"))			//*INSERT THE TIMESHEET ITEM (ADD IT TO THE DB)
+		error_log("checking value of lastInsertId:" . $lastInsertId[0]);
+		$timesheet_object->insertTimesheetItem($timesheet_object->getValueEncoded("person_id"), $lastInsertId[0]);
+	}	
+			displayTimesheet($timesheet_aggregate, $timesheet_item_aggregate);
 }
 
 ?>
