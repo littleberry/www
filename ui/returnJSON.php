@@ -341,11 +341,13 @@ function returnTimesheetsJSON($id, $collection, $startDate, $endDate) {
 	foreach ($timesheets as $timesheet) {
 		//error_log("### " . $timesheet->getValue("timesheet_id"));
 		$timesheet_items = Timesheet_Item::getTimesheetItems($timesheet->getValue("timesheet_id"));
-		error_log("### " . print_r($timesheet_items));
-		if ($timesheet_items == 0) {
+		//error_log("### " . ($timesheet_items));
+		/*
+if ($timesheet_items == 0) {
 			$timesheet_items = array();
 		}
-		error_log("### " . print_r($timesheet_items));
+*/
+		//error_log("### " . print_r($timesheet_items));
 		$timesheetJSON[] = array(
 			"timesheet_id" => $timesheet->getValue("timesheet_id"),
 			"timesheet_approved" => $timesheet->getValue("timesheet_approved"),

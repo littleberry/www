@@ -1,6 +1,5 @@
 ;
-
-var Timesheet = function ( id, week ) {
+function getTimesheet( id, week ) {
 	var timesheet = {};
 
 	var getData = {
@@ -12,22 +11,29 @@ var Timesheet = function ( id, week ) {
 	}
 	$.get( "returnJSON.php", getData )
 		.done( function( data ) {
-			console.log("done");
+			timesheet = $.parseJSON( data );
+			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
+			if ( timesheet[0].timesheet_items ) {
+				console.log("we have items to display");
+			} else {
+				console.log("no items to display yet");
+			}
+			//console.log("done");
 		})
 		.fail( function( data ) {
 			console.log("fail: " + data);
-		})
-		.success( function( data ) {
-			timesheet = $.parseJSON( data );
-			//console.log(ts);
-			
-			
-		})
-	
+		});
+		
 	return timesheet;
 }
-
-
+function saveTimesheet( elem ) {
+	var $tsTable = $( elem ).find( 'tbody' );
+	var tsId = $( "#timesheet-tasks-list" ).data( "timesheet_id" );
+	var tsItems = [];
+	
+	console.log(tsId);
+	
+}
 
 function getTasksForProject( id ) {
 	$.get( "returnJSON.php", {
@@ -172,8 +178,7 @@ function getWeekBookends( date ) {
 
 $( function() {
 	var thisWeek = getWeekBookends(); //leave blank to get current week
-	
-	var timesheet = new Timesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), thisWeek );
+	var timesheetData = getTimesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), thisWeek );
 
 	getTasksForProject( $( "#project-name" ).val() );
 	$( "#project-name" )
@@ -235,7 +240,11 @@ $( function() {
 		});
 		
 	$( ".ui-button.save" )
-		.button( "option", "disabled", true );
+		.button( "option", "disabled", false )
+		.click( function( evt ) {
+			saveTimesheet( $( '#timesheet-tasks-list' ) );
+			evt.preventDefault();
+		} );
 		
 	$( "#time-display" )
 		.buttonset();
