@@ -75,8 +75,8 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 		<h1 class="section-nav-title">Timesheets: </h1>
 		<ul class="section-menu">
 			<li class="section-menu-item"><a class="section-menu-link" href="timesheet.php">Time</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="#">Expenses</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="#">Pending Approval</a></li>
+			<!--li class="section-menu-item"><a class="section-menu-link" href="#">Expenses</a></li-->
+			<li class="section-menu-item"><a class="section-menu-link" href="timesheet_submitted.php">Pending Approval</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Unsubmitted</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Archive</a></li>
 
