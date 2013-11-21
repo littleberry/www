@@ -135,6 +135,7 @@ class Project_Person extends DataObject {
 				die("Query failed on project update: " . $e->getMessage() . " sql is " . $sql);
 			}
 	}	
+	
 }
 	
 ?>
