@@ -29,7 +29,7 @@ function getTimesheet( id, week ) {
 			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
 			if ( timesheet[0].timesheet_items ) {
 				console.log("we have items to display");
-				console.log(timesheet[0].timesheet_items);
+				console.log(timesheet[0].timesheet_items[0]);
 			} else {
 				console.log("no items to display yet");
 			}
