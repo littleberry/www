@@ -125,6 +125,7 @@ class Timesheet_Item extends DataObject {
 		}	
 	}
 	
+	//this function should not need an argument and is probably throwing an error.
 	public function updateTimesheetItem($timesheet_item_id) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_TIMESHEET_ITEM . " SET
@@ -136,7 +137,7 @@ class Timesheet_Item extends DataObject {
 			WHERE project_id = :project_id and person_id = :person_id and task_id = :task_id and timesheet_date = :timesheet_date";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":timesheet_item_id", $timesheet_item_id, PDO::PARAM_INT);
+			//$st->bindValue(":timesheet_item_id", $timesheet_item_id, PDO::PARAM_INT);
 			$st->bindValue(":timesheet_date", date('y/m/d', strtotime($this->data["timesheet_date"])), PDO::PARAM_INT);
 			$st->bindValue(":task_id", $this->data["task_id"], PDO::PARAM_INT);
 			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_INT);
@@ -172,6 +173,24 @@ class Timesheet_Item extends DataObject {
 			die("query failed getting the timesheets for this person: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+	
+	public function deleteTimesheetItem($person_id, $project_id, $task_id, $timesheet_date) {
+		$conn=parent::connect();
+		$sql = "DELETE FROM " . TBL_TIMESHEET_ITEM . " WHERE project_id = :project_id and person_id = :person_id and task_id = :task_id and timesheet_date = :timesheet_date";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":project_id", $person_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_date", $project_id, PDO::PARAM_INT);
+			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
+			$st->bindValue(":person_id", $timesheet_date, PDO::PARAM_INT);
+			$st->execute();	
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on update of timesheet item: " . $e->getMessage());
+		}
+	}
+
 
 }
 ?>
