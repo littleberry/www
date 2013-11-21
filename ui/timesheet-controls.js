@@ -1,4 +1,92 @@
 ;
+var TimesheetItem = function( timesheetItemId, projectId, taskId, personId, timesheetDate, timesheetHours, timesheetNotes ) {
+	var tsItem = {
+		timesheet_item_id: timesheetItemId,
+		project_id: projectId,
+		task_id: taskId,
+		person_id: personId,
+		timesheet_date: timesheetDate,
+		timesheet_hours: timesheetHours,
+		timesheet_notes: timesheetNotes
+	}
+	
+	return tsItem;
+}
+
+function getTimesheet( id, week ) {
+	var timesheet = {};
+	//console.log(id);
+	var getData = {
+		func: "returnTimesheetJSON",
+		id: id,
+		collection: "person",
+		startDate: week.start,
+		endDate: week.end
+	}
+	$.get( "returnJSON.php", getData )
+		.done( function( data ) {
+			timesheet = $.parseJSON( data );
+			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
+			if ( timesheet[0].timesheet_items ) {
+				console.log("we have items to display");
+				console.log(timesheet[0].timesheet_items[0]);
+			} else {
+				console.log("no items to display yet");
+			}
+			//console.log("done");
+		})
+		.fail( function( data ) {
+			console.log("fail: " + data);
+		});
+		
+	return timesheet;
+}
+
+function saveTimesheet( elem ) {
+	var $tsTable = $( elem ).find( 'tbody' );
+	var tsId = $( "#timesheet-tasks-list" ).data( "timesheet_id" );
+	var personId = $( "#timesheet-tasks-list" ).data( "person_id" );
+	var dates = [];
+	var thisWeek = getWeekBookends( ); //adjust later for saving weeks other than current
+	for ( var d = 0; d < 7; d++ ) {
+		dates[d] = new Date();
+		dates[d].setDate( thisWeek.start.getDate() + d );
+	}
+	//console.log(dates);
+	var tsItems = [];
+	
+	$tsTable.find( 'input' )
+		.each( function( index, elem ) {
+			var taskData = $( elem ).attr( "name" ).split( "_" );
+			var projId = taskData[0].substring(1);
+			var taskId = taskData[1].substring(1);
+			var day = taskData[2].substring(1); //may need to force conversion to number
+			var itemDate = dates[taskData[2].substring(1)].getFullYear() + "-" + dates[taskData[2].substring(1)].getMonth() + "-" + dates[taskData[2].substring(1)].getDate();
+			tsItems.push( new TimesheetItem(
+				tsId,
+				taskData[0].substring(1),
+				taskData[1].substring(1),
+				personId,
+				itemDate,
+				$( elem ).val(),
+				""
+			)); //need to do something about timesheet notes. Where are they saved? sending empty string for now.
+		})
+	
+	$.post( "timesheet.php", {
+			func: "saveTimesheet",
+			proc_type: "A",
+			timesheetItems: JSON.stringify( tsItems )
+		})
+		.done( function( data ) {
+			console.log("done: " + data);
+		})
+		.fail( function( data ) {
+			console.log("fail: " + data);
+		});
+	//console.log(tsItems);
+	
+}
 
 function getTasksForProject( id ) {
 	$.get( "returnJSON.php", {
@@ -114,11 +202,37 @@ function calculateTotals( elem ) {
 		
 		
 	}
+}
+
+function getWeekBookends( date ) {
+	var bookends = {};
+	var workWeekStart = 1; //Work week starts on Monday
+	var workWeekLength = 6; //Last day of the week (0..7);
+	var weekStart = new Date();
+	var weekEnd = new Date();
+
+	if ( date ) {
+		weekStart.setDate( date.getDate() - date.getDay() + workWeekStart );
+		weekEnd.setDate( weekStart.getDate() + workWeekLength );
+		
+	} else {
+		var today = new Date();
+		
+		weekStart.setDate( today.getDate() - today.getDay() + workWeekStart );
+		weekEnd.setDate( weekStart.getDate() + workWeekLength );
 	
-	
+		//console.log ( weekStart + ", " + today + ", " + weekEnd );
+	}
+	bookends["start"] = weekStart;
+	bookends["end"] = weekEnd;
+
+	return bookends;
 }
 
 $( function() {
+	var thisWeek = getWeekBookends(); //leave blank to get current week
+	var timesheetData = getTimesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), thisWeek );
+
 	getTasksForProject( $( "#project-name" ).val() );
 	$( "#project-name" )
 		.change( function( evt ) {
@@ -126,31 +240,31 @@ $( function() {
 		})
 		
 	$( '#add-ts-entry-modal' )
-	.dialog({
-		autoOpen: false,
-		resizable: false,
-		height: 360,
-		width: 600,
-		modal: true,
-		buttons: {
-			"+ Add Row": function() {
-				var rowInfo = {
-					task_id: $( "#task-name" ).val(),
-					task_name: $( "#task-name option:selected" ).text(),
-					project_id: $( "#project-name" ).val(),
-					project_name: $( "#project-name option:selected" ).text()
+		.dialog({
+			autoOpen: false,
+			resizable: false,
+			height: 360,
+			width: 600,
+			modal: true,
+			buttons: {
+				"+ Add Row": function() {
+					var rowInfo = {
+						task_id: $( "#task-name" ).val(),
+						task_name: $( "#task-name option:selected" ).text(),
+						project_id: $( "#project-name" ).val(),
+						project_name: $( "#project-name option:selected" ).text()
+					}
+					addTimesheetRow( rowInfo );
+					$( this ).dialog( "close" );
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );	
 				}
-				addTimesheetRow( rowInfo );
-				$( this ).dialog( "close" );
 			},
-			Cancel: function() {
-				$( this ).dialog( "close" );	
-			}
-		},
-		close: function() {
-	        //console.log("close modal");
-	    }
-	});
+			close: function() {
+		        //console.log("close modal");
+		    }
+		});
 	
 	$( '.new-time-entry' ).click( function ( evt ) {
 		
@@ -173,28 +287,37 @@ $( function() {
 
 $( function() {
 	$( ".ui-button" )
-      .button()
-      .click( function( evt ) {
-		  evt.preventDefault();
-      });
+		.button()
+		.click( function( evt ) {
+			evt.preventDefault();
+		});
+		
+	$( ".ui-button.save" )
+		.button( "option", "disabled", false )
+		.click( function( evt ) {
+			saveTimesheet( $( '#timesheet-tasks-list' ) );
+			evt.preventDefault();
+		} );
+		
 	$( "#time-display" )
 		.buttonset();
+		
 	$( "#time-period" )
 		.buttonset()
 		.find( ".previous-date" )
-			.button({
-		 		icons: {
-		     		primary: "ui-icon-triangle-1-w"
-		 		},
-		 		text: false
-			}).end()
+		.button({
+			icons: {
+			primary: "ui-icon-triangle-1-w"
+		},
+			text: false
+		}).end()
 		.find( ".next-date" )
-			.button({
-		 		icons: {
-		     		primary: "ui-icon-triangle-1-e"
-		 		},
-		 		text: false
-			});
+		.button({
+			icons: {
+			primary: "ui-icon-triangle-1-e"
+		},
+			text: false
+		});
 		
 			
 	/*

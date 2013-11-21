@@ -12,8 +12,6 @@
 	//protect this page
 	checklogin();
 	
-	include('header.php'); //add header.php to page
-	
 	//get the value off the url for timesheet_id
 	$processType = "A";
 	if (isset($_GET["timesheet_id"]) && $_GET["timesheet_id"] == "") {
@@ -22,22 +20,37 @@
 		$processType = "E";
 	}
 	
-	
-	if (isset($_POST["save_timesheet_button"]) and $_POST["save_timesheet_button"] == "Save Timesheet") {
-		saveTimesheet();
+	if (isset($_POST["func"])) {
+		if ($_POST["func"] == "saveTimesheet") {
+			error_log(">>>>>>  save timesheet");
+			if (isset($_POST["proc_type"])) {
+				$processType = $_POST["proc_type"];
+				echo saveTimesheet($processType);
+			}
+		}
 	} else {
-		displayTimesheet(new Timesheet(array()), new Timesheet_Item(array()));
+		if (isset($_POST["save_timesheet_button"]) and $_POST["save_timesheet_button"] == "Save Timesheet") {
+			saveTimesheet($processType);
+		} else {
+			include('header.php'); //add header.php to page moved to only be called when page is rendered so it's not sent back when page saved via JS/Ajax
+			displayTimesheet(new Timesheet(array()), new Timesheet_Item(array()));
+		}
 	}
 	
+	
+	
 function displayTimesheet($timesheet_aggregate) {
-	error_log("HERE IS THE POST!!!!!!!!!!!!!!!!!!");
+	//error_log("HERE IS THE POST!!!!!!!!!!!!!!!!!!");
 	//error_log(print_r($_POST, true));
+	//first, get the date off of the URL. This is not set up yet, but will be required to get
+	//the correct timesheet out of the database. Right now it just returns the current date.
 	if (isset($_GET["timesheet_date"])) {
 		$timesheet_date = $_GET["timesheet_date"];
 	} else {
 		$timesheet_date = date('d-m-Y');
 	}
 	$d = strtotime($timesheet_date);
+
 	//echo "here is timesheet aggregate when you first come in.";
 	//print_r($timesheet_aggregate);
 	//exit;
@@ -86,11 +99,6 @@ function displayTimesheet($timesheet_aggregate) {
 							<li class="entity-details-item hourly-rate task">
 								<label for="task_name" <?php validateField("task_name", $missingFields)?> class="entity-details-label">Task:</label>
 								<select id="task-name" name="task_name" class="task-name-select" tabindex="1">
-									<?php //this may be moved to JS
-										//list($tasksForProject) = Project_Task::getTasksForProject(1);
-										//foreach ($tasksForProject as $projectTask) { ?>
-											<!-- <option value="<?php //echo $projectTask->getValue("task_id"); ?>"><?php //echo $projectTask->getValue("task_name"); ?></option> -->
-									<?php //}	?> 
 								</select>
 							</li>
 						</ul>
@@ -114,7 +122,7 @@ function displayTimesheet($timesheet_aggregate) {
 				</span>
 				
 			</nav>
-			<table id="timesheet-tasks-list" class="entity-table timesheet tablesorter">
+			<table id="timesheet-tasks-list" class="entity-table timesheet tablesorter" data-person_id="<?php echo $person->getValue('person_id'); ?>">
 				<thead>
 					<tr>
 						<th class="task-name"></th>
@@ -158,8 +166,52 @@ function displayTimesheet($timesheet_aggregate) {
 <?php
 }
 
+function saveTimesheet($processType) {
+	error_log("POST: " . $_POST["timesheetItems"] );
+	$timesheet_items = json_decode($_POST["timesheetItems"]);
+	error_log("$timesheet_items: " . count($timesheet_items));
+	
+	foreach($timesheet_items as $timesheet_item) {
+		$tsi = Timesheet_Item::getTimesheetItemForPersonProjectTask($timesheet_item->timesheet_date, $timesheet_item->person_id, $timesheet_item->project_id, $timesheet_item->task_id);
+		error_log(print_r($tsi));
+		if ( $tsi ) {
+			//update
+			$tsi->setValue("timesheet_item_id", preg_replace("/[^ 0-9]/", "", $timesheet_item->timesheet_item_id));
+			$tsi->setValue("person_id", preg_replace("/[^ 0-9]/", "", $timesheet_item->person_id));
+			$tsi->setValue("timesheet_date", preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_date));
+			$tsi->setValue("task_id", preg_replace("/[^ 0-9]/", "", $timesheet_item->task_id));
+			$tsi->setValue("project_id", preg_replace("/[^ 0-9]/", "", $timesheet_item->project_id));
+			$tsi->setValue("timesheet_hours", preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_hours));
+			$tsi->setValue("timesheet_notes", preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_notes));
+			$tsi->updateTimesheetItem($timesheet_item->timesheet_item_id);
+		} else {
+			//insert
+			$newtsi = new Timesheet_Item( array(
+				"timesheet_item_id" => preg_replace("/[^ 0-9]/", "", $timesheet_item->timesheet_item_id),
+				"person_id" => preg_replace("/[^ 0-9]/", "", $timesheet_item->person_id),
+				"timesheet_date" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_date),
+				"task_id" => preg_replace("/[^ 0-9]/", "", $timesheet_item->task_id),
+				"project_id" => preg_replace("/[^ 0-9]/", "", $timesheet_item->project_id),
+				"timesheet_hours" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_hours),
+				"timesheet_notes" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_notes),
+			));
+			$newtsi->insertTimesheetItem($timesheet_item->person_id, $timesheet_item->timesheet_item_id);
+		}
+	}
+	/*
+$timesheet_items = array();
+	if ($processType = "A") { //Adding a timesheet item. I'm not sure this is really necessary.
+		
+	}  elseif ($processType = "E") { //Editing/updating a timesheet item
+	
+	} else { //error
+		error_log("Problem: I don't know what you want me to do with this.");
+	} 
+*/
+	return "saved timesheet items";
+}
  
-function saveTimesheet() {
+function saveTimesheetOld() {
 
 	//****************************************************************//
 	/*NOTE TO PATRICIA:
