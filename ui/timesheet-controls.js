@@ -1,7 +1,21 @@
 ;
+var TimesheetItem = function( timesheetItemId, projectId, taskId, personId, timesheetDate, timesheetHours, timesheetNotes ) {
+	var tsItem = {
+		timesheet_item_id: timesheetItemId,
+		project_id: projectId,
+		task_id: taskId,
+		person_id: personId,
+		timesheet_date: timesheetDate,
+		timesheet_hours: timesheetHours,
+		timesheet_notes: timesheetNotes
+	}
+	
+	return tsItem;
+}
+
 function getTimesheet( id, week ) {
 	var timesheet = {};
-
+	//console.log(id);
 	var getData = {
 		func: "returnTimesheetJSON",
 		id: id,
@@ -15,6 +29,7 @@ function getTimesheet( id, week ) {
 			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
 			if ( timesheet[0].timesheet_items ) {
 				console.log("we have items to display");
+				console.log(timesheet[0].timesheet_items);
 			} else {
 				console.log("no items to display yet");
 			}
@@ -26,13 +41,50 @@ function getTimesheet( id, week ) {
 		
 	return timesheet;
 }
+
 function saveTimesheet( elem ) {
 	var $tsTable = $( elem ).find( 'tbody' );
 	var tsId = $( "#timesheet-tasks-list" ).data( "timesheet_id" );
+	var personId = $( "#timesheet-tasks-list" ).data( "person_id" );
+	var dates = [];
+	var thisWeek = getWeekBookends( ); //adjust later for saving weeks other than current
+	for ( var d = 0; d < 7; d++ ) {
+		dates[d] = new Date();
+		dates[d].setDate( thisWeek.start.getDate() + d );
+	}
+	//console.log(dates);
 	var tsItems = [];
 	
+	$tsTable.find( 'input' )
+		.each( function( index, elem ) {
+			var taskData = $( elem ).attr( "name" ).split( "_" );
+			var projId = taskData[0].substring(1);
+			var taskId = taskData[1].substring(1);
+			var day = taskData[2].substring(1); //may need to force conversion to number
+			var itemDate = dates[taskData[2].substring(1)].getFullYear() + "-" + dates[taskData[2].substring(1)].getMonth() + "-" + dates[taskData[2].substring(1)].getDate();
+			tsItems.push( new TimesheetItem(
+				tsId,
+				taskData[0].substring(1),
+				taskData[1].substring(1),
+				personId,
+				itemDate,
+				$( elem ).val(),
+				""
+			)); //need to do something about timesheet notes. Where are they saved? sending empty string for now.
+		})
 	
-	console.log(tsId);
+	$.post( "timesheet.php", {
+			func: "saveTimesheet",
+			proc_type: "A",
+			timesheetItems: JSON.stringify( tsItems )
+		})
+		.done( function( data ) {
+			console.log("done: " + data);
+		})
+		.fail( function( data ) {
+			console.log("fail: " + data);
+		});
+	//console.log(tsItems);
 	
 }
 

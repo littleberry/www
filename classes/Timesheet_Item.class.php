@@ -77,7 +77,11 @@ class Timesheet_Item extends DataObject {
 				$timesheet_item[] = new Timesheet_Item($row);
 			}
 			parent::disconnect($conn);
-			return $timesheet_item;
+			if (count($timesheet_item) > 0) {
+				return $timesheet_item;
+			} else {
+				return 0;
+			}
 		}catch(PDOException $e) {
 			parent::disconnect($conn);
 			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
