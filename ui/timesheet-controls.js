@@ -31,6 +31,7 @@ function saveTimesheet( elem ) {
 	var tsId = $( "#timesheet-tasks-list" ).data( "timesheet_id" );
 	var tsItems = [];
 	
+	
 	console.log(tsId);
 	
 }
