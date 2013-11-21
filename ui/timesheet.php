@@ -301,7 +301,7 @@ function saveTimesheet() {
 	} elseif ($processType = "A") {
 
 		//*INSERT THE TIMESHEET (ADD IT TO THE DB)
-		$timesheet_object->updateTimesheet($timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));			//*INSERT THE TIMESHEET ITEM (ADD IT TO THE DB)
+		$timesheet_object->updateTimesheet($timesheet_object->getValueEncoded("timesheet_start_date"),$timesheet_object->getValueEncoded("timesheet_end_date"));		//*INSERT THE TIMESHEET ITEM (ADD IT TO THE DB)
 		error_log("checking value of lastInsertId:" . $lastInsertId[0]);
 		$timesheet_object->insertTimesheetItem($timesheet_object->getValueEncoded("person_id"), $lastInsertId[0]);
 	}	
