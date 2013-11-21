@@ -149,7 +149,29 @@ class Timesheet_Item extends DataObject {
 			die("Query failed on update of timesheet item: " . $e->getMessage());
 		}
 	}
-
+	
+	//display all information about a timesheet for a person, including the details and whether it is submitted, returned as an array of timesheet_item objects. 
+	public function getSubmittedTimesheetDetail($timesheet_id, $is_submitted) {
+		$conn=parent::connect();
+		//$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_id = :timesheet_id";
+		//We're going to need the aggregate at some point so I'll stick it here.
+		$sql = "SELECT ts.*, td.* FROM " . TBL_TIMESHEET . " as ts, " . TBL_TIMESHEET_ITEM . " as td WHERE ts.timesheet_id = td.timesheet_item_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
+			$st->execute();
+			$timesheet_details=array();
+			foreach ($st->fetchAll() as $row) {
+				$timesheet_item[] = $row;
+				error_log(print_r($row,true));
+			}
+			parent::disconnect($conn);
+			return array($timesheet_item);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed getting the timesheets for this person: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
 
 }
 ?>
