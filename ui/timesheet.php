@@ -60,7 +60,6 @@ function displayTimesheet($timesheet_aggregate) {
 		error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
 		exit();
 	}
-	
 	?>
 	
 	<div id="page-content" class="page-content">
@@ -172,9 +171,11 @@ function saveTimesheet($processType) {
 	error_log("$timesheet_items: " . count($timesheet_items));
 	
 	foreach($timesheet_items as $timesheet_item) {
+		error_log(">>> " . $timesheet_item->timesheet_date . ", " . $timesheet_item->person_id . ", " . $timesheet_item->project_id . ", " . $timesheet_item->task_id);
 		$tsi = Timesheet_Item::getTimesheetItemForPersonProjectTask($timesheet_item->timesheet_date, $timesheet_item->person_id, $timesheet_item->project_id, $timesheet_item->task_id);
-		error_log(print_r($tsi));
+		error_log("+++ " . $tsi);
 		if ( $tsi ) {
+			$tsi = $tsi[0];
 			//update
 			$tsi->setValue("timesheet_item_id", preg_replace("/[^ 0-9]/", "", $timesheet_item->timesheet_item_id));
 			$tsi->setValue("person_id", preg_replace("/[^ 0-9]/", "", $timesheet_item->person_id));
@@ -198,16 +199,8 @@ function saveTimesheet($processType) {
 			$newtsi->insertTimesheetItem($timesheet_item->person_id, $timesheet_item->timesheet_item_id);
 		}
 	}
-	/*
-$timesheet_items = array();
-	if ($processType = "A") { //Adding a timesheet item. I'm not sure this is really necessary.
-		
-	}  elseif ($processType = "E") { //Editing/updating a timesheet item
-	
-	} else { //error
-		error_log("Problem: I don't know what you want me to do with this.");
-	} 
-*/
+
+
 	return "saved timesheet items";
 }
  
