@@ -15,21 +15,48 @@ var TimesheetItem = function( timesheetItemId, projectId, taskId, personId, time
 
 function getTimesheet( id, week ) {
 	var timesheet = {};
-	//console.log(id);
+	var startDate = week.start.getFullYear() + "-" + (week.start.getMonth() + 1) + "-" + week.start.getDate();
+	var endDate = week.end.getFullYear() + "-" + (week.end.getMonth() + 1) + "-" + week.end.getDate();
+	
 	var getData = {
 		func: "returnTimesheetJSON",
 		id: id,
 		collection: "person",
-		startDate: week.start,
-		endDate: week.end
+		startDate: startDate,
+		endDate: endDate
 	}
 	$.get( "returnJSON.php", getData )
 		.done( function( data ) {
+			//console.log( data );
 			timesheet = $.parseJSON( data );
 			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
-			if ( timesheet[0].timesheet_items ) {
+			var tsItems = timesheet[0].timesheet_items;
+			
+			if ( timesheet[0].timesheet_items.length > 0 ) {
 				console.log("we have items to display");
-				console.log(timesheet[0].timesheet_items[0]);
+				
+				for ( var i = 0; i < tsItems.length; i+=7 ) {
+					var rowInfo = {
+						timesheet_item_id: tsItems[i].timesheet_item_id,
+						task_name: tsItems[i].task_name,
+						task_id: tsItems[i].task_id,
+						project_name: tsItems[i].project_name,
+						project_id: tsItems[i].project_id,
+						person_id: tsItems[i].person_id
+					}
+					var days = [];
+					for ( var d = i; d < i + 7; d++ ) {
+						days[d % 7] = {
+							timesheet_date: tsItems[d].timesheet_date,
+							timesheet_hours: tsItems[d].timesheet_hours,
+							timesheet_notes: tsItems[d].timesheet_notes
+						}
+					}
+					rowInfo.timesheet_days = days;
+					addTimesheetRow( rowInfo );
+					
+				}
+
 			} else {
 				console.log("no items to display yet");
 			}
@@ -61,14 +88,14 @@ function saveTimesheet( elem ) {
 			var projId = taskData[0].substring(1);
 			var taskId = taskData[1].substring(1);
 			var day = taskData[2].substring(1); //may need to force conversion to number
-			var itemDate = dates[taskData[2].substring(1)].getFullYear() + "-" + dates[taskData[2].substring(1)].getMonth() + "-" + dates[taskData[2].substring(1)].getDate();
+			var itemDate = dates[taskData[2].substring(1)].getFullYear() + "-" + (dates[taskData[2].substring(1)].getMonth() + 1) + "-" + dates[taskData[2].substring(1)].getDate();
 			tsItems.push( new TimesheetItem(
 				tsId,
 				taskData[0].substring(1),
 				taskData[1].substring(1),
 				personId,
 				itemDate,
-				$( elem ).val(),
+				Number( $( elem ).val() ),
 				""
 			)); //need to do something about timesheet notes. Where are they saved? sending empty string for now.
 		})
@@ -119,6 +146,7 @@ function getTasksForProject( id ) {
 }
 
 function addTimesheetRow( row ) {
+	//console.log(row.timesheet_days.length);
 	$timeInput = $( '<input type="text" class="time-entry-input" />' );
 	$deleteRow = $( '<a href="#" class="ui-button delete">x</a>' );
 	$table = $( "#timesheet-tasks-list tbody" );
@@ -132,10 +160,18 @@ function addTimesheetRow( row ) {
 						var inputName = "p" + row.project_id + "_t" + row.task_id + "_d" + i;
 						return $timeInput.clone()
 							.attr( "name", inputName )
+							.val( function() {
+								if ( row.timesheet_days ) {
+									return row.timesheet_days[i].timesheet_hours;
+								}
+							})
 							.change( function( evt ) {
 								calculateTotals( $( this ) );
 							})
 							.blur( function( evt ) {
+								$( this ).val( function( elem ) {
+									return Number( $( this ).val() ).toFixed(2);
+								});
 								calculateTotals( $( this ) );
 							});
 					})
@@ -145,17 +181,27 @@ function addTimesheetRow( row ) {
 		.append( '<td class="total">' )
 		.append( function() {
 			return $deleteRow
-				.clone()
+				.clone( true )
 				.button({
 					icons: {
 						primary: "ui-icon-close"
 					},
 					text: false
 				})
+				.click(function( evt ) {
+					removeTimesheetRow( $( this ).parents( 'tr' ) );
+					
+					evt.preventDefault();
+				})
 		});
 		
 	$table
 		.append( $newRow );
+}
+
+function removeTimesheetRow( $row ) {
+	console.log("remove row");
+	$( $row ).remove();
 }
 
 function calculateTotals( elem ) {
@@ -179,7 +225,7 @@ function calculateTotals( elem ) {
 			.parents( 'tbody' )
 			.find( 'tr' )
 			.each( function( index, elem ) {
-				colTotal += Number( $( elem ).children( 'td' ).eq( elemIndex ).children( 'input' ).val() );
+				colTotal += Number( $( elem ).children( 'td' ).eq( elemIndex ).children( 'input' ).val() ).toFixed(2);
 			})
 			.end()
 			.siblings( 'tfoot' )
@@ -192,7 +238,7 @@ function calculateTotals( elem ) {
 				
 				$( this ).prevAll( '.total' )
 				.each( function() {
-					total += Number( $( this ).text() );
+					total += Number( $( this ).text() ).toFixed(2);
 				})
 				return total;
 			});
@@ -297,7 +343,7 @@ $( function() {
 		.click( function( evt ) {
 			saveTimesheet( $( '#timesheet-tasks-list' ) );
 			evt.preventDefault();
-		} );
+		});
 		
 	$( "#time-display" )
 		.buttonset();
