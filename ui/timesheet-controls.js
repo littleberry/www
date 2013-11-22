@@ -29,7 +29,6 @@ function getTimesheet( id, week ) {
 		.done( function( data ) {
 			//console.log( data );
 			timesheet = $.parseJSON( data );
-			console.log(timesheet[0].timesheet_id);
 			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
 			var tsItems = timesheet[0].timesheet_items;
 			
@@ -54,8 +53,6 @@ function getTimesheet( id, week ) {
 						}
 					}
 					rowInfo.timesheet_days = days;
-					//i += 7;
-					console.log(rowInfo);
 					addTimesheetRow( rowInfo );
 					
 				}
@@ -165,7 +162,6 @@ function addTimesheetRow( row ) {
 							.attr( "name", inputName )
 							.val( function() {
 								if ( row.timesheet_days ) {
-									calculateTotals( $( this ) );
 									return row.timesheet_days[i].timesheet_hours;
 								}
 							})
@@ -173,6 +169,9 @@ function addTimesheetRow( row ) {
 								calculateTotals( $( this ) );
 							})
 							.blur( function( evt ) {
+								$( this ).val( function( elem ) {
+									return Number( $( this ).val() ).toFixed(2);
+								});
 								calculateTotals( $( this ) );
 							});
 					})
@@ -182,17 +181,27 @@ function addTimesheetRow( row ) {
 		.append( '<td class="total">' )
 		.append( function() {
 			return $deleteRow
-				.clone()
+				.clone( true )
 				.button({
 					icons: {
 						primary: "ui-icon-close"
 					},
 					text: false
 				})
+				.click(function( evt ) {
+					removeTimesheetRow( $( this ).parents( 'tr' ) );
+					
+					evt.preventDefault();
+				})
 		});
 		
 	$table
 		.append( $newRow );
+}
+
+function removeTimesheetRow( $row ) {
+	console.log("remove row");
+	$( $row ).remove();
 }
 
 function calculateTotals( elem ) {
@@ -216,7 +225,7 @@ function calculateTotals( elem ) {
 			.parents( 'tbody' )
 			.find( 'tr' )
 			.each( function( index, elem ) {
-				colTotal += Number( $( elem ).children( 'td' ).eq( elemIndex ).children( 'input' ).val() );
+				colTotal += Number( $( elem ).children( 'td' ).eq( elemIndex ).children( 'input' ).val() ).toFixed(2);
 			})
 			.end()
 			.siblings( 'tfoot' )
@@ -229,7 +238,7 @@ function calculateTotals( elem ) {
 				
 				$( this ).prevAll( '.total' )
 				.each( function() {
-					total += Number( $( this ).text() );
+					total += Number( $( this ).text() ).toFixed(2);
 				})
 				return total;
 			});
@@ -258,7 +267,7 @@ function getWeekBookends( date ) {
 		weekStart.setDate( today.getDate() - today.getDay() + workWeekStart );
 		weekEnd.setDate( weekStart.getDate() + workWeekLength );
 	
-		console.log ( weekStart + ", " + today + ", " + weekEnd );
+		//console.log ( weekStart + ", " + today + ", " + weekEnd );
 	}
 	bookends["start"] = weekStart;
 	bookends["end"] = weekEnd;
@@ -334,7 +343,7 @@ $( function() {
 		.click( function( evt ) {
 			saveTimesheet( $( '#timesheet-tasks-list' ) );
 			evt.preventDefault();
-		} );
+		});
 		
 	$( "#time-display" )
 		.buttonset();
