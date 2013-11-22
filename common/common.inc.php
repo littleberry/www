@@ -4,6 +4,8 @@ require_once("../classes/Person.class.php");
 session_start();
 //print_r($_SESSION);
 
+//set the default timezone
+date_default_timezone_set('America/New_York');
 ini_set ('display_errors', 0);
 //server configuration variables for each server.
 //$location_id = gethostname();
