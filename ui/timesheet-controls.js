@@ -31,11 +31,12 @@ function getTimesheet( id, week ) {
 			timesheet = $.parseJSON( data );
 			console.log(timesheet[0].timesheet_id);
 			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
+			var tsItems = timesheet[0].timesheet_items;
+			
 			if ( timesheet[0].timesheet_items.length > 0 ) {
 				console.log("we have items to display");
-				var tsItems = timesheet[0].timesheet_items;
 				
-				for ( var i = 0; i < tsItems.length; i++ ){
+				for ( var i = 0; i < tsItems.length; i+=7 ) {
 					var rowInfo = {
 						timesheet_item_id: tsItems[i].timesheet_item_id,
 						task_name: tsItems[i].task_name,
@@ -46,17 +47,17 @@ function getTimesheet( id, week ) {
 					}
 					var days = [];
 					for ( var d = i; d < i + 7; d++ ) {
-						days[d] = {
+						days[d % 7] = {
 							timesheet_date: tsItems[d].timesheet_date,
 							timesheet_hours: tsItems[d].timesheet_hours,
 							timesheet_notes: tsItems[d].timesheet_notes
 						}
 					}
-					i = d;
 					rowInfo.timesheet_days = days;
-					
+					//i += 7;
 					console.log(rowInfo);
 					addTimesheetRow( rowInfo );
+					
 				}
 
 			} else {
