@@ -18,10 +18,10 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 	//we will have all of this already in timsheets, but we need it for this test.
 	
 	
-	list($timesheets) = Timesheet::getSubmittedTimesheetsByManager($_SESSION["logged_in"]);
+	list($timesheets) = Timesheet_Item::getSubmittedTimesheetsByManager($_SESSION["logged_in"]);
 	foreach($timesheets as $timesheet) {
 		echo "You need to approve timesheet " . $timesheet->getValueEncoded("timesheet_id");
-		list($timesheet_and_items)=$timesheet->getSubmittedTimesheetDetail($timesheet->getValueEncoded("timesheet_id"), 1);
+		list($timesheet_and_items)=Timesheet_Item::getSubmittedTimesheetDetail($timesheet->getValueEncoded("timesheet_id"));
 	}
 ?>
 <html>

@@ -15,6 +15,31 @@ class Timesheet_Item extends DataObject {
 		"timesheet_notes"=>""
 	);
 	
+		//get all of the submitted timesheets for a specific person (this just does the assignee right now, but it should include all people that are administrators as well).
+        //maybe re-write this as a join. This is going to be slow and is confusing.
+        //this returns all submitted timesheets for this manager, which is what we want.
+        public function getSubmittedTimesheetsByManager($manager_email) {
+                $conn=parent::connect();
+                error_log($manager_email);
+                $sql="SELECT timesheet_id FROM " . TBL_TIMESHEET . " WHERE timesheet_id in (select timesheet_item_id from " . TBL_TIMESHEET_ITEM . " WHERE project_id in (select project_id from " . TBL_PROJECT_PERSON . " WHERE project_assigned_by = :manager_email)) and timesheet_submitted = 1";
+                try {
+                        $st = $conn->prepare($sql);
+                        $st->bindValue(":manager_email", $manager_email, PDO::PARAM_STR);
+                        //$st->bindValue(":timesheet_date", date('y-m-d', strtotime($timesheet_date)), PDO::PARAM_STR);
+                        $st->execute();
+                        $timesheet=array();
+                        foreach ($st->fetchAll() as $row) {
+                                error_log(print_r($row,true));
+                                $timesheet[] = new Timesheet($row);
+                        }
+                        parent::disconnect($conn);
+                        return array($timesheet);
+                }catch(PDOException $e) {
+                        parent::disconnect($conn);
+                        die("query failed here: " . $e->getMessage() . "query is " . $sql);
+                }
+        }
+	
 	//display all information about a timesheet returned as an array.
 	public function getTimesheetItems($timesheet_item_id) {
 		$conn=parent::connect();
@@ -156,11 +181,11 @@ class Timesheet_Item extends DataObject {
 	}
 	
 	//display all information about a timesheet for a person, including the details and whether it is submitted, returned as an array of timesheet_item objects. 
-	public function getSubmittedTimesheetDetail($timesheet_id, $is_submitted) {
+	public function getSubmittedTimesheetDetail($timesheet_id) {
 		$conn=parent::connect();
 		//$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_id = :timesheet_id";
 		//We're going to need the aggregate at some point so I'll stick it here.
-		$sql = "SELECT ts.*, td.* FROM " . TBL_TIMESHEET . " as ts, " . TBL_TIMESHEET_ITEM . " as td WHERE ts.timesheet_id = td.timesheet_item_id";
+		$sql = "SELECT td.*, ts.* FROM " . TBL_TIMESHEET_ITEM . " as td JOIN " . TBL_TIMESHEET . " as ts ON ts.timesheet_id = td.timesheet_item_id WHERE ts.timesheet_id = :timesheet_id";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
