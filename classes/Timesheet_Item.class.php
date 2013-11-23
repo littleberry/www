@@ -25,6 +25,7 @@ class Timesheet_Item extends DataObject {
                         $st = $conn->prepare($sql);
                         $st->bindValue(":manager_email", $manager_email, PDO::PARAM_STR);
                         //$st->bindValue(":timesheet_date", date('y-m-d', strtotime($timesheet_date)), PDO::PARAM_STR);
+                        error_log($manager_email);
                         $st->execute();
                         $timesheet=array();
                         foreach ($st->fetchAll() as $row) {
