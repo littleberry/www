@@ -6,6 +6,8 @@ require_once("../classes/Timesheet.class.php");
 require_once("../classes/Timesheet_Item.class.php");
 require_once("../classes/Project.class.php");
 require_once("../classes/Client.class.php");
+require_once("../classes/Task.class.php");
+
 
 
 
@@ -39,6 +41,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 		<?php 
 			$timesheets_for_approval = array();
 			foreach($timesheets as $timesheet) {
+			//print_r($timesheet);
 				list($timesheet_dates) = $timesheet->getTimesheetDatesByTimesheetId($timesheet->getValueEncoded("timesheet_id"));
 				?>
 				<tr><td style="background-color:grey;"><a href="timesheet_submitted.php?timesheet_id=<?php echo $timesheet->getValueEncoded("timesheet_id");?>"><?php echo $timesheet_dates->getValueEncoded("timesheet_start_date"); ?> THROUGH <?php echo $timesheet_dates->getValueEncoded("timesheet_end_date"); ?></a></td></tr>
@@ -53,13 +56,18 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 					echo "<tr><td>show timesheet item. for " . $timesheet->getValueEncoded("timesheet_id") . "</td></tr>";
 					
 					list($timesheet_and_items)=$timesheet_item->getSubmittedTimesheetDetail($timesheet->getValueEncoded("timesheet_id"));
+			
 					foreach ($timesheet_and_items as $timesheet_item) {
 					?>
 						<tr><td><?php 
 						$project = Project::getProjectByProjectId($timesheet_item->getValueEncoded("project_id"));
 						$client_id = $project->getValueEncoded("client_id");
 						$client = Client::getClient($client_id);
-						echo $client->getValueEncoded("client_name"); ?></td></tr>
+						echo $client->getValueEncoded("client_name"); 
+						echo $project->getValueEncoded("project_name");
+						$task = Task::getTaskName($timesheet_item->getValueEncoded("task_id"));
+						echo $task["task_name"];
+						echo $timesheet_item->getValueEncoded("timesheet_hours");?></td></tr>
 				<?php 
 					}
 				}
