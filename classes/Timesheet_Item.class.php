@@ -20,7 +20,6 @@ class Timesheet_Item extends DataObject {
         //this returns all submitted timesheets for this manager, which is what we want.
         public function getSubmittedTimesheetsByManager($manager_email) {
                 $conn=parent::connect();
-                error_log($manager_email);
                 $sql="SELECT timesheet_id FROM " . TBL_TIMESHEET . " WHERE timesheet_id in (select timesheet_item_id from " . TBL_TIMESHEET_ITEM . " WHERE project_id in (select project_id from " . TBL_PROJECT_PERSON . " WHERE project_assigned_by = :manager_email)) and timesheet_submitted = 1";
                 try {
                         $st = $conn->prepare($sql);
@@ -192,8 +191,8 @@ class Timesheet_Item extends DataObject {
 			$st->execute();
 			$timesheet_details=array();
 			foreach ($st->fetchAll() as $row) {
-				$timesheet_item[] = $row;
-				error_log(print_r($row,true));
+				$timesheet_item[] = new Timesheet_Item($row);
+				//error_log(print_r($row,true));
 			}
 			parent::disconnect($conn);
 			return array($timesheet_item);
@@ -219,7 +218,28 @@ class Timesheet_Item extends DataObject {
 			die("Query failed on update of timesheet item: " . $e->getMessage());
 		}
 	}
-
+	
+	
+	//add the hours up!
+	public function sumTimesheetHours($timesheet_item_id) {
+		$conn=parent::connect();
+		$sql="SELECT sum(timesheet_hours) FROM " . TBL_TIMESHEET_ITEM . " WHERE timesheet_item_id = :timesheet_item_id GROUP BY timesheet_item_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_item_id", $timesheet_item_id, PDO::PARAM_INT);
+			$st->execute();
+			$sum=array();
+			foreach ($st->fetchAll() as $row) {
+				$sum = $row;
+			}
+			parent::disconnect($conn);
+			error_log(print_r($sum,true));
+			return $sum;
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
 
 }
 ?>
