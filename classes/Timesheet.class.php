@@ -37,7 +37,7 @@ class Timesheet extends DataObject {
 		}
 	}
 	
-	//get all of the timesheet info for a specific timesheet.
+	//get all of the timesheet info for a specific timesheet. This should probably be renamed
 	public function getTimesheetById($person_id, $timesheet_start_date, $timesheet_end_date) {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE person_id = :person_id and timesheet_start_date = :timesheet_start_date and timesheet_end_date = :timesheet_end_date";
@@ -63,6 +63,29 @@ class Timesheet extends DataObject {
 		}
 	}
 	
+	//get all of the timesheet info for a specific timesheet. This should probably be renamed
+	public function getTimesheetDatesByTimesheetId($timesheet_id) {
+		$conn=parent::connect();
+		$sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_id = :timesheet_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_INT);
+			$st->execute();
+			$timesheet=array();
+			foreach ($st->fetchAll() as $row) {
+				$timesheet[] = new Timesheet($row);
+			}
+			parent::disconnect($conn);
+			if (count($timesheet) > 0) {
+				return $timesheet;
+			} else {
+				return 0;
+			}
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
 
 			
 	//function inserts new timesheet into db and returns the autoincrement field so we can update the timesheet_item table with the key 	
