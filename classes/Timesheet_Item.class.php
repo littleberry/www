@@ -207,10 +207,10 @@ class Timesheet_Item extends DataObject {
 		$sql = "DELETE FROM " . TBL_TIMESHEET_ITEM . " WHERE project_id = :project_id and person_id = :person_id and task_id = :task_id and timesheet_date = :timesheet_date";
 		try {
 			$st = $conn->prepare($sql);
-			$st->bindValue(":project_id", $person_id, PDO::PARAM_INT);
-			$st->bindValue(":timesheet_date", $project_id, PDO::PARAM_INT);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
 			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
-			$st->bindValue(":person_id", $timesheet_date, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_date", $timesheet_date, PDO::PARAM_INT);
 			$st->execute();	
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
