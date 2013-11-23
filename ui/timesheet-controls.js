@@ -246,7 +246,7 @@ function calculateTotals( elem ) {
 			.parents( 'tbody' )
 			.find( 'tr' )
 			.each( function( index, elem ) {
-				colTotal += Number( $( elem ).children( 'td' ).eq( elemIndex ).children( 'input' ).val() ).toFixed(2);
+				colTotal += Number( $( elem ).children( 'td' ).eq( elemIndex ).children( 'input' ).val() );//.toFixed(2);
 			})
 			.end()
 			.siblings( 'tfoot' )
@@ -259,7 +259,7 @@ function calculateTotals( elem ) {
 				
 				$( this ).prevAll( '.total' )
 				.each( function() {
-					total += Number( $( this ).text() ).toFixed(2);
+					total += Number( $( this ).text() );//.toFixed(2);
 				})
 				return total;
 			});
