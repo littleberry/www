@@ -22,7 +22,7 @@
 	
 	if (isset($_POST["func"])) {
 		if ($_POST["func"] == "saveTimesheet") {
-			error_log(">>>>>>  save timesheet");
+			//error_log(">>>>>>  save timesheet");
 			if (isset($_POST["proc_type"])) {
 				$processType = $_POST["proc_type"];
 				echo saveTimesheet($processType);
@@ -168,12 +168,20 @@ function displayTimesheet($timesheet_aggregate) {
 function saveTimesheet($processType) {
 	error_log("POST: " . $_POST["timesheetItems"] );
 	$timesheet_items = json_decode($_POST["timesheetItems"]);
-	error_log("$timesheet_items: " . count($timesheet_items));
+	$delete_items = json_decode($_POST["deleteItems"]);
+	error_log(">>>>>> delete_items: " . count($delete_items));
+	
+	if ($delete_items) {
+		foreach($delete_items as $delete_item) {
+			error_log(">>>>>>>" . $delete_item->person_id . ", " . $delete_item->project_id . ", " . $delete_item->task_id . ", " .  $delete_item->timesheet_date);
+			Timesheet_Item::deleteTimesheetItem($delete_item->person_id, $delete_item->project_id, $delete_item->task_id, $delete_item->timesheet_date);
+		}
+	}
 	
 	foreach($timesheet_items as $timesheet_item) {
-		error_log(">>> " . $timesheet_item->timesheet_date . ", " . $timesheet_item->person_id . ", " . $timesheet_item->project_id . ", " . $timesheet_item->task_id);
+		//error_log(">>> " . $timesheet_item->timesheet_date . ", " . $timesheet_item->person_id . ", " . $timesheet_item->project_id . ", " . $timesheet_item->task_id);
 		$tsi = Timesheet_Item::getTimesheetItemForPersonProjectTask($timesheet_item->timesheet_date, $timesheet_item->person_id, $timesheet_item->project_id, $timesheet_item->task_id);
-		error_log("+++ " . $tsi);
+		//error_log("+++ " . $tsi);
 		if ( $tsi ) {
 			$tsi = $tsi[0];
 			//update

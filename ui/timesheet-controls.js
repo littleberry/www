@@ -69,7 +69,7 @@ function getTimesheet( id, week ) {
 	return timesheet;
 }
 
-function saveTimesheet( elem ) {
+function saveTimesheet( elem, deleteRow ) {
 	var $tsTable = $( elem ).find( 'tbody' );
 	var tsId = $( "#timesheet-tasks-list" ).data( "timesheet_id" );
 	var personId = $( "#timesheet-tasks-list" ).data( "person_id" );
@@ -99,11 +99,36 @@ function saveTimesheet( elem ) {
 				""
 			)); //need to do something about timesheet notes. Where are they saved? sending empty string for now.
 		})
+		
+	if ( deleteRow ) {
+		var deleteItems = [];
+		$( deleteRow ).find( 'input' )
+			.each( function( index, elem ) {
+				var taskData = $( elem ).attr( "name" ).split( "_" );
+				var projId = taskData[0].substring(1);
+				var taskId = taskData[1].substring(1);
+				var day = taskData[2].substring(1); //may need to force conversion to number
+				var itemDate = dates[taskData[2].substring(1)].getFullYear() + "-" + (dates[taskData[2].substring(1)].getMonth() + 1) + "-" + dates[taskData[2].substring(1)].getDate();
+					deleteItems.push( new TimesheetItem(
+						tsId,
+						taskData[0].substring(1),
+						taskData[1].substring(1),
+						personId,
+						itemDate,
+						Number( $( elem ).val() ),
+						""
+					)); //need to do something about timesheet notes. Where are they saved? sending empty string for now.
+			})
+	} else {
+		var deleteItems = 0;
+	}
+	console.log(deleteItems);
 	
 	$.post( "timesheet.php", {
 			func: "saveTimesheet",
 			proc_type: "A",
-			timesheetItems: JSON.stringify( tsItems )
+			timesheetItems: JSON.stringify( tsItems ),
+			deleteItems: JSON.stringify( deleteItems )
 		})
 		.done( function( data ) {
 			console.log("done: " + data);
@@ -189,19 +214,15 @@ function addTimesheetRow( row ) {
 					text: false
 				})
 				.click(function( evt ) {
-					removeTimesheetRow( $( this ).parents( 'tr' ) );
-					
+					saveTimesheet( $( '#timesheet-tasks-list' ),  $( this ).parents( 'tr' ) );
+					$( this ).parents( 'tr' )
+						.remove();
 					evt.preventDefault();
 				})
 		});
 		
 	$table
 		.append( $newRow );
-}
-
-function removeTimesheetRow( $row ) {
-	console.log("remove row");
-	$( $row ).remove();
 }
 
 function calculateTotals( elem ) {
@@ -271,6 +292,18 @@ function getWeekBookends( date ) {
 	}
 	bookends["start"] = weekStart;
 	bookends["end"] = weekEnd;
+	
+	var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	
+	$( '.page-title' ).text( function() {
+		var dateTitle = "";
+		dateTitle += months[weekStart.getMonth()] + " " + weekStart.getDate() + " - ";
+		if ( weekEnd.getMonth() != weekStart.getMonth() ) {
+			dateTitle += months[weekEnd.getMonth()];
+		}
+		dateTitle += " " + weekEnd.getDate() + ", " + weekEnd.getFullYear();
+		return dateTitle;
+	})
 
 	return bookends;
 }
