@@ -39,7 +39,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 	<h1>Pending Approval</h1>
 		<table border="1px solid">
 		
-					<input type="hidden" name="action" value="Approve All Timesheets">
+					<input type="hidden" name="action" value="Approve Timesheet">
 		<?php 
 			$timesheets_for_approval = array();
 			foreach($timesheets as $timesheet) {
@@ -114,7 +114,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 function approveAllTimesheets () {
 	echo "approve all timesheets";	
 }
-function approveTimesheets () {
+function approveTimesheet () {
 	echo "approve just this timesheet";	
 }
 ?>
