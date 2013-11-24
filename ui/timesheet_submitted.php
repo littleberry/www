@@ -55,7 +55,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 				
 				<?php 
 				$person = Person::getPersonById($timesheet_dates->getValueEncoded("person_id"));
-				?><a href="timesheet_submitted.php?timesheet_id=<?php echo $timesheet->getValueEncoded("timesheet_id");?>"><?php echo $person->getValueEncoded("person_first_name"); echo(" "); echo $person->getValueEncoded("person_last_name");?></a><?php echo $timesheet_item->sumTimesheetHours($timesheet->getValueEncoded("timesheet_id"))["sum(timesheet_hours)"]?></td></tr> 
+				?><a href="timesheet_submitted.php?timesheet_id=<?php echo $timesheet->getValueEncoded("timesheet_id");?>"><?php echo $person->getValueEncoded("person_first_name"); echo(" "); echo $person->getValueEncoded("person_last_name");?></a><b><?php echo $timesheet_item->sumTimesheetHours($timesheet->getValueEncoded("timesheet_id"))["sum(timesheet_hours)"]?>Hours</b></td></tr> 
 				
 		<?php 
 				$timesheets_for_approval[] = $timesheet->getValueEncoded("timesheet_id");
@@ -117,7 +117,9 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 									$project = Project::getProjectName($row->getValue("project_id"));
 									echo " - " . $project["project_name"] . "<br>";
 									$task = Task::getTask($row->getValue("task_id"));
-									echo  $task->getValueEncoded("task_name") . "</td></tr>";
+									echo  $task->getValueEncoded("task_name");
+									echo "<b>" . $row->getValue("timesheet_hours") . "</b></td>";
+"</td></tr>";
 								}
 							}
 						}		
