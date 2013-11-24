@@ -38,9 +38,14 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 	<form method="post" action="timesheet_submitted.php">
 	<h1>Pending Approval</h1>
 		<table border="1px solid">
-		
-					<input type="hidden" name="action" value="Approve Timesheet">
-		<?php 
+							
+					<?php 
+					if (isset($_GET["timesheet_id"]) && $_GET["timesheet_id"] == $timesheet->getValueEncoded("timesheet_id")) {
+						?><input type="hidden" name="action" value="Approve Timesheet"><?php
+					} else {
+						?><input type="hidden" name="action" value="Approve All Timesheets"><?php
+					}
+		 
 			$timesheets_for_approval = array();
 			foreach($timesheets as $timesheet) {
 			//print_r($timesheet);

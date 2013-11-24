@@ -233,13 +233,14 @@ class Timesheet_Item extends DataObject {
 	public function deleteTimesheetItem($obj) {
 		error_log("**************************");
 		$conn=parent::connect();
-		$sql = "DELETE FROM " . TBL_TIMESHEET_ITEM . " WHERE person_id = :person_id and task_id = :task_id and project_id = :project_id and timesheet_date = :timesheet_date";
+		$sql = "DELETE FROM " . TBL_TIMESHEET_ITEM . " WHERE person_id = '" . $this->data["person_id"] . "' and task_id = '" . $this->data["task_id"] . "' and project_id = '". $this->data["project_id"] . "' and timesheet_date = '" . date('Y-m-d', strtotime($this->data["timesheet_date"])) . "'";
+		//$sql = "DELETE FROM " . TBL_TIMESHEET_ITEM . " WHERE person_id = :person_id and task_id = :task_id and project_id = :project_id and timesheet_date = :timesheet_date";
 		error_log($sql);
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":person_id", $this->data["person_id"], PDO::PARAM_INT);
-			$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
 			$st->bindValue(":task_id", $this->data["task_id"], PDO::PARAM_INT);
+			$st->bindValue(":project_id", $this->data["project_id"], PDO::PARAM_INT);
 			$st->bindValue(":timesheet_date", date('y/m/d', strtotime($this->data["timesheet_date"])), PDO::PARAM_STR);
 			$st->execute();	
 			parent::disconnect($conn);
