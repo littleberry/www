@@ -32,7 +32,7 @@ if (isset($_POST["approve_timesheets"]) and $_POST["approve_timesheets"] == "App
 }
 	
 function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
-	list($timesheets) = $timesheet_item->getSubmittedTimesheetsByManager($_SESSION["logged_in"]);
+	list($timesheets) = $timesheet_item->getSubmittedTimesheetsByManager($_SESSION["logged_in"], 1, 0);
 	?>
 	<form method="post" action="timesheet_submitted.php">
 	<h1>Pending Approval</h1>
