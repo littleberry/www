@@ -36,7 +36,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 	?>
 	<form method="post" action="timesheet_submitted.php">
 	<h1>Pending Approval</h1>
-		<table border="1px solid">
+		<table border="0px solid">
 							
 					<?php 
 					if (isset($_GET["timesheet_id"]) && $_GET["timesheet_id"] == $timesheet->getValueEncoded("timesheet_id")) {
@@ -50,8 +50,8 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 			//print_r($timesheet);				
 				list($timesheet_dates) = $timesheet->getTimesheetDatesByTimesheetId($timesheet->getValueEncoded("timesheet_id"));
 				?>
-				<tr><td style="background-color:grey;"><?php echo $timesheet_dates->getValueEncoded("timesheet_start_date"); ?> THROUGH <?php echo $timesheet_dates->getValueEncoded("timesheet_end_date"); ?></td></tr>
-				<tr><td>
+				<tr><td style="background-color:grey;" colspan=8><?php echo $timesheet_dates->getValueEncoded("timesheet_start_date"); ?> THROUGH <?php echo $timesheet_dates->getValueEncoded("timesheet_end_date"); ?></td></tr>
+				<tr><td colspan=8>
 				
 				<?php 
 				$person = Person::getPersonById($timesheet_dates->getValueEncoded("person_id"));
@@ -110,11 +110,11 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 								$rows = Timesheet_Item::getTimesheetItemForPersonProjectTask($person,$project,$task,$timesheet->getValue("timesheet_start_date"), $timesheet->getValue("timesheet_end_date"));
 								$i = 0;
 								foreach ($rows as $row) {
-									echo "<tr><td>" . $row->getValue("timesheet_date") . " - " . date('D', strtotime($row->getValue("timesheet_date"))) . "</td></tr>";
+									echo "<tr><td colspan=8 style='background-color:lightgrey;'>" . $row->getValue("timesheet_date") . " - " . date('D', strtotime($row->getValue("timesheet_date"))) . "</td></tr>";
 									$projects = Project::getProjectByProjectId($row->getValue("project_id"));
 									$client_id = $projects->getValueEncoded("client_id");
 									$client_name = Client::getClientNameById($client_id);
-									echo "<tr><td>" . $client_name["client_name"];
+									echo "<tr><td colspan=8>" . $client_name["client_name"];
 									$project = Project::getProjectName($row->getValue("project_id"));
 									echo " - " . $project["project_name"] . "<br>";
 									$task = Task::getTask($row->getValue("task_id"));
@@ -126,10 +126,10 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 						}		
 					}
 
-						?><tr><td>
+						?><tr><td colspan=8>
 						<a href="timesheet_submitted.php?timesheet_id=<?php echo $timesheet->getValueEncoded("timesheet_id")?>">Hide Timesheet Details</a><br><?php
 					} else {
-						?><tr><td><a href="timesheet_submitted.php?timesheet_id=<?php echo $timesheet->getValueEncoded("timesheet_id")?>&detail=yes">Show Timesheet Details</a><br><?php
+						?><tr><td colspan=8><a href="timesheet_submitted.php?timesheet_id=<?php echo $timesheet->getValueEncoded("timesheet_id")?>&detail=yes">Show Timesheet Details</a><br><?php
 					
 					}
 						?>
