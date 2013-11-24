@@ -174,13 +174,23 @@ function saveTimesheet($processType) {
 	if ($delete_items) {
 		foreach($delete_items as $delete_item) {
 			error_log(">>>>>>>" . $delete_item->person_id . ", " . $delete_item->project_id . ", " . $delete_item->task_id . ", " .  $delete_item->timesheet_date);
-			Timesheet_Item::deleteTimesheetItem($delete_item->person_id, $delete_item->project_id, $delete_item->task_id, $delete_item->timesheet_date);
+			$deltsi = new Timesheet_Item( array(
+				"timesheet_item_id" => preg_replace("/[^ 0-9]/", "", $delete_item->timesheet_item_id),
+				"person_id" => preg_replace("/[^ 0-9]/", "", $delete_item->person_id),
+				"timesheet_date" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $delete_item->timesheet_date),
+				"task_id" => preg_replace("/[^ 0-9]/", "", $delete_item->task_id),
+				"project_id" => preg_replace("/[^ 0-9]/", "", $delete_item->project_id),
+				"timesheet_hours" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $delete_item->timesheet_hours),
+				"timesheet_notes" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $delete_item->timesheet_notes),
+			));
+		
+			$deltsi->deleteTimesheetItem($deltsi);
 		}
 	}
 	
 	foreach($timesheet_items as $timesheet_item) {
 		//error_log(">>> " . $timesheet_item->timesheet_date . ", " . $timesheet_item->person_id . ", " . $timesheet_item->project_id . ", " . $timesheet_item->task_id);
-		$tsi = Timesheet_Item::getTimesheetItemForPersonProjectTask($timesheet_item->timesheet_date, $timesheet_item->person_id, $timesheet_item->project_id, $timesheet_item->task_id);
+		$tsi = Timesheet_Item::getTimesheetItemForDatePersonProjectTask($timesheet_item->timesheet_date, $timesheet_item->person_id, $timesheet_item->project_id, $timesheet_item->task_id);
 		//error_log("+++ " . $tsi);
 		if ( $tsi ) {
 			$tsi = $tsi[0];
