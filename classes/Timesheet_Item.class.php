@@ -18,9 +18,9 @@ class Timesheet_Item extends DataObject {
 		//get all of the submitted timesheets for a specific person (this just does the assignee right now, but it should include all people that are administrators as well).
         //maybe re-write this as a join. This is going to be slow and is confusing.
         //this returns all submitted timesheets for this manager, which is what we want.
-        public function getSubmittedTimesheetsByManager($manager_email) {
+        public function getSubmittedTimesheetsByManager($manager_email, $submitted_value, $approved_value) {
                 $conn=parent::connect();
-                $sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_id in (select timesheet_item_id from " . TBL_TIMESHEET_ITEM . " WHERE project_id in (select project_id from " . TBL_PROJECT_PERSON . " WHERE project_assigned_by = :manager_email)) and timesheet_submitted = 1";
+                $sql="SELECT *	 FROM " . TBL_TIMESHEET . " WHERE timesheet_id in (select timesheet_item_id from " . TBL_TIMESHEET_ITEM . " WHERE project_id in (select project_id from " . TBL_PROJECT_PERSON . " WHERE project_assigned_by = :manager_email)) and timesheet_submitted = " . $submitted_value . " and timesheet_approved = " . $approved_value;
                 try {
                         $st = $conn->prepare($sql);
                         $st->bindValue(":manager_email", $manager_email, PDO::PARAM_STR);
