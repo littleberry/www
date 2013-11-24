@@ -35,11 +35,11 @@ function getTimesheet( id, week ) {
 			//console.log( data );
 			timesheet = $.parseJSON( data );
 			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
-			console.log( "saved timesheet_id: " + $( "#timesheet-tasks-list" ).data( "timesheet_id" ) );
+			//console.log( "saved timesheet_id: " + $( "#timesheet-tasks-list" ).data( "timesheet_id" ) );
 			var tsItems = timesheet[0].timesheet_items;
 			
 			if ( timesheet[0].timesheet_items.length > 0 ) {
-				console.log("we have items to display");
+				//console.log("we have items to display");
 				
 				for ( var i = 0; i < tsItems.length; i+=7 ) {
 					var rowInfo = {
@@ -72,19 +72,7 @@ function getTimesheet( id, week ) {
 			console.log("fail: " + data);
 		});
 		
-	//add dates to table header
-	var today = new Date();
-	$( "#timesheet-tasks-list th.day" ).not( '.total' )
-		.each( function( index ) {
-			$( this ).find( 'span' ).remove();
-			var date = new Date();
-			date.setDate( week.start.getDate() + index );
-			if ( date == today ) {
-				$( this ).addClass( 'today' );
-			}
-			$( this ).append( "<span>" + monthsNarrow[date.getMonth()] + " " + date.getDate() + "</span>" );
-		})
-	
+		
 	//calculateTotals();
 	return timesheet;
 }
@@ -309,11 +297,11 @@ function getWeekBookends( date ) {
 	
 	if ( date.getDay() == 1 ) {
 		weekStart = date;
-	
 	} else if ( date.getDay() == 0 ) {
 		weekStart.setDate( date.getDate() - ( date.getDay() + 7 ) + workWeekStart ); //compensating for Monday start of work week.
 	} else {
-		weekStart.setDate( date.getDate() - date.getDay() + workWeekStart );
+		weekStart = new Date( date.getFullYear(), date.getMonth(), ( date.getDate() - date.getDay() + workWeekStart) );
+		//console.log("weekStart is: " + weekStart);
 	}
 	weekEnd = new Date(weekStart);
 	weekEnd.setDate( weekEnd.getDate() + workWeekLength );
@@ -322,7 +310,7 @@ function getWeekBookends( date ) {
 		start: weekStart,
 		end: weekEnd
 	}
-	console.log ( "bookends: " + bookends.start + " - " + bookends.end );
+	//console.log ( "bookends: " + bookends.start + " - " + bookends.end );
 	
 	$( '.page-title' ).text( function() {
 		var dateTitle = "";
@@ -333,6 +321,22 @@ function getWeekBookends( date ) {
 		dateTitle += " " + weekEnd.getDate() + ", " + weekEnd.getFullYear();
 		return dateTitle;
 	});
+	
+	//add dates to table header
+	var today = new Date();
+	$( "#timesheet-tasks-list th.day" ).not( '.total' )
+		.each( function( index ) {
+			$( this ).find( 'span' ).remove();
+			var thdate = new Date(bookends.start);
+			thdate.setDate( bookends.start.getDate() + index );
+			if ( thdate == today ) {
+				$( this ).addClass( 'today' );
+			}
+			
+			//console.log("the month is: " + thdate.getMonth());
+			$( this ).append( "<span>" + monthsNarrow[thdate.getMonth()] + " " + thdate.getDate() + "</span>" );
+		})
+
 	
 	$( "#timesheet-tasks-list" ).data( "timesheet_start", bookends.start.toDateString() );
 	//console.log("date: " + date + ", " + "weekStart: " + $( "#timesheet-tasks-list" ).data( "timesheet_start"));
@@ -461,15 +465,17 @@ $( function() {
 		});
 		
 			
-	/*
-$( "#date-picker" )
+	$( "#date-picker" )
 		.datepicker({
-			showOn: "both",
-			buttonImage: "libraries/images/calendar-icon.png",
-			buttonImageOnly: true
+			onSelect: function( date ) {
+				saveTimesheet( $( '#timesheet-tasks-list' ) );
+				var date = date;
+				var showWeek = getWeekBookends( date );
+				var timesheetData = getTimesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), showWeek );
+				
+			}
 		})
 		.button();
-*/
 		
 	/*
 $( ".date-picker-btn" )
