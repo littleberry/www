@@ -68,12 +68,13 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 					$tasks = Timesheet_Item::getDistinctValues($timesheet->getValueEncoded("timesheet_id"), "task_id");
 					$people = Timesheet_Item::getDistinctValues($timesheet->getValueEncoded("timesheet_id"), "person_id");
 
-
+					//echo("HERE" . $timesheet->getValue("timesheet_start_date"));
+					//print_r($timesheet);	
 						
 					foreach($projects as $project) {
 						foreach($tasks as $task) {
 							foreach($people as $person) {
-								$rows = Timesheet_Item::getTimesheetItemForPersonProjectTask($person,$project,$task);
+								$rows = Timesheet_Item::getTimesheetItemForPersonProjectTask($person,$project,$task,$timesheet->getValue("timesheet_start_date"), $timesheet->getValue("timesheet_end_date"));
 								$i = 0;
 								foreach ($rows as $row) {
 									if ($i == 0) {
@@ -106,7 +107,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 						foreach($projects as $project) {
 							foreach($tasks as $task) {
 								foreach($people as $person) {
-								$rows = Timesheet_Item::getTimesheetItemForPersonProjectTask($person,$project,$task);
+								$rows = Timesheet_Item::getTimesheetItemForPersonProjectTask($person,$project,$task,$timesheet->getValue("timesheet_start_date"), $timesheet->getValue("timesheet_end_date"));
 								$i = 0;
 								foreach ($rows as $row) {
 									echo "<tr><td>" . $row->getValue("timesheet_date") . " - " . date('D', strtotime($row->getValue("timesheet_date"))) . "</td></tr>";
