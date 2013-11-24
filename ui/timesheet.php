@@ -191,7 +191,7 @@ function saveTimesheet($processType) {
 	foreach($timesheet_items as $timesheet_item) {
 		//error_log(">>> " . $timesheet_item->timesheet_date . ", " . $timesheet_item->person_id . ", " . $timesheet_item->project_id . ", " . $timesheet_item->task_id);
 		$tsi = Timesheet_Item::getTimesheetItemForDatePersonProjectTask($timesheet_item->timesheet_date, $timesheet_item->person_id, $timesheet_item->project_id, $timesheet_item->task_id);
-		//error_log("+++ " . $tsi);
+		error_log("+++ " . $tsi);
 		if ( $tsi ) {
 			$tsi = $tsi[0];
 			//update
