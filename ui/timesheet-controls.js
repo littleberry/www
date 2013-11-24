@@ -99,7 +99,7 @@ function saveTimesheet( elem, deleteRow ) {
 	//console.log(dates);
 	var tsItems = [];
 	
-	$tsTable.find( 'input' )
+	$tsTable.find( 'input' ).not( '.remove' )
 		.each( function( index, elem ) {
 			var taskData = $( elem ).attr( "name" ).split( "_" );
 			var projId = taskData[0].substring(1);
@@ -116,7 +116,7 @@ function saveTimesheet( elem, deleteRow ) {
 				""
 			)); //need to do something about timesheet notes. Where are they saved? sending empty string for now.
 		})
-		
+	console.log(tsItems);
 	if ( deleteRow ) {
 		var deleteItems = [];
 		$( deleteRow ).find( 'input' )
@@ -235,6 +235,7 @@ function addTimesheetRow( row ) {
 					text: false
 				})
 				.click(function( evt ) {
+					$( this ).parents( 'tr' ).find( 'input' ).addClass( 'remove' );
 					saveTimesheet( $( '#timesheet-tasks-list' ),  $( this ).parents( 'tr' ) );
 					$( this ).parents( 'tr' )
 						.remove();
