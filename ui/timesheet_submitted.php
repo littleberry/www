@@ -22,10 +22,10 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 	exit();
 }
 	
-	
-if (isset($_POST["action"]) and $_POST["action"] == "Approve All Timesheets") {
+if (isset($_POST["approve_timesheets"]) and $_POST["approve_timesheets"] == "Approve All Timesheets") {
+//if (isset($_POST["action"]) and $_POST["action"] == "Approve All Timesheets") {
 	approveAllTimesheets();
-} elseif (isset($_POST["action"]) and $_POST["action"] == "Approve Timesheet") {
+} elseif (isset($_POST["approve_timesheets"]) and $_POST["approve_timesheets"] == "Approve Timesheet") {
 	approveTimesheet();
 } else {
 	include('header.php'); //add header.php to page moved to only be called when page is rendered so it's not sent back when page saved via JS/Ajax
@@ -38,9 +38,14 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 	<form method="post" action="timesheet_submitted.php">
 	<h1>Pending Approval</h1>
 		<table border="1px solid">
-		
-					<input type="hidden" name="action" value="Approve All Timesheets">
-		<?php 
+							
+					<?php 
+					if (isset($_GET["timesheet_id"]) && $_GET["timesheet_id"] == $timesheet->getValueEncoded("timesheet_id")) {
+						?><input type="hidden" name="action" value="Approve Timesheet"><?php
+					} else {
+						?><input type="hidden" name="action" value="Approve All Timesheets"><?php
+					}
+		 
 			$timesheets_for_approval = array();
 			foreach($timesheets as $timesheet) {
 			//print_r($timesheet);
@@ -105,7 +110,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 			$title = "Approve All Timesheets";
 		}	
 		?>
-			<tr><td><input type="submit" value="<?php echo $title?>"></td></tr>
+			<tr><td><input type="submit" name="approve_timesheets" value="<?php echo $title?>"></td></tr>
 		</table>
 		</form>
 		</html>
@@ -114,7 +119,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 function approveAllTimesheets () {
 	echo "approve all timesheets";	
 }
-function approveTimesheets () {
+function approveTimesheet () {
 	echo "approve just this timesheet";	
 }
 ?>
