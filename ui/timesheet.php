@@ -60,6 +60,13 @@ function displayTimesheet($timesheet_aggregate) {
 		error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
 		exit();
 	}
+	
+	/*
+Timesheet::deleteTimesheet(377);
+	Timesheet::deleteTimesheet(378);
+	Timesheet::deleteTimesheet(379);
+	Timesheet::deleteTimesheet(380);
+*/
 	?>
 	
 	<div id="page-content" class="page-content">

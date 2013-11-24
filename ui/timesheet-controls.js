@@ -28,11 +28,14 @@ function getTimesheet( id, week ) {
 		startDate: startDate,
 		endDate: endDate
 	}
+	
+	$( "#timesheet-tasks-list" ).find( 'tbody' ).empty();
 	$.get( "returnJSON.php", getData )
 		.done( function( data ) {
 			//console.log( data );
 			timesheet = $.parseJSON( data );
 			$( "#timesheet-tasks-list" ).data( "timesheet_id", timesheet[0].timesheet_id );
+			console.log( "saved timesheet_id: " + $( "#timesheet-tasks-list" ).data( "timesheet_id" ) );
 			var tsItems = timesheet[0].timesheet_items;
 			
 			if ( timesheet[0].timesheet_items.length > 0 ) {
@@ -73,13 +76,13 @@ function getTimesheet( id, week ) {
 	var today = new Date();
 	$( "#timesheet-tasks-list th.day" ).not( '.total' )
 		.each( function( index ) {
+			$( this ).find( 'span' ).remove();
 			var date = new Date();
 			date.setDate( week.start.getDate() + index );
 			if ( date == today ) {
 				$( this ).addClass( 'today' );
 			}
-			//var dayDate = ;
-			$( this ).html( $( this ).html() + "<br />" + monthsNarrow[date.getMonth()] + " " + date.getDate() );
+			$( this ).append( "<span>" + monthsNarrow[date.getMonth()] + " " + date.getDate() + "</span>" );
 		})
 	
 	//calculateTotals();
@@ -89,9 +92,10 @@ function getTimesheet( id, week ) {
 function saveTimesheet( elem, deleteRow ) {
 	var $tsTable = $( elem ).find( 'tbody' );
 	var tsId = $( "#timesheet-tasks-list" ).data( "timesheet_id" );
+	console.log("saving to timesheet_id: " + tsId )
 	var personId = $( "#timesheet-tasks-list" ).data( "person_id" );
 	var dates = [];
-	var thisWeek = getWeekBookends( ); //adjust later for saving weeks other than current
+	var thisWeek = getWeekBookends( $( "#timesheet-tasks-list" ).data( "timesheet_start" ) ); //adjust later for saving weeks other than current
 	for ( var d = 0; d < 7; d++ ) {
 		dates[d] = new Date();
 		dates[d].setDate( thisWeek.start.getDate() + d );
@@ -139,7 +143,7 @@ function saveTimesheet( elem, deleteRow ) {
 	} else {
 		var deleteItems = 0;
 	}
-	console.log(deleteItems);
+	//console.log(deleteItems);
 	
 	$.post( "timesheet.php", {
 			func: "saveTimesheet",
@@ -293,26 +297,32 @@ function calculateTotals( elem ) {
 function getWeekBookends( date ) {
 	var bookends = {};
 	var workWeekStart = 1; //Work week starts on Monday
-	var workWeekLength = 6; //Last day of the week (0..7);
+	var workWeekLength = 6; //Last day of the week (0..6);
 	var weekStart = new Date();
 	var weekEnd = new Date();
 
-	if ( date ) {
-		weekStart.setDate( date.getDate() - date.getDay() + workWeekStart );
-		weekEnd.setDate( weekStart.getDate() + workWeekLength );
-		
+	if ( !date ) {
+		var date = new Date();
 	} else {
-		var today = new Date();
-		
-		weekStart.setDate( today.getDate() - today.getDay() + workWeekStart );
-		weekEnd.setDate( weekStart.getDate() + workWeekLength );
-	
-		//console.log ( weekStart + ", " + today + ", " + weekEnd );
+		date = new Date( date );
 	}
-	bookends["start"] = weekStart;
-	bookends["end"] = weekEnd;
 	
-	//var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	if ( date.getDay() == 1 ) {
+		weekStart = date;
+	
+	} else if ( date.getDay() == 0 ) {
+		weekStart.setDate( date.getDate() - ( date.getDay() + 7 ) + workWeekStart ); //compensating for Monday start of work week.
+	} else {
+		weekStart.setDate( date.getDate() - date.getDay() + workWeekStart );
+	}
+	weekEnd = new Date(weekStart);
+	weekEnd.setDate( weekEnd.getDate() + workWeekLength );
+
+	bookends = {
+		start: weekStart,
+		end: weekEnd
+	}
+	console.log ( "bookends: " + bookends.start + " - " + bookends.end );
 	
 	$( '.page-title' ).text( function() {
 		var dateTitle = "";
@@ -322,13 +332,16 @@ function getWeekBookends( date ) {
 		}
 		dateTitle += " " + weekEnd.getDate() + ", " + weekEnd.getFullYear();
 		return dateTitle;
-	})
-	$( "#timesheet-tasks-list" ).data( "timesheet_start", weekStart );
+	});
+	
+	$( "#timesheet-tasks-list" ).data( "timesheet_start", bookends.start.toDateString() );
+	//console.log("date: " + date + ", " + "weekStart: " + $( "#timesheet-tasks-list" ).data( "timesheet_start"));
 	
 	return bookends;
 }
 
 $( function() {
+	console.log("start");
 	var thisWeek = getWeekBookends(); //leave blank to get current week
 	var timesheetData = getTimesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), thisWeek );
 
@@ -412,10 +425,12 @@ $( function() {
 		})
 		.click( function( evt ) {
 			saveTimesheet( $( '#timesheet-tasks-list' ) );
-			console.log("prev week");
 			var date = new Date( $( "#timesheet-tasks-list" ).data( "timesheet_start" ) );
-			date.setDate( date.getDate() - 7 );
-			console.log( date);
+			console.log("date when prev clicked: " + date);
+			date.setDate( new Date(date).getDate() - 7 );
+			console.log("date after setting for prev week: " + date);
+			var prevWeek = getWeekBookends( date );
+			var timesheetData = getTimesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), prevWeek );
 			evt.preventDefault();
 		})
 		.end()
@@ -428,17 +443,20 @@ $( function() {
 		})
 		.click( function( evt ) {
 			saveTimesheet( $( '#timesheet-tasks-list' ) );
-			console.log("next week");
 			var date = new Date( $( "#timesheet-tasks-list" ).data( "timesheet_start" ) );
-			date.setDate( date.getDate() + 7 );
-			console.log( date);
+			console.log("date when next clicked: " + date);
+			date.setDate( new Date(date).getDate() + 7 );
+			console.log("date after setting for next week: " + date);
+			var nextWeek = getWeekBookends( date );
+			var timesheetData = getTimesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), nextWeek );
 			evt.preventDefault();
 		})
 		.end()
 		.find( ".current-date" )
 		.click( function( evt ) {
-			saveTimesheet( $( '#timesheet-tasks-list' ) );
+			//saveTimesheet( $( '#timesheet-tasks-list' ) );
 			console.log("this week");
+			
 			evt.preventDefault();
 		});
 		
