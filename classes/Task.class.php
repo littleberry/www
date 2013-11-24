@@ -39,7 +39,7 @@ class Task extends DataObject {
 	//crazy or tired.
 	public static function getTask($task_id) {
 		$conn=parent::connect();
-		$sql = "SELECT * FROM " . TBL_CLIENT . " WHERE task.task_id = :task_id";
+		$sql = "SELECT * FROM " . TBL_TASK . " WHERE task_id = :task_id";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
