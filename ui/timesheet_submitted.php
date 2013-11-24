@@ -13,6 +13,8 @@ require_once("../classes/Task.class.php");
 
 checkLogin();
 
+
+
 if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 	$person = Person::getByEmailAddress($_SESSION["logged_in"]);
 } else {
@@ -35,8 +37,7 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 	?>
 	<form method="post" action="timesheet_submitted.php">
 	<h1>Pending Approval</h1>
-	<html>
-		<table style="width:100%;" border="1px solid;">
+		<table border="1px solid">
 					<input type="hidden" name="action" value="Approve All Timesheets">
 		<?php 
 			$timesheets_for_approval = array();
@@ -53,26 +54,49 @@ function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
 		<?php 
 				$timesheets_for_approval[] = $timesheet->getValueEncoded("timesheet_id");
 				if (isset($_GET["timesheet_id"]) && $_GET["timesheet_id"] == $timesheet->getValueEncoded("timesheet_id")) {
-					echo "<tr><td>show timesheet item. for " . $timesheet->getValueEncoded("timesheet_id") . "</td></tr>";
+					//echo "<tr><td>show timesheet item. for " . $timesheet->getValueEncoded("timesheet_id") . "</td></tr>";
 					
-					list($timesheet_and_items)=$timesheet_item->getSubmittedTimesheetDetail($timesheet->getValueEncoded("timesheet_id"));
-			
-					foreach ($timesheet_and_items as $timesheet_item) {
-					?>
-						<tr><td><?php 
-						$project = Project::getProjectByProjectId($timesheet_item->getValueEncoded("project_id"));
-						$client_id = $project->getValueEncoded("client_id");
-						$client = Client::getClient($client_id);
-						echo $client->getValueEncoded("client_name"); 
-						echo $project->getValueEncoded("project_name");
-						$task = Task::getTaskName($timesheet_item->getValueEncoded("task_id"));
-						echo $task["task_name"];
-						echo $timesheet_item->getValueEncoded("timesheet_hours");?></td></tr>
-				<?php 
+					list($timesheet_items)=$timesheet_item->getSubmittedTimesheetDetail($timesheet->getValueEncoded("timesheet_id"));
+					//all of this for the UI. >(
+					$projects = Timesheet_Item::getDistinctValues($timesheet->getValueEncoded("timesheet_id"), "project_id");
+					$tasks = Timesheet_Item::getDistinctValues($timesheet->getValueEncoded("timesheet_id"), "task_id");
+					$people = Timesheet_Item::getDistinctValues($timesheet->getValueEncoded("timesheet_id"), "person_id");
+
+						 //	$project = Project::getProjectByProjectId($timesheet_item->getValueEncoded("project_id"));
+						//	$client_id = $project->getValueEncoded("client_id");
+						//	$client = Client::getClient($client_id);
+						//	echo $client->getValueEncoded("client_name"); 
+						//	echo $project->getValueEncoded("project_name");
+						//	$task = Task::getTaskName($timesheet_item->getValueEncoded("task_id"));
+						///	echo $task["task_name"];
+						//}
+						//echo $timesheet_item->getValueEncoded("timesheet_hours");
+						
+					foreach($projects as $project) {
+						foreach($tasks as $task) {
+							foreach($people as $person) {
+								$rows = Timesheet_Item::getTimesheetItemForPersonProjectTask($person,$project,$task);
+								$i = 0;
+								foreach ($rows as $row) {
+									if ($i == 0) {
+										echo "<tr><td>" . $row->getValue("person_id") . "</td>";
+										echo "<td>" . $row->getValue("project_id") . "</td>";
+										echo "<td>" . $row->getValue("task_id") . "</td>";
+										echo "<td>" . $row->getValue("timesheet_date") . "<br/>";
+										echo $row->getValue("timesheet_hours") . "</td>";
+									} else {
+										echo "<td>" . $row->getValue("timesheet_date") . "<br/>";
+										echo $row->getValue("timesheet_hours") . "</td>";
+									}
+									$i++;
+								}
+							}
+						}		
 					}
-				}
-			} ?>
-		
+				}	
+			}
+			
+		?>			
 			<tr><td><input type="submit" value="Approve All Timesheets"></td></tr>
 		</table>
 		</form>
