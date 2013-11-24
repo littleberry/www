@@ -91,7 +91,7 @@ class Timesheet_Item extends DataObject {
 	
 	
 	//display all information about a timesheet for a specific date returned as an array.
-	public function getTimesheetItemForPersonProjectTask($timesheet_date, $person_id, $project_id, $task_id) {
+	public function getTimesheetItemForDatePersonProjectTask($timesheet_date, $person_id, $project_id, $task_id) {
 		$conn=parent::connect();
 		$sql="SELECT * FROM " . TBL_TIMESHEET_ITEM . " WHERE timesheet_date = :timesheet_date and person_id = :person_id and project_id = :project_id and task_id = :task_id";
 		try {
@@ -116,6 +116,33 @@ class Timesheet_Item extends DataObject {
 			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+
+//display all information about a timesheet for a specific person, project and task returned as an array.
+	public function getTimesheetItemForPersonProjectTask($person_id, $project_id, $task_id) {
+		$conn=parent::connect();
+		$sql="SELECT * FROM " . TBL_TIMESHEET_ITEM . " WHERE person_id = :person_id and project_id = :project_id and task_id = :task_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
+			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
+			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
+			$st->execute();
+			$timesheet_item=array();
+			foreach ($st->fetchAll() as $row) {
+				$timesheet_item[] = new Timesheet_Item($row);
+			}
+			parent::disconnect($conn);
+			if (count($timesheet_item) > 0) {
+				return $timesheet_item;
+			} else {
+				return 0;
+			}
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+
 		
 	//function inserts new timesheet item into db. 	
 	public function insertTimesheetItem($person_id, $timesheet_item_id) {
@@ -203,20 +230,22 @@ class Timesheet_Item extends DataObject {
 		}
 	}
 	
-	public function deleteTimesheetItem($person_id, $project_id, $task_id, $timesheet_date) {
+	public function deleteTimesheetItem($person_id,$project_id,$task_id,$timesheet_date) {
+		error_log("**************************");
 		$conn=parent::connect();
-		$sql = "DELETE FROM " . TBL_TIMESHEET_ITEM . " WHERE project_id = :project_id and person_id = :person_id and task_id = :task_id and timesheet_date = :timesheet_date";
+		$sql = "DELETE FROM " . TBL_TIMESHEET_ITEM . " WHERE person_id = :person_id and task_id = :task_id and project_id = :project_id and timesheet_date = :timesheet_date";
+		error_log($sql);
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
 			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
-			$st->bindValue(":timesheet_date", $timesheet_date, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_date", date('y/m/d', strtotime($timesheet_date)), PDO::PARAM_STR);
 			$st->execute();	
 			parent::disconnect($conn);
 		} catch (PDOException $e) {
 			parent::disconnect($conn);
-			die("Query failed on update of timesheet item: " . $e->getMessage());
+			die("Query failed on delete of timesheet item: " . $e->getMessage());
 		}
 	}
 	
@@ -241,6 +270,27 @@ class Timesheet_Item extends DataObject {
 			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
 		}
 	}
+	
+	//get the distinct values from the timesheet.
+	public function getDistinctValues($timesheet_item_id, $col_name) {
+		$conn=parent::connect();
+		$sql="SELECT distinct(" . $col_name . ") FROM " . TBL_TIMESHEET_ITEM . " WHERE timesheet_item_id = :timesheet_item_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_item_id", $timesheet_item_id, PDO::PARAM_INT);
+			$st->execute();
+			$values=array();
+			foreach ($st->fetchAll() as $row) {
+				$values[] = $row[$col_name];
+			}
+			parent::disconnect($conn);
+			return $values;
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed here getting the details for the timesheet: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+
 
 }
 ?>
