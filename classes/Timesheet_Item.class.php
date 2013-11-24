@@ -20,7 +20,7 @@ class Timesheet_Item extends DataObject {
         //this returns all submitted timesheets for this manager, which is what we want.
         public function getSubmittedTimesheetsByManager($manager_email) {
                 $conn=parent::connect();
-                $sql="SELECT timesheet_id FROM " . TBL_TIMESHEET . " WHERE timesheet_id in (select timesheet_item_id from " . TBL_TIMESHEET_ITEM . " WHERE project_id in (select project_id from " . TBL_PROJECT_PERSON . " WHERE project_assigned_by = :manager_email)) and timesheet_submitted = 1";
+                $sql="SELECT * FROM " . TBL_TIMESHEET . " WHERE timesheet_id in (select timesheet_item_id from " . TBL_TIMESHEET_ITEM . " WHERE project_id in (select project_id from " . TBL_PROJECT_PERSON . " WHERE project_assigned_by = :manager_email)) and timesheet_submitted = 1";
                 try {
                         $st = $conn->prepare($sql);
                         $st->bindValue(":manager_email", $manager_email, PDO::PARAM_STR);
@@ -117,15 +117,17 @@ class Timesheet_Item extends DataObject {
 		}
 	}
 
-//display all information about a timesheet for a specific person, project and task returned as an array.
-	public function getTimesheetItemForPersonProjectTask($person_id, $project_id, $task_id) {
+//display all information about a timesheet for a specific person, project and task for a returned as an array.
+	public function getTimesheetItemForPersonProjectTask($person_id, $project_id, $task_id, $timesheet_start_date, $timesheet_end_date) {
 		$conn=parent::connect();
-		$sql="SELECT * FROM " . TBL_TIMESHEET_ITEM . " WHERE person_id = :person_id and project_id = :project_id and task_id = :task_id";
+		$sql="SELECT * FROM " . TBL_TIMESHEET_ITEM . " WHERE person_id = :person_id and project_id = :project_id and task_id = :task_id and timesheet_date >= :timesheet_start_date and timesheet_date <= :timesheet_end_date";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
 			$st->bindValue(":project_id", $project_id, PDO::PARAM_INT);
 			$st->bindValue(":task_id", $task_id, PDO::PARAM_INT);
+			$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($timesheet_start_date)), PDO::PARAM_STR);
+			$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($timesheet_end_date)), PDO::PARAM_STR);
 			$st->execute();
 			$timesheet_item=array();
 			foreach ($st->fetchAll() as $row) {
