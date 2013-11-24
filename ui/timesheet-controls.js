@@ -1,4 +1,7 @@
 ;
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+var monthsNarrow = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 var TimesheetItem = function( timesheetItemId, projectId, taskId, personId, timesheetDate, timesheetHours, timesheetNotes ) {
 	var tsItem = {
 		timesheet_item_id: timesheetItemId,
@@ -66,6 +69,20 @@ function getTimesheet( id, week ) {
 			console.log("fail: " + data);
 		});
 		
+	//add dates to table header
+	var today = new Date();
+	$( "#timesheet-tasks-list th.day" ).not( '.total' )
+		.each( function( index ) {
+			var date = new Date();
+			date.setDate( week.start.getDate() + index );
+			if ( date == today ) {
+				$( this ).addClass( 'today' );
+			}
+			//var dayDate = ;
+			$( this ).html( $( this ).html() + "<br />" + monthsNarrow[date.getMonth()] + " " + date.getDate() );
+		})
+	
+	//calculateTotals();
 	return timesheet;
 }
 
@@ -175,6 +192,7 @@ function addTimesheetRow( row ) {
 	$timeInput = $( '<input type="text" class="time-entry-input" />' );
 	$deleteRow = $( '<a href="#" class="ui-button delete">x</a>' );
 	$table = $( "#timesheet-tasks-list tbody" );
+	rowTotal = 0;
 	$newRow = $( '<tr>' )
 		.append( "<td>" + row.project_name + "<br />" + row.task_name + "</td>" )
 		.append( function() {
@@ -187,7 +205,10 @@ function addTimesheetRow( row ) {
 							.attr( "name", inputName )
 							.val( function() {
 								if ( row.timesheet_days ) {
+									rowTotal += Number( row.timesheet_days[i].timesheet_hours );
 									return row.timesheet_days[i].timesheet_hours;
+								} else {
+									return 0;
 								}
 							})
 							.change( function( evt ) {
@@ -203,7 +224,7 @@ function addTimesheetRow( row ) {
 			}
 			return weekTDs;
 		})
-		.append( '<td class="total">' )
+		.append( '<td class="total">' + rowTotal.toFixed(2) + '</td>' )
 		.append( function() {
 			return $deleteRow
 				.clone( true )
@@ -223,6 +244,8 @@ function addTimesheetRow( row ) {
 		
 	$table
 		.append( $newRow );
+	
+	//$newRow.find( 'input' );
 }
 
 function calculateTotals( elem ) {
@@ -237,7 +260,7 @@ function calculateTotals( elem ) {
 			})
 			.end()
 			.find( '.total' )
-			.text( rowTotal );
+			.text( rowTotal.toFixed(2) );
 		
 		var colTotal = 0;
 		var elemIndex = elem.parents('td').index();
@@ -251,7 +274,7 @@ function calculateTotals( elem ) {
 			.end()
 			.siblings( 'tfoot' )
 			.find( 'td' ).eq( elemIndex )
-			.text( colTotal );
+			.text( colTotal.toFixed(2) );
 		
 		$( 'td.week-total' )
 			.text( function() {
@@ -261,13 +284,8 @@ function calculateTotals( elem ) {
 				.each( function() {
 					total += Number( $( this ).text() );//.toFixed(2);
 				})
-				return total;
-			});
-					
-	} else {
-		//called first time to tally existing timesheet
-		
-		
+				return total.toFixed(2);
+			});	
 	}
 }
 
@@ -293,7 +311,7 @@ function getWeekBookends( date ) {
 	bookends["start"] = weekStart;
 	bookends["end"] = weekEnd;
 	
-	var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	//var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 	
 	$( '.page-title' ).text( function() {
 		var dateTitle = "";
@@ -304,7 +322,8 @@ function getWeekBookends( date ) {
 		dateTitle += " " + weekEnd.getDate() + ", " + weekEnd.getFullYear();
 		return dateTitle;
 	})
-
+	$( "#timesheet-tasks-list" ).data( "timesheet_start", weekStart );
+	
 	return bookends;
 }
 
@@ -389,13 +408,37 @@ $( function() {
 			primary: "ui-icon-triangle-1-w"
 		},
 			text: false
-		}).end()
+		})
+		.click( function( evt ) {
+			saveTimesheet( $( '#timesheet-tasks-list' ) );
+			console.log("prev week");
+			var date = new Date( $( "#timesheet-tasks-list" ).data( "timesheet_start" ) );
+			date.setDate( date.getDate() - 7 );
+			console.log( date);
+			evt.preventDefault();
+		})
+		.end()
 		.find( ".next-date" )
 		.button({
 			icons: {
 			primary: "ui-icon-triangle-1-e"
 		},
 			text: false
+		})
+		.click( function( evt ) {
+			saveTimesheet( $( '#timesheet-tasks-list' ) );
+			console.log("next week");
+			var date = new Date( $( "#timesheet-tasks-list" ).data( "timesheet_start" ) );
+			date.setDate( date.getDate() + 7 );
+			console.log( date);
+			evt.preventDefault();
+		})
+		.end()
+		.find( ".current-date" )
+		.click( function( evt ) {
+			saveTimesheet( $( '#timesheet-tasks-list' ) );
+			console.log("this week");
+			evt.preventDefault();
 		});
 		
 			
