@@ -685,11 +685,19 @@ legend.contact-details-title {
 	text-align: right;
 	vertical-align: text-top;
 }
+th.day span {
+	display: block;
+	color: #8295c2;
+}
 input[type=text].time-entry-input {
 	position: relative;
 	width: 4em;
 }
-
+input[type=text].date-picker-input {
+	position: relative;
+	width: 7em;
+	margin: 0 .5em;
+}
 
 
 

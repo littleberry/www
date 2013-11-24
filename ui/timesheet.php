@@ -60,6 +60,14 @@ function displayTimesheet($timesheet_aggregate) {
 		error_log("Something is wrong here...this person is not logged in and you shouldn't be seeing this, timesheet.php.");
 		exit();
 	}
+	
+	/*
+Timesheet::deleteTimesheet(376);
+	Timesheet::deleteTimesheet(384);
+	Timesheet::deleteTimesheet(385);
+	Timesheet::deleteTimesheet(386);
+	Timesheet::deleteTimesheet(390);
+*/
 	?>
 	
 	<div id="page-content" class="page-content">
@@ -112,9 +120,7 @@ function displayTimesheet($timesheet_aggregate) {
 					<a href="#" class="ui-button current-date">This week</a>
 					<a href="#" class="ui-button next-date">Next week</a>
 				</span>
-				<!-- <input id="date-picker" type="hidden" title="Select date" value="" /> -->
-				
-				<!-- <span id="date-picker"></span> -->
+				<input id="date-picker" type="text" class="date-picker-input" title="Enter date" value="" placeholder="Enter date" />
 				<span id="time-display">
 					<input id="day-view" type="radio" name="time-view" class="ui-button time-view-button" title="Day" value="Day" /><label for="day-view">Day</label>
 					<input id="week-view" type="radio" name="time-view" class="ui-button time-view-button" title="Week" value="Week" checked="checked" /><label for="week-view">Week</label>
