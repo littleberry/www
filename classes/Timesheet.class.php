@@ -192,6 +192,25 @@ class Timesheet extends DataObject {
 
 	}
 
+//approve the timesheet.
+	public function approveTimesheet($timesheet_id) {
+		$conn=parent::connect();
+		$sql = "UPDATE " . TBL_TIMESHEET . " SET
+			timesheet_submitted = 1, timesheet_approved = 1
+			WHERE timesheet_id = :timesheet_id";
+		try {
+			$st = $conn->prepare($sql);
+			$st->bindValue(":timesheet_id", $timesheet_id, PDO::PARAM_STR);
+			$st->execute();
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on update of timesheet, sql is $sql " . $e->getMessage());
+		}
+
+	}
+
+
 	public function deleteTimesheet($timesheet_id) {
 		$conn=parent::connect();
 		$sql = "DELETE FROM " . TBL_TIMESHEET . " WHERE timesheet_id = :timesheet_id";

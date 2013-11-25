@@ -31,9 +31,9 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 <form method="get" action="submitme.php">
  <input type="hidden" name="action" value="submit_timesheet"/>
 <TABLE border=1px solid;>
-<field type="hidden" value="<?php echo $_GET["timesheet_id"]?>">
+<field type="hidden" name="timesheet_id" value="<?php echo $_GET["timesheet_id"]?>">
 <TR><TD>January 10</TD></TR>
-<TR><TD><input type="text" name="timesheet_id" value="<?php echo $timesheets->getValue("timesheet_id");?>"></TD></TD></TR>
+<TR><TD><input type="text" name="timesheet" value="<?php echo $timesheets->getValue("timesheet_id");?>"></TD></TD></TR>
 </TABLE>
 <button type="submit">Click to Submit the Timesheet.</button>
 
