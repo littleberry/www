@@ -458,9 +458,9 @@ $( function() {
 		.end()
 		.find( ".current-date" )
 		.click( function( evt ) {
-			//saveTimesheet( $( '#timesheet-tasks-list' ) );
-			console.log("this week");
-			
+			saveTimesheet( $( '#timesheet-tasks-list' ) );
+			var thisWeek = getWeekBookends( );
+			var timesheetData = getTimesheet( $( "#timesheet-tasks-list" ).data( "person_id" ), thisWeek );
 			evt.preventDefault();
 		});
 		
