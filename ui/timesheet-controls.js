@@ -420,9 +420,45 @@ $( function() {
 			saveTimesheet( $( '#timesheet-tasks-list' ) );
 			evt.preventDefault();
 		});
-		
+	
+	var $timesheetWeekView = $( 'tbody.week-view' ); //exisits when page loaded
+	var $timesheetDayView = $( '<tbody class="day-view">' ); //doesn't exist when page loaded. Must be created.
+	
 	$( "#time-display" )
-		.buttonset();
+		.buttonset()
+		.find( "#day-view" )
+		.click( function( evt ) {
+			$timesheetDayView = $timesheetWeekView.clone( true );
+			var today = new Date();
+			$( '#timesheet-tasks-list tbody' ).find( 'td.day' )
+				.each( function( index, elem ) {
+					if ( $( this ).index() % 7 == today.getDay() ) {
+						$( this ).attr( "colspan", 7 );
+					} else {
+						$( this ).hide();
+					}
+				});
+			//$timesheetWeekView = $( 'tbody.week-view' ).detach();
+			//$( '#timesheet-tasks-list' ).append( $timesheetDayView );
+			console.log( "Switch to day view" );
+			evt.preventDefault();
+		})
+		.end()
+		.find( "#week-view" )
+		.click( function( evt ) {
+			$( '#timesheet-tasks-list tbody' ).find( 'td.day' )
+				.each( function( index, elem ) {
+					if ( $( this ).attr( "colspan" ) ) {
+						$( this ).attr( "colspan", 0 );
+					} else {
+						$( this ).show();
+					}
+				})
+			//$timesheetDayView.remove();
+			//$( '#timesheet-tasks-list' ).append( $timesheetWeekView );
+			console.log( "Switch to week view" );
+			evt.preventDefault();
+		});
 		
 	$( "#time-period" )
 		.buttonset()

@@ -156,7 +156,7 @@ function displayTimesheet($timesheet_aggregate) {
 						<td></td>
 					</tr>
 				</tfoot>
-				<tbody>
+				<tbody class="week-view">
 				</tbody>
 			</table>
 		</div>
