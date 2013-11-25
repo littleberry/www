@@ -29,7 +29,13 @@ function getTimesheet( id, week ) {
 		endDate: endDate
 	}
 	
-	$( "#timesheet-tasks-list" ).find( 'tbody' ).empty();
+	$( "#timesheet-tasks-list" )
+		.find( 'tbody' )
+		.empty()
+		.end()
+		.find( 'tfoot td.total, tfoot td.week-total' )
+		.text( "" );
+	
 	$.get( "returnJSON.php", getData )
 		.done( function( data ) {
 			//console.log( data );
