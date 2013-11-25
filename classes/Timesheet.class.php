@@ -196,7 +196,7 @@ class Timesheet extends DataObject {
 	public function approveTimesheet($timesheet_id) {
 		$conn=parent::connect();
 		$sql = "UPDATE " . TBL_TIMESHEET . " SET
-			timesheet_submitted = 0, timesheet_approved = 1
+			timesheet_submitted = 1, timesheet_approved = 1
 			WHERE timesheet_id = :timesheet_id";
 		try {
 			$st = $conn->prepare($sql);
