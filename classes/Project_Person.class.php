@@ -13,6 +13,26 @@ class Project_Person extends DataObject {
 		"project_assigned_by"=>""
 	);
 	
+	//function returns all person information for those that have projects.
+	public static function getAssignedProjects() {
+		$conn=parent::connect();
+		$sql = "SELECT * FROM " . TBL_PERSON . " WHERE person_id IN (SELECT distinct(person_id) FROM " . TBL_PROJECT_PERSON . ")";
+		try {
+			$st = $conn->prepare($sql);
+			$st->execute();
+			$people=array();
+			foreach ($st->fetchAll() as $row) {
+				$people[] = new Person($row);
+			}
+			$row=$st->fetch();
+			parent::disconnect($conn);
+			return array($people);
+		}catch(PDOException $e) {
+			parent::disconnect($conn);
+			die("query failed returning the people for the project: " . $e->getMessage() . "query is " . $sql);
+		}
+	}
+	
 	//function returns all of the people associated with a given project (archived and not).
 	public static function getPeopleForProject($project_id) {
 		$conn=parent::connect();
