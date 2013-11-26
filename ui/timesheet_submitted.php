@@ -32,7 +32,15 @@ if (isset($_POST["approve_timesheets"]) and $_POST["approve_timesheets"] == "App
 }
 	
 function displayTimesheetApprovalForm($timesheet, $timesheet_item) {
-	list($timesheets) = $timesheet_item->getSubmittedTimesheetsByManager($_SESSION["logged_in"], 1, 0);
+	$person_type = Person::getByEmailAddress($_SESSION["logged_in"]);
+	if ($person_type->getValueEncoded("person_perm_id") == 'Administrator') {
+		list($timesheets) = Timesheet_Item::getSubmittedTimesheets(1, 0);
+	} else {
+		list($timesheets) = Timesheet_Item::getSubmittedTimesheetsByManager($_SESSION["logged_in"], 1, 0);
+	}
+	if (!$timesheets) {
+		echo "Congratulations! You have no timesheets to approve.";
+	}
 	?>
 	<form method="post" action="timesheet_submitted.php">
 	<h1>Pending Approval</h1>
