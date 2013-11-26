@@ -20,7 +20,7 @@ class Timesheet extends DataObject {
 	//get all of the timesheet ids for a specific person
 	public function getTimesheetIds($person_id) {
 		$conn=parent::connect();
-		$sql="SELECT distinct(timesheet_id) FROM " . TBL_TIMESHEET . " WHERE person_id = :person_id";
+		$sql="SELECT distinct(timesheet_id), timesheet_start_date, timesheet_end_date FROM " . TBL_TIMESHEET . " WHERE person_id = :person_id";
 		try {
 			$st = $conn->prepare($sql);
 			$st->bindValue(":person_id", $person_id, PDO::PARAM_INT);
@@ -224,6 +224,28 @@ class Timesheet extends DataObject {
 			die("Query failed on update of timesheet item: " . $e->getMessage());
 		}
 	}
+	
+	//get out all of the timesheet dates so we can display the unsubmitted by date
+	public function getTimesheetDates() {
+		$conn=parent::connect();
+		//this is going to break something but we can't sql this way.
+		//$sql = "select distinct(timesheet_start_date), timesheet_end_date, timesheet_id FROM " . TBL_TIMESHEET;
+		$sql = "select distinct(timesheet_start_date), timesheet_end_date FROM " . TBL_TIMESHEET;
+		try {
+			$st = $conn->prepare($sql);
+			$st->execute();	
+			foreach ($st->fetchAll() as $row) {
+				$timesheet[] = new Timesheet($row);
+			}
+			return $timesheet;
+			parent::disconnect($conn);
+		} catch (PDOException $e) {
+			parent::disconnect($conn);
+			die("Query failed on update of timesheet item: " . $e->getMessage());
+		}
+	}
+
+
 }
 
 ?>
