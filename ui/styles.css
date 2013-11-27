@@ -689,6 +689,14 @@ th.day span {
 	display: block;
 	color: #8295c2;
 }
+th.day.today {
+	background-color: #193E73;
+	color: #FAF9FF;
+}
+th.day.current {
+	background-color: #152959;
+	color: #FAF9FF;
+}
 input[type=text].time-entry-input {
 	position: relative;
 	width: 4em;
