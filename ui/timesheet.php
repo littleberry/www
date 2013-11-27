@@ -186,7 +186,7 @@ function saveTimesheet($processType) {
 				"timesheet_date" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $delete_item->timesheet_date),
 				"task_id" => preg_replace("/[^ 0-9]/", "", $delete_item->task_id),
 				"project_id" => preg_replace("/[^ 0-9]/", "", $delete_item->project_id),
-				"timesheet_hours" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $delete_item->timesheet_hours),
+				"timesheet_hours" => preg_replace("/[^ \.\:[0-9]]/", "", $delete_item->timesheet_hours),
 				"timesheet_notes" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $delete_item->timesheet_notes),
 			));
 		
@@ -206,7 +206,7 @@ function saveTimesheet($processType) {
 			$tsi->setValue("timesheet_date", preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_date));
 			$tsi->setValue("task_id", preg_replace("/[^ 0-9]/", "", $timesheet_item->task_id));
 			$tsi->setValue("project_id", preg_replace("/[^ 0-9]/", "", $timesheet_item->project_id));
-			$tsi->setValue("timesheet_hours", preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_hours));
+			$tsi->setValue("timesheet_hours", preg_replace("/[^ \.\:[0-9]]/", "", $timesheet_item->timesheet_hours));
 			$tsi->setValue("timesheet_notes", preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_notes));
 			$tsi->updateTimesheetItem($timesheet_item->timesheet_item_id);
 		} else {
@@ -217,7 +217,7 @@ function saveTimesheet($processType) {
 				"timesheet_date" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_date),
 				"task_id" => preg_replace("/[^ 0-9]/", "", $timesheet_item->task_id),
 				"project_id" => preg_replace("/[^ 0-9]/", "", $timesheet_item->project_id),
-				"timesheet_hours" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_hours),
+				"timesheet_hours" => preg_replace("/[^ \.\:[0-9]]/", "", $timesheet_item->timesheet_hours),
 				"timesheet_notes" => preg_replace("/[^ \-\_a-zA-Z0-9]/", "", $timesheet_item->timesheet_notes),
 			));
 			$newtsi->insertTimesheetItem($timesheet_item->person_id, $timesheet_item->timesheet_item_id);
