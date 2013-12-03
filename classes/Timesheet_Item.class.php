@@ -15,6 +15,31 @@ class Timesheet_Item extends DataObject {
 		"timesheet_notes"=>""
 	);
 	
+		
+		//get all of the timesheet information for this timeframe. This is used in reporting.
+		public function reportTimesheetsInfo($timesheet_start_date, $timesheet_end_date) {
+		        $conn=parent::connect();
+                $sql="SELECT *	 FROM " . TBL_TIMESHEET_ITEM . " WHERE timesheet_date > :timesheet_start_date and timesheet_date < :timesheet_end_date";
+                try {
+                        $st = $conn->prepare($sql);
+						$st->bindValue(":timesheet_start_date", date('y-m-d', strtotime($timesheet_start_date)), PDO::PARAM_STR);
+						$st->bindValue(":timesheet_end_date", date('y-m-d', strtotime($timesheet_end_date)), PDO::PARAM_STR);
+                        $st->execute();
+                        $timesheet=array();
+                        foreach ($st->fetchAll() as $row) {
+                                error_log(print_r($row,true));
+                                $timesheet_item[] = new Timesheet_Item($row);
+                        }
+                        parent::disconnect($conn);
+                        return array($timesheet_item);
+                }catch(PDOException $e) {
+                        parent::disconnect($conn);
+                        die("query failed here: " . $e->getMessage() . "query is " . $sql);
+                }
+        }
+
+		
+		
 		//this and the next functions are not named well. They return timesheets by status, not just submitted. Rename these!
 	
 		//this returns all timesheets by status for this manager.
