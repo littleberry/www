@@ -26,10 +26,10 @@ class Report extends CI_Controller {
 		//check this out or delete this if it's not working for us.
 		$this->load->library('menu');
 		$this->menu_pages = array(
-                    "report?fromdate=$this->fromdate&todate=$this->todate#clients" => "Clients",
-                    "report?fromdate=$this->fromdate&todate=$this->todate#projects" => "Projects",
-                    "report?fromdate=$this->fromdate&todate=$this->todate#tasks" => "Tasks",
-                    "report?fromdate=$this->fromdate&todate=$this->todate#staff" => "Staff"
+                    "report?fromdate=$this->fromdate&todate=$this->todate&page=clients" => "Clients",
+                    "report?fromdate=$this->fromdate&todate=$this->todate&page=projects" => "Projects",
+                    "report?fromdate=$this->fromdate&todate=$this->todate&page=tasks" => "Tasks",
+                    "report?fromdate=$this->fromdate&todate=$this->todate&page=staff" => "Staff"
                 );
  
 				//get the name of the active page
@@ -44,34 +44,52 @@ class Report extends CI_Controller {
 	
 	//this is the main index function
 	function index() {
-	    //these are all the queries
+	    //load the model
 	    $this->load->model('Report_model', '', TRUE);
-		//all hours
-		$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
-		//billable hours
-		$this->data['billablequery'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
-		//clients returned to page as URLs
 		//we'll try doing this here instead of in the view (which is probably right!!)
 		//build the anchors dynamically to return to the view.
-		$clientquery = $this->Report_model->getClients($this->todate, $this->fromdate);
-		$client_url = array();
-		foreach ($clientquery as $clients) {
-			$myurl = $this->timetrackerurls->generate_url($clients->client_id, $clients->client_name);
-			$client_url[] = $myurl;
-		}
-		$this->data['client_url'] = $client_url;
 		
-		$this->data['clientquery'] = $this->Report_model->getClients($this->todate, $this->fromdate);
-		$this->data['clienthoursquery'] = $this->Report_model->getClientHours($this->todate, $this->fromdate);
-		$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
+		//hours tracked
+		$this->data['total_hours'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
+		
 		//billable hours
-		$this->data['billablequery'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
-		//projects
-		$this->data['projectquery'] = $this->Report_model->getProjects($this->todate, $this->fromdate);
-		$this->data['projecthoursquery'] = $this->Report_model->getProjectHours($this->todate, $this->fromdate);
+		$this->data['billable_hours'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
 		
+		//unbillable hours
+		//this is in the view
+		
+		//billable amount
+		$this->data['billable_type'] = $this->Report_model->billableType($this->todate, $this->fromdate);
+		//project_hourly_rate
+		$this->data['project_hourly_rate'] = $this->Report_model->getProjectHourlyRate($this->todate, $this->fromdate);
+		//uninvoiced amount
+		
+		
+		//can I load a top view?
 		$data = $this->data;
-		$this->load->view('anchors', $data);
+		$this->load->view('top_view', $data);
+		
+		
+		//show the different views here for clients, projects, and tasks.
+		$this->input->get('page');
+		//we could do this by showing different views, although it would be nice if we could just highlight a different part of the same view, but maybe that is why index is this way...
+		//client view
+		if ($this->input->get('page') == "clients") {
+			$client_url = array();
+			$this->data['controller'] = "report_controller";
+			$this->data['view'] = "client_report";
+			$clientquery = $this->Report_model->getClients($this->todate, $this->fromdate);
+			foreach ($clientquery as $clients) {
+				$myurl = $this->timetrackerurls->generate_client_url($clients->client_id, $clients->client_name, $this->data['controller'], $this->data['view']);
+				$client_url[] = $myurl;
+			}
+			$this->data['client_url'] = $client_url;
+		
+			$data = $this->data;
+			$this->load->view('client_view', $data);
+		} else {
+			$this->load->view('project_view', $data);		
+		}
 	}
 	
 }
