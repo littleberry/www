@@ -26,10 +26,10 @@ class Report_controller extends CI_Controller {
 		//check this out or delete this if it's not working for us.
 		$this->load->library('menu');
 		$this->menu_pages = array(
-                    "report?page=clients" => "Clients",
-                    "report?page=projects" => "Projects",
-                    "report?page=tasks" => "Tasks",
-                    "report?page=staff" => "Staff"
+                    "report?fromdate=$this->fromdate&todate=$this->todate&page=clients" => "Clients",
+                    "report?fromdate=$this->fromdate&todate=$this->todate&page=projects" => "Projects",
+                    "report?fromdate=$this->fromdate&todate=$this->todate&page=tasks" => "Tasks",
+                    "report?fromdate=$this->fromdate&todate=$this->todate&page=staff" => "Staff"
                 );
  
 				//get the name of the active page
@@ -53,10 +53,12 @@ class Report_controller extends CI_Controller {
 		//clients returned to page as URLs
 		//we'll try doing this here instead of in the view (which is probably right!!)
 		//build the anchors dynamically to return to the view.
+		$this->data['controller'] = "report_controller";
+		$this->data['view'] = "client_report";
 		$clientquery = $this->Report_model->getClients($this->todate, $this->fromdate);
 		$client_url = array();
 		foreach ($clientquery as $clients) {
-			$myurl = $this->timetrackerurls->generate_url($clients->client_id, $clients->client_name);
+			$myurl = $this->timetrackerurls->generate_client_url($clients->client_id, $clients->client_name, $this->data['controller'], $this->data['view']);
 			$client_url[] = $myurl;
 		}
 		$this->data['client_url'] = $client_url;
