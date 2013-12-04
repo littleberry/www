@@ -65,7 +65,7 @@ class Report extends CI_Controller {
 		//uninvoiced amount
 		
 		
-		//can I load a top view?
+		//top view common code
 		$data = $this->data;
 		$this->load->view('top_view', $data);
 		

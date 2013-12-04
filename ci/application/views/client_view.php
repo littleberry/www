@@ -5,7 +5,6 @@
 	<?php foreach ($client_url as $url) {
 		echo $url . "<br>";
 	}
-	echo $controller;
 	//print_r($client_url);
 	?></td></tr>
 	</table>
