@@ -12,6 +12,7 @@ class Report_model extends CI_Model {
 		$sumquery = $this->db->from('timesheet_item');
 		$sumquery = $this->db->where('timesheet_date <', $to);
 		$sumquery = $this->db->where('timesheet_date >', $from);
+		$sumquery = $this->db->having('count(*) > 0');
 		$sumquery = $this->db->get();
 		return $sumquery->result();
 	}
@@ -23,10 +24,42 @@ class Report_model extends CI_Model {
 		$billablequery = $this->db->where('project_billable =', 1);
 		$billablequery = $this->db->where('timesheet_date <', $to);
 		$billablequery = $this->db->where('timesheet_date >', $from);
+		$billablequery = $this->db->having('count(*) > 0');
 		$billablequery = $this->db->get();	
 		return $billablequery->result();
 	}
-
+	
+	//get out the billable type.
+	function billableType($to, $from) {
+		$billabletypequery = $this->db->select('project_invoice_by');
+		$billabletypequery = $this->db->from('project');
+		$billabletypequery = $this->db->join('timesheet_item', 'timesheet_item.project_id = project.project_id');
+		$billabletypequery = $this->db->where('timesheet_date <', $to);
+		$billabletypequery = $this->db->where('timesheet_date >', $from);
+		$billabletypequery = $this->db->having('count(*) > 0');
+		$billabletypequery = $this->db->get();	
+		return $billabletypequery->result();
+	}
+	
+	//get out the project hours and rate.
+	function getProjectHourlyRate($to, $from) {
+		$hourlyratequery = $this->db->select('project_hourly_rate');
+		$hourlyratequery = $this->db->from('project');
+		$hourlyratequery = $this->db->select_sum('timesheet_hours');
+		$hourlyratequery = $this->db->join('timesheet_item', 'timesheet_item.project_id = project.project_id');
+		$hourlyratequery = $this->db->where('project_billable =', 1);
+		$hourlyratequery = $this->db->where('timesheet_date <', $to);
+		$hourlyratequery = $this->db->where('timesheet_date >', $from);
+		$hourlyratequery = $this->db->having('count(*) > 0');
+		$hourlyratequery = $this->db->get();	
+		return $hourlyratequery->result();
+	}
+	
+	//get out the person hours and rate.
+	
+	//get out the task hours and rate.
+	
+	//client queries
 	function getClients($to, $from) {
 		$clientquery = $this->db->distinct('client_name', 'client_id');
 		$clientquery = $this->db->from('client');
@@ -52,6 +85,7 @@ class Report_model extends CI_Model {
 		return $clienthoursquery->result();
 	}
 	
+	//project queries
 	function getProjectHours($to, $from) {
 		$projecthoursquery = $this->db->select('project_name');
 		$projecthoursquery = $this->db->from('project');
