@@ -2,6 +2,33 @@
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var monthsNarrow = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var $editEntry = $( '<a class="ui-button edit-entry">Edit</a>' )
+	.button({
+		icons: {
+			primary: "ui-icon-pencil"
+		},
+		text: false
+	})
+	.click( function( evt ) {
+		var now = new Date();
+		console.log( "start timer: " + now.getTime() );
+		evt.preventDefault();
+	})
+
+;
+
+var $timerBtn = $( '<a class="ui-button timer">Start</a>' )
+	.button({
+		icons: {
+			primary: "ui-icon-clock"
+		}
+	})
+	.click( function( evt ) {
+		var now = new Date();
+		console.log( "start timer: " + now.getTime() );
+		evt.preventDefault();
+	});
+
 
 var TimesheetItem = function( timesheetItemId, projectId, taskId, personId, timesheetDate, timesheetHours, timesheetNotes ) {
 	var tsItem = {
@@ -404,9 +431,14 @@ function toggleTimesheetView( date ) {
 		$tsDays.each( function( index, elem ) {
 			if ( $( this ).attr( "colspan" ) ) {
 				$( this ).attr( "colspan", 0 );
-			} else {
-				$( this ).show();
 			}
+			$( this ).show();
+			swapInputText( $( this ).find( 'span' ) );
+			$( this )
+				.find( 'a' )
+				.each( function( index, elem ) {
+					$( this ).remove();
+				})
 		});
 		updatePageHeaderDate( getWeekBookends( date ), view );
 		$( '.new-time-entry .ui-button-text' ).text( "+ Add Row" );
@@ -418,9 +450,18 @@ function toggleTimesheetView( date ) {
 					.show();
 				$( '#timesheet-tasks-list' ).find( 'th' ).eq( $( this ).index() )
 					.addClass( 'current' );
+				swapInputText( $( this ).find( 'input' ) );
+				$timerBtn.clone( true )
+					.appendTo( $( this ) );
+				$editEntry.clone( true )
+					.appendTo( $( this ) );
 			} else {
 				$( this ).hide()
-					.removeClass( 'current' );
+					.removeClass( 'current' )
+					.find( 'a' )
+					.each( function( index, elem ) {
+						$( this ).remove();
+					})
 			}
 		});
 		$( '.new-time-entry .ui-button-text' ).text( "+ Add Entry" );
@@ -429,6 +470,24 @@ function toggleTimesheetView( date ) {
 		//console.log( "Switch to day view" );
 	}
 }
+
+function swapInputText( elem ) {
+	if ( $( elem ).is( 'input' ) ) {
+		$( '<span class="time-entry">' )
+			.attr( 'id', ( $( elem ).attr( 'name' ) ) )
+			.text( $( elem ).val() )
+			.insertBefore( $( elem ) );
+		$( elem ).hide();
+		
+	} else if ( $( elem ).is( 'span' ) ) {
+		console.log( $('input[name="' + $( elem ).attr( 'id' ) + '"]') );
+		$( elem ).next( 'input[name="' + $( elem ).attr( 'id' ) + '"]' )
+			.val( $( elem ).text() )
+			.show();
+		$( elem ).remove();
+	}
+}
+
 
 $( function() {
 	console.log("start");
@@ -538,8 +597,8 @@ $( function() {
 		.find( ".previous-date" )
 		.button({
 			icons: {
-			primary: "ui-icon-triangle-1-w"
-		},
+				primary: "ui-icon-triangle-1-w"
+			},
 			text: false
 		})
 		.click( function( evt ) {
@@ -606,5 +665,4 @@ $( ".date-picker-btn" )
 			evt.preventDefault();
 		});
 */
-
 });
