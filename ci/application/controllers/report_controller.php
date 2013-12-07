@@ -44,7 +44,6 @@ class Report_controller extends CI_Controller {
 	
 	
 	function client_report() {
-	    //these are all the queries
 	    $this->load->model('Report_model', '', TRUE);
 		//all hours
 		$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
@@ -54,17 +53,21 @@ class Report_controller extends CI_Controller {
 		//we'll try doing this here instead of in the view (which is probably right!!)
 		//build the anchors dynamically to return to the view.
 		$this->data['controller'] = "report_controller";
-		$this->data['view'] = "client_report";
-		$clientquery = $this->Report_model->getClients($this->todate, $this->fromdate);
-		$client_url = array();
-		foreach ($clientquery as $clients) {
-			$myurl = $this->timetrackerurls->generate_client_url($clients->client_id, $clients->client_name, $this->data['controller'], $this->data['view']);
-			$client_url[] = $myurl;
+		$this->data['view'] = "project_report";
+		$projectquery = $this->Report_model->getProjectsByClient($this->todate, $this->fromdate, $this->client_id);
+		//print_r($projectquery);
+		$project_url = array();
+		foreach ($projectquery as $projects) {
+			//print_r($clients);
+			$myurl = $this->timetrackerurls->generate_project_url($projects['project_id'], $projects['project_name'], $this->data['controller'], $this->data['view']);
+			$project_url[] = $myurl;
 		}
-		$this->data['client_url'] = $client_url;
+		$this->data['project_url'] = $project_url;
+		$this->data['client_name'] = $this->Report_model->getClientName($_GET["client_id"]);
+		error_log($this->client_id);
 		
-		$this->data['clientquery'] = $this->Report_model->getClients($this->todate, $this->fromdate);
-		$this->data['clienthoursquery'] = $this->Report_model->getClientHours($this->todate, $this->fromdate);
+		//$this->data['clientquery'] = $this->Report_model->getClients($this->todate, $this->fromdate);
+		//$this->data['clienthoursquery'] = $this->Report_model->getClientHours($this->todate, $this->fromdate);
 		
 		$data = $this->data;
 		$this->load->view('report_client_view', $data);

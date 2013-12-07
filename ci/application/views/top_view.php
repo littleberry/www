@@ -80,15 +80,4 @@ background-color: aqua;
 	?>
 	</h3></h3></td><td>
 	<h5>Billable Amount</h5><h3>
-	<?php 
-	//I have this sinking feeling like I need to redesign the project table. UGH.
-	foreach ($billable_type as $project_type) {
-			//we need to add the values for invoice by task hourly rate and person hourly rate.
-			//also add some code here to handle do not apply hourly rate.
-			if ($project_type->project_invoice_by == "Project hourly rate") {
-				foreach ($project_hourly_rate as $hourly_rate) {
-					echo "$" . money_format('%i', floatval($hourly_rate->project_hourly_rate) * floatval($hourly_rate->timesheet_hours));
-				}
-			}
-	}
-	?></h3></td></td></tr>
+	<?php echo "$ " . $billable_amount . ".00"?></h3></td></td></tr>

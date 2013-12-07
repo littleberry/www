@@ -59,6 +59,7 @@ background-color: aqua;
 	<tr><td>
 	<b>Hours Tracked</b><br>
 	<?php 
+	echo $client_name[0]->client_name;
 	foreach ($sumquery as $timesheet_hours) {
 		echo $timesheet_hours->timesheet_hours;
 	}
@@ -79,18 +80,18 @@ background-color: aqua;
 </td></tr>
 	<tr><td><b>Name</b><br>
 				<?php
-		foreach ($client_url as $clients) {
-		print_r($clients);
+		foreach ($project_url as $projects) {
+		print_r($projects);
 		echo "<br>";
 	}
 	?>
 
 	</td><td><b>Hours</b><br>
 		<?php
-		foreach ($clienthoursquery as $clienthours) {
-		echo $clienthours->timesheet_hours;
-		echo "<br>";
-	}
+		//foreach ($clienthoursquery as $clienthours) {
+		//echo $clienthours->timesheet_hours;
+		//echo "<br>";
+	//}
 	?>
 
 	</td><td>Billable Hours</td><td>Billable Amount</td></tr>
