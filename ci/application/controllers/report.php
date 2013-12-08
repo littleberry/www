@@ -16,6 +16,8 @@ class Report extends CI_Controller {
 		$client_id = $this->input->get('client_id');
 		//date picker code
 		$this->load->library('DatePicker');   
+		//now we have the task object
+		$this->load->library('Task');
 		$mypicker = $this->datepicker->show_picker();
 	    $this->data['picker'] = $mypicker;
 	    //time tracker url code
@@ -47,7 +49,10 @@ class Report extends CI_Controller {
 	function index() {
 	    //load the model
 	    $this->load->model('Report_model', '', TRUE);
-		//we'll try doing this here instead of in the view (which is probably right!!)
+	    //this wass just a test to see how to load data into objects.
+	    //$task = $this->Report_model->getTaskObject();
+	    
+	    //we'll try doing this here instead of in the view (which is probably right!!)
 		//build the anchors dynamically to return to the view.
 		
 		//hours tracked
@@ -81,6 +86,7 @@ class Report extends CI_Controller {
 		
 		$project_total_rate = 0;
 		foreach ($total_rate as $rate) {
+			//print_r($total_rate);
 			$project_total_rate = $project_total_rate + $rate;
 		}
 		
@@ -98,7 +104,7 @@ class Report extends CI_Controller {
 		if ($this->input->get('page') == "clients") {
 			//****CLIENT DATA*****//
 			$client_url = array();
-			$client_total_rate = array();
+			$client_rate = "";
 			$this->data['controller'] = "report_controller";
 			$this->data['view'] = "client_report";
 			$clientquery = $this->Report_model->getClientHours($this->todate, $this->fromdate);
@@ -109,35 +115,62 @@ class Report extends CI_Controller {
 				$client_url[]['client_time'] = $clients['timesheet_hours'];
 				$client_hours_type = $this->Report_model->getHoursByClientType($this->todate, $this->fromdate, $clients['client_id']);
 				$i = 0;
+				$client_rate = "";
 				foreach ($client_hours_type as $hours) {
-				//print_r($hours);
-				//echo "<br><br>";
 					if ($hours['project_billable'] == 1) {
+					if ($i == 0) {
 						$client_url[]['client_billable_hours'] = $hours['timesheet_hours'];
+					}
 						if ($hours['project_invoice_by'] == "Project hourly rate") {
+							//echo "PROJECT HOURLY RATE";
 							$hourly_rate = $this->Report_model->getProjectHourlyRate($hours['project_id']);
-							$client_url[]['client_rate'] = money_format('%i', $hourly_rate[0]->project_hourly_rate * $hours['timesheet_hours']);
+							//echo "PROJECT HOURLY RATE";
+							//error_log(print_r($hourly_rate,true));
+							//error_log("HOURS");
+							//error_log(print_r($hours['client_id'],true));
+							$client_rate = money_format('%i', $hourly_rate[0]->project_hourly_rate * $hours['timesheet_hours']);
 						} elseif ($hours['project_invoice_by'] == "Person hourly rate") {
-							$hourly_rate = $this->Report_model->getPersonHourlyRate($project_type['person_id']);
-							$client_url[]['client_rate'] = money_format('%i', $hourly_rate[0]->person_hourly_rate * $hours['timesheet_hours']);
+							$hourly_rate = $this->Report_model->getPersonHourlyRate($hours['person_id']);
+							//error_log(print_r($hourly_rate,true));
+							$client_rate = money_format('%i', $hourly_rate[0]->person_hourly_rate * $hours['timesheet_hours']);
 						} else if ($hours['project_invoice_by'] == "Task hourly rate") {
-							$hourly_rate = $this->Report_model->getTaskHourlyRate($project_type['task_id']);
-							$client_url[]['client_rate'] = money_format('%i', $hourly_rate[0]->task_hourly_rate * $hours['timesheet_hours']);
+							//error_log("TASK IS");
+							//error_log($project_type['task_id']);
+							$hourly_rate = $this->Report_model->getTaskHourlyRate($hours['task_id']);
+							//error_log(print_r($hourly_rate,true));
+							$client_rate = money_format('%i', $hourly_rate[0]->task_hourly_rate * $hours['timesheet_hours']);
 						} elseif ($hours['project_invoice_by'] == "Do not apply hourly rate") {
-							$client_url[]['client_rate'] = "0.00";
+							$client_rate = "0.00";
 						}
 					} else {
 						if ($i == 0) {
 							$client_url[]['client_billable_hours'] = "0";
-							$client_url[]['client_rate'] = "0.00";
+							$client_rate = "0.00";
 						}
 					}
+				$client_rate_temp[] = array();
+				$client_rate_temp['client_rate'][] = $client_rate;
+				$client_rate_temp['client_id'][] = $hours['client_id'];
 				$i++;
 				}
 			}
-			
-			//$client_url[]['client_rate'] = $client_total_rate;
-			$this->data['client_url'] = $client_url;		
+
+		$client_url[]['client_total_rate'] = "";
+		foreach ($clientquery as $clients) {			
+			$running_total = 0;
+			foreach($client_rate_temp['client_id'] as $key=>$val) {
+				if ($clients['client_id'] == $client_rate_temp['client_id'][$key]) {		
+					
+					$running_total = money_format('%i', $client_rate_temp['client_rate'][$key] + $running_total);
+				}
+			}
+			$client_url[]['client_total_rate'] = $running_total;
+		}
+		
+
+			//error_log("BLERTIE");
+			//$client_url[]['client_total_rate'] = $client_total_rate;
+			$this->data['client_url'] = $client_url;
 			$data = $this->data;
 			$this->load->view('client_view', $data);
 		} elseif ($this->input->get('page') == "projects") {
@@ -177,6 +210,5 @@ class Report extends CI_Controller {
 		} elseif ($this->input->get('page') == "staff") {
 			$this->load->view('staff_view', $data);		
 		}
-	}
-	
+	}	
 }
