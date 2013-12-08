@@ -85,6 +85,7 @@ class Report_model extends CI_Model {
 	//get out the project hours and rate.
 	function getProjectHourlyRate($project_id) {
 		$hourlyratequery = $this->db->select('project_hourly_rate');
+		$hourlyratequery = $this->db->select('project_id');
 		$hourlyratequery = $this->db->from('project');
 		$hourlyratequery = $this->db->where('project_id =', $project_id);
 		$hourlyratequery = $this->db->get();	
@@ -94,6 +95,7 @@ class Report_model extends CI_Model {
 	//get out the person hours and rate.
 	function getPersonHourlyRate($person_id) {
 		$hourlyratequery = $this->db->select('person_hourly_rate');
+		$hourlyratequery = $this->db->select('person_id');
 		$hourlyratequery = $this->db->from('person');
 		$hourlyratequery = $this->db->where('person_id =', $person_id);
 		$hourlyratequery = $this->db->get();	
@@ -103,6 +105,7 @@ class Report_model extends CI_Model {
 	//get out the task hours and rate.
 	function getTaskHourlyRate($task_id) {
 		$hourlyratequery = $this->db->select('task_hourly_rate');
+		$hourlyratequery = $this->db->select('task_id');
 		$hourlyratequery = $this->db->from('task');
 		$hourlyratequery = $this->db->where('task_id =', $task_id);
 		$hourlyratequery = $this->db->get();	
@@ -162,6 +165,8 @@ class Report_model extends CI_Model {
 		$clienthoursquery = $this->db->select('project.project_invoice_by');
 		$clienthoursquery = $this->db->select('client.client_id');
 		$clienthoursquery = $this->db->select('project.project_id');
+		$clienthoursquery = $this->db->select('timesheet_item.task_id');
+		$clienthoursquery = $this->db->select('timesheet_item.person_id');
 		$clienthoursquery = $this->db->select_sum('timesheet_item.timesheet_hours');
 		$clienthoursquery = $this->db->from('client');
 		$clienthoursquery = $this->db->join('project', 'project.client_id = client.client_id');
@@ -169,8 +174,10 @@ class Report_model extends CI_Model {
 		$clienthoursquery = $this->db->where('client.client_id =', $client_id);
 		$clienthoursquery = $this->db->where('timesheet_item.timesheet_date <=', $to);
 		$clienthoursquery = $this->db->where('timesheet_item.timesheet_date >=', $from);
-		$clienthoursquery = $this->db->group_by('project.project_billable');
 		$clienthoursquery = $this->db->group_by('client.client_id');
+		$clienthoursquery = $this->db->group_by('project.project_billable');
+		$clienthoursquery = $this->db->group_by('timesheet_item.person_id');
+		$clienthoursquery = $this->db->group_by('timesheet_item.task_id');
 		$clienthoursquery = $this->db->having('count(*) > 0');
 		$clienthoursquery = $this->db->get();	
 		foreach($clienthoursquery->result_array() as $row)
@@ -278,5 +285,17 @@ class Report_model extends CI_Model {
 		}
 		return $rows;	
 	}
-
+	
+	//this is just a test to see how to load data into objects. 
+	function getTaskObject() {
+		$taskquery = $this->db->select('*');
+		$taskquery = $this->db->from('task');
+		$taskquery = $this->db->get();	
+		foreach($taskquery->result('Task') as $row)
+		{    
+		$rows[] = $row; //add the fetched result to the result array;
+		}
+		//error_log(print_r($rows,true));
+		return $rows;
+	}
 }
