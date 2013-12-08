@@ -168,8 +168,6 @@ class Report extends CI_Controller {
 		}
 		
 
-			//error_log("BLERTIE");
-			//$client_url[]['client_total_rate'] = $client_total_rate;
 			$this->data['client_url'] = $client_url;
 			$data = $this->data;
 			$this->load->view('client_view', $data);
