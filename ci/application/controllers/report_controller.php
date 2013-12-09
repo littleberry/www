@@ -12,7 +12,7 @@ class Report_controller extends CI_Controller {
 		parent::__construct();
 		$this->fromdate = $this->input->get('fromdate');
 		$this->todate = $this->input->get('todate');
-		$client_id = $this->input->get('client_id');
+		$this->client_id = $this->input->get('client_id');
 		//date picker code
 		$this->load->library('DatePicker');   
 		$mypicker = $this->datepicker->show_picker();
@@ -46,7 +46,7 @@ class Report_controller extends CI_Controller {
 	function client_report() {
 	    $this->load->model('Report_model', '', TRUE);
 		//all hours
-		$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
+		//$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
 		//billable hours
 		$this->data['billablequery'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
 		//clients returned to page as URLs
@@ -55,16 +55,17 @@ class Report_controller extends CI_Controller {
 		$this->data['controller'] = "report_controller";
 		$this->data['view'] = "project_report";
 		$projectquery = $this->Report_model->getProjectsByClient($this->todate, $this->fromdate, $this->client_id);
-		//print_r($projectquery);
 		$project_url = array();
+		$this->data['sum_project_hours'] = "0";
 		foreach ($projectquery as $projects) {
 			//print_r($clients);
 			$myurl = $this->timetrackerurls->generate_project_url($projects['project_id'], $projects['project_name'], $this->data['controller'], $this->data['view']);
 			$project_url[] = $myurl;
+			$this->data['sum_project_hours'] = $projects['timesheet_hours'];
 		}
 		$this->data['project_url'] = $project_url;
 		$this->data['client_name'] = $this->Report_model->getClientName($_GET["client_id"]);
-		error_log($this->client_id);
+		//error_log($this->client_id);
 		
 		//$this->data['clientquery'] = $this->Report_model->getClients($this->todate, $this->fromdate);
 		//$this->data['clienthoursquery'] = $this->Report_model->getClientHours($this->todate, $this->fromdate);

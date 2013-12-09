@@ -56,14 +56,11 @@ background-color: aqua;
 	<table width="100%" style="border:1px solid;">
 	<tr><td><?php echo $picker ?>
 	</td></tr>
+	<tr><td><?php echo $client_name[0]->client_name;?>
 	<tr><td>
 	<b>Hours Tracked</b><br>
 	<?php 
-	echo $client_name[0]->client_name;
-	foreach ($sumquery as $timesheet_hours) {
-		echo $timesheet_hours->timesheet_hours;
-	}
-	if (empty($sumquery)) echo "0";
+	print_r($sum_project_hours);
 	?>
 	</td><td><b>Billable Hours</b><br>
 	<?

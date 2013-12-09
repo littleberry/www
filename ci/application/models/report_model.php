@@ -209,19 +209,21 @@ class Report_model extends CI_Model {
 		return $rows;	
 	}
 	
-	function getProjectsByClient($to, $from, $project_id) {
+	function getProjectsByClient($to, $from, $client_id) {
+		$rows = array();
 		$projectquery = $this->db->select('project.project_name');
 		$projectquery = $this->db->select('project.project_id');
-		$projectquery = $this->db->select('client.client_name');
-		$projectquery = $this->db->select('client.client_id');
+		//$projectquery = $this->db->select('client.client_name');
+		//$projectquery = $this->db->select('client.client_id');
 		$projectquery = $this->db->from('project');
 		$projectquery = $this->db->select_sum('timesheet_item.timesheet_hours');
 		$projectquery = $this->db->join('client', 'client.client_id = project.client_id');
 		$projectquery = $this->db->join('timesheet_item', 'project.project_id = timesheet_item.project_id');
+		$projectquery = $this->db->where('client.client_id =', $client_id);
 		$projectquery = $this->db->where('timesheet_item.timesheet_date <=', $to);
 		$projectquery = $this->db->where('timesheet_item.timesheet_date >=', $from);
+		//$projectquery = $this->db->group_by('client.client_name');
 		$projectquery = $this->db->group_by('project.project_name');
-		$projectquery = $this->db->group_by('client.client_name');
 		$projectquery = $this->db->having('count(*) > 0');
 		$projectquery = $this->db->get();	
 		foreach($projectquery->result_array() as $row)

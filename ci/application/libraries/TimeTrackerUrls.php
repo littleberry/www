@@ -9,7 +9,8 @@ class TimeTrackerUrls{
 		$fromdate = $_GET['fromdate'];
 		$todate = $_GET['todate'];
 		$kind = 'week';
-		$anchor = anchor("$base/index.php/$controller/$view?fromdate=$fromdate&todate=$todate&client_id=$client_id", "$client_name");
+		$page = $_GET['page'];
+		$anchor = anchor("$base/index.php/$controller/$view?fromdate=$fromdate&todate=$todate&client_id=$client_id&page=$page", "$client_name");
 		return $anchor;
 	}
 

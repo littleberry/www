@@ -109,62 +109,69 @@ class Report extends CI_Controller {
 			$this->data['view'] = "client_report";
 			$clientquery = $this->Report_model->getClientHours($this->todate, $this->fromdate);
 			foreach ($clientquery as $clients) {
-				//error_log(print_r($clients,true));
-				$anchored_client_url = $this->timetrackerurls->generate_client_url($clients['client_id'], $clients['client_name'], $this->data['controller'], $this->data['view']);
-				$client_url[]['client_url'] = $anchored_client_url;
-				$client_url[]['client_time'] = $clients['timesheet_hours'];
 				$client_hours_type = $this->Report_model->getHoursByClientType($this->todate, $this->fromdate, $clients['client_id']);
 				$i = 0;
 				$client_rate = "";
+				$client_billable_time = "";
 				foreach ($client_hours_type as $hours) {
 					if ($hours['project_billable'] == 1) {
-					if ($i == 0) {
-						$client_url[]['client_billable_hours'] = $hours['timesheet_hours'];
-					}
 						if ($hours['project_invoice_by'] == "Project hourly rate") {
-							//echo "PROJECT HOURLY RATE";
 							$hourly_rate = $this->Report_model->getProjectHourlyRate($hours['project_id']);
-							//echo "PROJECT HOURLY RATE";
-							//error_log(print_r($hourly_rate,true));
-							//error_log("HOURS");
-							//error_log(print_r($hours['client_id'],true));
+							$client_total_time = $hours['timesheet_hours'];
+							$client_billable_time = $hours['timesheet_hours'];
 							$client_rate = money_format('%i', $hourly_rate[0]->project_hourly_rate * $hours['timesheet_hours']);
 						} elseif ($hours['project_invoice_by'] == "Person hourly rate") {
 							$hourly_rate = $this->Report_model->getPersonHourlyRate($hours['person_id']);
-							//error_log(print_r($hourly_rate,true));
+							$client_total_time = $hours['timesheet_hours'];
+							$client_billable_time = $hours['timesheet_hours'];
 							$client_rate = money_format('%i', $hourly_rate[0]->person_hourly_rate * $hours['timesheet_hours']);
 						} else if ($hours['project_invoice_by'] == "Task hourly rate") {
-							//error_log("TASK IS");
-							//error_log($project_type['task_id']);
 							$hourly_rate = $this->Report_model->getTaskHourlyRate($hours['task_id']);
-							//error_log(print_r($hourly_rate,true));
+							$client_total_time = $hours['timesheet_hours'];
+							$client_billable_time = $hours['timesheet_hours'];
 							$client_rate = money_format('%i', $hourly_rate[0]->task_hourly_rate * $hours['timesheet_hours']);
 						} elseif ($hours['project_invoice_by'] == "Do not apply hourly rate") {
+							$client_total_time = $hours['timesheet_hours'];
+							$client_billable_time = "0.00";
 							$client_rate = "0.00";
 						}
 					} else {
 						if ($i == 0) {
-							$client_url[]['client_billable_hours'] = "0";
+							$client_total_time = $hours['timesheet_hours'];
+							$client_billable_time = "0.00";
 							$client_rate = "0.00";
 						}
 					}
 				$client_rate_temp[] = array();
 				$client_rate_temp['client_rate'][] = $client_rate;
 				$client_rate_temp['client_id'][] = $hours['client_id'];
+				$client_rate_temp['client_billable_time'][] = $client_billable_time;
+				$client_rate_temp['client_total_time'][] = $client_total_time;
 				$i++;
 				}
 			}
 
 		$client_url[]['client_total_rate'] = "";
+		$client_url[]['client_billable_hours'] = "";
+		$client_url[]['client_total_hours'] = "";
 		foreach ($clientquery as $clients) {			
-			$running_total = 0;
+			$running_total_rate = 0;
+			$running_billable_time = 0;
+			$running_total_time = 0;
 			foreach($client_rate_temp['client_id'] as $key=>$val) {
 				if ($clients['client_id'] == $client_rate_temp['client_id'][$key]) {		
 					
-					$running_total = money_format('%i', $client_rate_temp['client_rate'][$key] + $running_total);
+					$anchored_client_url = $this->timetrackerurls->generate_client_url($clients['client_id'], $clients['client_name'], $this->data['controller'], $this->data['view']);
+					$running_total_time = $client_rate_temp['client_total_time'][$key] + $running_total_time;
+					$running_billable_time = $client_rate_temp['client_billable_time'][$key] + $running_billable_time;
+					$running_total_rate = money_format('%i', $client_rate_temp['client_rate'][$key] + $running_total_rate);
 				}
 			}
-			$client_url[]['client_total_rate'] = $running_total;
+			
+			$client_url[]['client_url'] = $anchored_client_url;
+			$client_url[]['client_total_hours'] = $running_total_time;
+			$client_url[]['client_billable_hours'] = $running_billable_time;
+			$client_url[]['client_total_rate'] = $running_total_rate;
 		}
 		
 
