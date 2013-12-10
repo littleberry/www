@@ -344,4 +344,39 @@ class Report_model extends CI_Model {
 		//error_log(print_r($rows,true));
 		return $rows;
 	}
+	
+	//what if we get ALL data
+	function getAllHours($to, $from) {
+		$rows = array(); //will hold all results
+		$projecthoursquery = $this->db->select('client.client_id');
+		$projecthoursquery = $this->db->select('client.client_name');
+		$projecthoursquery = $this->db->select('project.project_billable');
+		$projecthoursquery = $this->db->select('project.project_invoice_by');
+		$projecthoursquery = $this->db->select('project.project_id');
+		$projecthoursquery = $this->db->select('project.project_hourly_rate');
+		$projecthoursquery = $this->db->select('person.person_hourly_rate');
+		$projecthoursquery = $this->db->select('task.task_hourly_rate');
+		$projecthoursquery = $this->db->select('timesheet_item.task_id');
+		$projecthoursquery = $this->db->select('timesheet_item.person_id');
+		$projecthoursquery = $this->db->select('timesheet_item.timesheet_date');
+		$projecthoursquery = $this->db->select_sum('timesheet_item.timesheet_hours');
+		$projecthoursquery = $this->db->from('client');
+		$projecthoursquery = $this->db->join('project', 'project.client_id = client.client_id');
+		$projecthoursquery = $this->db->join('timesheet_item', 'timesheet_item.project_id = project.project_id');
+		$projecthoursquery = $this->db->join('task', 'timesheet_item.task_id = task.task_id');
+		$projecthoursquery = $this->db->join('person', 'timesheet_item.person_id = person.person_id');
+		$projecthoursquery = $this->db->where('timesheet_item.timesheet_date <=', $to);
+		$projecthoursquery = $this->db->where('timesheet_item.timesheet_date >=', $from);
+		$projecthoursquery = $this->db->group_by('client.client_name');
+		$projecthoursquery = $this->db->group_by('project.project_name');
+		$projecthoursquery = $this->db->group_by('task.task_id');
+		$projecthoursquery = $this->db->group_by('person.person_id');
+		$projecthoursquery = $this->db->having('count(*) > 0');
+		$projecthoursquery = $this->db->get();	
+		foreach($projecthoursquery->result_array() as $row)
+		{    
+        $rows[] = $row; //add the fetched result to the result array;
+		}
+		return $rows;	
+	}
 }

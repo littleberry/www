@@ -57,33 +57,41 @@ class Report extends CI_Controller {
 	    
 	    //we'll try doing this here instead of in the view (which is probably right!!)
 		//build the anchors dynamically to return to the view.
+		//testing
+		$testing = $this->Report_model->getAllHours($this->todate, $this->fromdate);
+		error_log(print_r($testing,true));
 		
 		//hours tracked
 		$this->data['total_hours'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
 		
 		//billable hours
-		$this->data['billable_hours'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
+		//$this->data['billable_hours'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
 		
 		//billable types
 		$billable_type = $this->Report_model->billableType($this->todate, $this->fromdate);
 		//project_hourly_rate
 		$total_rate = array();
+		$total_hours = array();
 		//this should be in an outside function or called from a library.
 		foreach ($billable_type as $project_type) {
 			if ($project_type['project_invoice_by'] == "Project hourly rate") {
 				$hourly_rate = $this->Report_model->getProjectHourlyRate($project_type['project_id']);
+				$total_hours[] = $project_type['timesheet_hours'];
 				$total_rate[] = money_format('%i', $hourly_rate[0]->project_hourly_rate * $project_type['timesheet_hours']);
 			}
 			if ($project_type['project_invoice_by'] == "Person hourly rate") {
 				$hourly_rate = $this->Report_model->getPersonHourlyRate($project_type['person_id']);
+				$total_hours[] = $project_type['timesheet_hours'];
 				$total_rate[] = money_format('%i', $hourly_rate[0]->person_hourly_rate * $project_type['timesheet_hours']);
 			}
 			if ($project_type['project_invoice_by'] == "Task hourly rate") {
 				$hourly_rate = $this->Report_model->getTaskHourlyRate($project_type['task_id']);
+				$total_hours[] = $project_type['timesheet_hours'];
 				$total_rate[] = money_format('%i', $hourly_rate[0]->task_hourly_rate * $project_type['timesheet_hours']);
 			}
 			if (($project_type['project_invoice_by'] == "Do not apply hourly rate")) {
 				$total_rate[] = 0;
+				$toal_hours[] = 0;
 			}
 		}
 		
@@ -92,7 +100,13 @@ class Report extends CI_Controller {
 			//print_r($total_rate);
 			$project_total_rate = $project_total_rate + $rate;
 		}
+		$project_total_hours = 0;
+		foreach ($total_hours as $hours) {
+			//print_r($total_rate);
+			$project_total_hours = $project_total_hours + $hours;
+		}
 		
+		$this->data['billable_hours'] = $project_total_hours;
 		$this->data['billable_amount'] = $project_total_rate;
 		//uninvoiced amount
 		//wait to implement until invoicing is complete
@@ -114,6 +128,7 @@ class Report extends CI_Controller {
 			$clientquery = $this->Report_model->getClientHours($this->todate, $this->fromdate);
 			foreach ($clientquery as $clients) {
 				$client_hours_type = $this->Report_model->getHoursByClientType($this->todate, $this->fromdate, $clients['client_id']);
+				error_log(print_r($client_hours_type,true));
 				$i = 0;
 				$client_rate = "";
 				$client_billable_time = "";
@@ -150,6 +165,7 @@ class Report extends CI_Controller {
 				$client_rate_temp['client_rate'][] = $client_rate;
 				$client_rate_temp['client_id'][] = $hours['client_id'];
 				$client_rate_temp['client_billable_time'][] = $client_billable_time;
+				//print_r($client_billable_time);
 				$client_rate_temp['client_total_time'][] = $client_total_time;
 				$i++;
 				}
@@ -158,6 +174,7 @@ class Report extends CI_Controller {
 		$client_url[]['client_total_rate'] = "";
 		$client_url[]['client_billable_hours'] = "";
 		$client_url[]['client_total_hours'] = "";
+		
 		foreach ($clientquery as $clients) {			
 			$running_total_rate = 0;
 			$running_billable_time = 0;
@@ -212,7 +229,7 @@ class Report extends CI_Controller {
 				$this->data["tasks"][] = $task->task_name;
 				$this->data["tasks"][] = $task->timesheet_hours;
 			}
-			error_log(print_r($task_url, true));
+			//error_log(print_r($task_url, true));
 			$this->data['task_url'] = $task_url;
 			$data = $this->data;
 			$this->load->view('task_view', $data);		

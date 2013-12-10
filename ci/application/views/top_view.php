@@ -62,11 +62,12 @@ background-color: aqua;
 	}
 	?></h3>
 	</td><td><td><h5>Billable Hours</h5><h3><?php 
-	if (!$billable_hours) {
-		echo 0;
-	} else {
-		echo $billable_hours[0]->timesheet_hours;
-	}
+	//if (!$billable_hours) {
+	//	echo 0;
+	//} else {
+	//	echo $billable_hours[0]->timesheet_hours;
+	//}
+	echo $billable_hours;
 	?>
 	<br>
 	<h5>Unbillable Hours</h5><h3><?php 
