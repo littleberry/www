@@ -19,10 +19,10 @@
 	<h1 class="site-title">Time Tracker</h1>
 	<nav id="site-nav" class="site-nav">
 		<ul id="site-menu" class="site-menu">
-			<li class="site-menu-item"><a class="site-menu-link" href="timesheet.php">Timesheets</a></li>
-			<li class="site-menu-item"><a class="site-menu-link" href="http://localhost:8888/time_tracker/ci/index.php/report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))));?>&page=clients">Reports</a></li>
+			<li class="site-menu-item"><a class="site-menu-link" href="/time_tracker/ui/timesheet.php">Timesheets</a></li>
+			<li class="site-menu-item"><a class="site-menu-link" href="/time_tracker/ci/index.php/report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))));?>&page=clients">Reports</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Invoices</a></li>
-			<li class="site-menu-item"><a class="site-menu-link" href="manage.php">Manage</a></li>
+			<li class="site-menu-item"><a class="site-menu-link" href="/time_tracker/ui/clients.php">Manage</a></li>
 		<?php //} ?>	
 		</ul>
 	</nav>
@@ -44,7 +44,7 @@
 	<nav id="section-nav" class="section-nav timesheets">
 		<h1 class="section-nav-title">Reports: </h1>
 		<ul class="section-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="http://localhost:8888/time_tracker/ci/index.php/report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))))?>&page=clients">Time</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ci/index.php/report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))))?>&page=clients">Time</a></li>
 			<!--li class="section-menu-item"><a class="section-menu-link" href="#">Expenses</a></li-->
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Detailed Time</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Uninvoiced</a></li>
