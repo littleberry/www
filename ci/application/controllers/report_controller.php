@@ -13,6 +13,7 @@ class Report_controller extends CI_Controller {
 		$this->fromdate = $this->input->get('fromdate');
 		$this->todate = $this->input->get('todate');
 		$this->client_id = $this->input->get('client_id');
+		$this->project_id = $this->input->get('project_id');
 		//date picker code
 		$this->load->library('DatePicker');   
 		$mypicker = $this->datepicker->show_picker();
@@ -153,13 +154,16 @@ class Report_controller extends CI_Controller {
 		
 		//these are all the queries
 		$this->load->model('Report_model', '', TRUE);
-		//all hours
-		$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
+		//all hours for projects
+		//NOT THIS THIS IS ALL HOURS, WE NEED TO AGGREGATE AT THE PROJECT LEVEL
+		//$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
 		//billable hours
-		$this->data['billablequery'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
+		//NOT THIS THIS IS ALL BILLABLE HOURS WE NEED TO AGGREGATE AT THE PROJECT LEVEL
+		//$this->data['billablequery'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
 		//projects
-		$this->data['projectquery'] = $this->Report_model->getProjects($this->todate, $this->fromdate);
-		$this->data['projecthoursquery'] = $this->Report_model->getProjectHours($this->todate, $this->fromdate);
+		error_log($this->project_id);
+		$this->data['project_query'] = $this->Report_model->projectBillableHours($this->todate, $this->fromdate, $this->project_id);
+		$this->data['project_hours_query'] = $this->Report_model->getHoursByProjectType($this->todate, $this->fromdate, $this->project_id);
 		$data = $this->data;
 		$this->load->view('header_view');
 		$this->load->view('report_project_view', $data);

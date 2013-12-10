@@ -44,7 +44,7 @@
 	<nav id="section-nav" class="section-nav timesheets">
 		<h1 class="section-nav-title">Reports: </h1>
 		<ul class="section-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="../ci/index.php/report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))))?>&page=clients">Time</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))))?>&page=clients">Time</a></li>
 			<!--li class="section-menu-item"><a class="section-menu-link" href="#">Expenses</a></li-->
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Detailed Time</a></li>
 			<li class="section-menu-item"><a class="section-menu-link" href="#">Uninvoiced</a></li>
