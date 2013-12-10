@@ -1,6 +1,7 @@
 <?php
 /***this is the main controller for the repots section.*/
 
+
 class Report extends CI_Controller {
 	var $base;
 	var $css;
@@ -11,6 +12,8 @@ class Report extends CI_Controller {
 	function __construct() {
 		//this is common code to all of these objects.
 		parent::__construct();
+		//load the header file
+		//$this->load->helper('header_helper');
 		$this->fromdate = $this->input->get('fromdate');
 		$this->todate = $this->input->get('todate');
 		$client_id = $this->input->get('client_id');
@@ -96,6 +99,7 @@ class Report extends CI_Controller {
 		
 		//top view common code
 		$data = $this->data;
+		$this->load->view('header_view');
 		$this->load->view('top_view', $data);
 		
 		

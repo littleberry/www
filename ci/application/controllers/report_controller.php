@@ -145,6 +145,7 @@ class Report_controller extends CI_Controller {
 		
 		
 		$data = $this->data;
+		$this->load->view('header_view');
 		$this->load->view('report_client_view', $data);
 	}
 	
@@ -160,6 +161,7 @@ class Report_controller extends CI_Controller {
 		$this->data['projectquery'] = $this->Report_model->getProjects($this->todate, $this->fromdate);
 		$this->data['projecthoursquery'] = $this->Report_model->getProjectHours($this->todate, $this->fromdate);
 		$data = $this->data;
+		$this->load->view('header_view');
 		$this->load->view('report_project_view', $data);
 	}
 
