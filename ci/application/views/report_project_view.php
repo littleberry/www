@@ -15,7 +15,7 @@
 			<h3 class="page-title"><?php echo date_format(new DateTime($_GET['fromdate']), "F j, Y");?> to <?php echo date_format(new DateTime($_GET['todate']), "F j, Y");?></h3>
 		</header>
 	<table width="100%">
-	<tr><td>
+	<tr><td><?php echo $project_url;?></td></tr>
 	<tr><td><?php echo $picker ?>
 	</td></tr>
 	<tr><td>

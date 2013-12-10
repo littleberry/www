@@ -56,44 +56,62 @@ background-color: aqua;
 	<table width="100%" style="border:1px solid;">
 	<tr><td><?php echo $picker ?>
 	</td></tr>
+	<tr><td><?php echo $client_name[0]->client_name;?>
 	<tr><td>
-	<b>Hours Tracked</b><br>
+	<b><h3>Hours Tracked</h3></b><br>
 	<?php 
-	foreach ($sumquery as $timesheet_hours) {
-		echo $timesheet_hours->timesheet_hours;
-	}
-	if (empty($sumquery)) echo "0";
+	print_r($sum_project_hours);
 	?>
-	</td><td><b>Billable Hours</b><br>
-	<?
-	foreach ($billablequery as $timesheet_hours) {
-		if (!$timesheet_hours) { 
-			echo "0";
-		} else {
-			echo $timesheet_hours->timesheet_hours;
-		}
+	</td><td><td><h5>Billable Hours</h5><h3><?php 
+	if (!$sum_project_billable_hours) {
+		echo 0;
+	} else {
+		echo $sum_project_billable_hours[0]->timesheet_hours;
 	}
 	?>
-	</td><td>Billable Amount</td><td>Uninvoiced Amount</td></tr>
+	<br>
+	<h5>Unbillable Hours</h5><h3><?php 
+	if (!$sum_project_hours) {
+		echo "0";
+	} elseif (!$sum_project_billable_hours) {
+		echo intval($sum_project_hours) - 0;
+	} else {
+		echo intval($sum_project_hours - intval($sum_project_billable_hours[0]->timesheet_hours) . ".00");
+	}
+	?>
+	</h3></h3></td><td>
+	<h5>Billable Amount</h5><h3>
+	<?php 
+	//figure this out on Monday
+	//$billable_amount = $project_url['project_billable_hours'];
+	//$billable_amount = $project_url[6]['project_total_rate'];
+	print_r($project_billable_sum);
+	//echo "$ " . $billable_amount?></h3></td></td></tr>
+
+	
+	</td></tr>
 	<tr><td colspan="4">	<div id="menucss"><?php echo $menu ?></div>
 </td></tr>
-	<tr><td><b>Name</b><br>
-				<?php
-		foreach ($client_url as $clients) {
-		print_r($clients);
-		echo "<br>";
+	<tr><td><h5>Name</h5></td><td><h5>Hours</h5></td><td><h5>Billable Hours</h5></td><td><h5>Billable Amount</h5></td></tr>
+	<?php 
+	$i = 0;
+	foreach ($project_url as $key=>$value) {
+		//print_r($project_url);
+		foreach ($value as $val) {
+			if ($val || $val == "0.00") {
+				echo "<td>$val</td>";
+				if ($i%4 == 2) {
+					echo "</tr><tr>";
+				}
+			}
+			$i++;
+		}
 	}
-	?>
+	echo "<BR><BR>";
+	//error_log(print_r($client_url,true));
+?>
+	</table>
 
-	</td><td><b>Hours</b><br>
-		<?php
-		foreach ($clienthoursquery as $clienthours) {
-		echo $clienthours->timesheet_hours;
-		echo "<br>";
-	}
-	?>
-
-	</td><td>Billable Hours</td><td>Billable Amount</td></tr>
 	</table>
 	</div>
 	<footer id="site-footer" class="site-footer">

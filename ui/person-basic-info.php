@@ -512,7 +512,7 @@ function showP(elem){
 				Project_Person::deletePersonProject($person_id->getValue("person_id"));
 				foreach ($project_ids as $project_id) {	
 					if (($project_id) && ($person_id)) {
-						$project_person->insertProjectPerson($person_id->getValue("person_id"), $project_id);
+						$project_person->insertProjectPerson($person_id->getValue("person_id"), $project_id, $_SESSION['logged_in']);
 					}
 				}
 			} catch (Exception $e) {

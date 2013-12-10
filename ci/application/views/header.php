@@ -21,7 +21,7 @@
 		<ul id="site-menu" class="site-menu">
 			<li class="site-menu-item"><a class="site-menu-link" href="timesheet.php">Timesheets</a></li>
 			<?php //if ($header_controller_vars->getValueEncoded("person_perm_id") != "Regular User") {
-				?>			<li class="site-menu-item"><a class="site-menu-link" href="http://localhost:8888/time_tracker/ci/index.php/report_controller/client_report?fromdate=2013-11-17&todate=2013-11-23">Reports</a></li>
+				?>			<li class="site-menu-item"><a class="site-menu-link" href="http://localhost:8888/time_tracker/ci/index.php/report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))));?>&page=clients">Reports</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Invoices</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="manage.php">Manage</a></li>
 		<?php //} ?>	
