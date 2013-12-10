@@ -132,6 +132,7 @@ class Report_controller extends CI_Controller {
 			$project_url[]['project_total_hours'] = $running_total_time;
 			$project_url[]['project_billable_hours'] = $running_billable_time;
 			$project_url[]['project_total_rate'] = $running_total_rate;
+			//client sum at the project level
 			$project_billable_sum = $project_billable_sum + $running_total_rate;
 		}
 ////////////////////////

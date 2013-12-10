@@ -83,8 +83,10 @@ background-color: aqua;
 	<h5>Billable Amount</h5><h3>
 	<?php 
 	//figure this out on Monday
-	$billable_amount = "0";
-	echo "$ " . $billable_amount . ".00"?></h3></td></td></tr>
+	//$billable_amount = $project_url['project_billable_hours'];
+	//$billable_amount = $project_url[6]['project_total_rate'];
+	print_r($project_billable_sum);
+	//echo "$ " . $billable_amount?></h3></td></td></tr>
 
 	
 	</td></tr>
