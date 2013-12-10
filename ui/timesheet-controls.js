@@ -311,6 +311,7 @@ function addTimesheetRow( row ) {
 		
 	$table
 		.append( $newRow );
+	calculateTotals( );
 		
 }
 
@@ -325,10 +326,9 @@ function decimalToTime( dec ) {
 }
 
 function timeToDecimal( time ) {
-	if ( time.indexOf( ":" ) >= 0 ) {
+	if ( (typeof dec == "string" ) && ( dec.indexOf( ":" ) >= 0 ) ) {
 		var num = numeral().unformat( time + ":00" );
 		num = num / 60 / 60;
-		console.log( "time -> dec: " + num );
 	} else {
 		var num = time;
 	}
@@ -336,54 +336,42 @@ function timeToDecimal( time ) {
 }
 
 
-function calculateTotals( elem ) {
-	if ( elem ) {
-		//called when updating a time entry
-		var rowTotal = 0;
-		$( elem )
-			.parents( 'tr' )
-			.find( 'input' )
-			.each( function( index, inputElem ) {
-				console.log( $( this ).val() );
-				rowTotal += timeToDecimal( $( inputElem ).val() );
-				console.log("rowTotal = " + rowTotal);
-			})
+function calculateTotals( ) {
+	var rowTotal = 0;
+	var colTotals = [0, 0, 0, 0, 0, 0, 0];
+	var grandTotal = 0
+	
+	$( "#timesheet-tasks-list" )
+		.find( 'tbody tr' )
+		.each( function( index, elem ){
+			$( elem ).find( 'input' )
+				.each( function( index, elem ){
+					rowTotal += numeral( $( elem ).val() + ":00" ).value();
+					colTotals[ index ] += numeral( $( elem ).val() + ":00" ).value();
+				})
 			.end()
 			.find( '.total' )
 			.text( function() {
-				var time = decimalToTime( rowTotal );
-				return time;
-			});
-		
-		var colTotal = 0;
-		var elemIndex = elem.parents('td').index();
-		
-		$( elem )
-			.parents( 'tbody' )
-			.find( 'tr' )
-			.each( function( index, elem ) {
-				colTotal += timeToDecimal( $( elem ).children( 'td' ).eq( elemIndex ).children( 'input' ).val() );
+				var weekTotal = numeral( rowTotal ).format( "00:00" );
+				grandTotal += rowTotal;
+				rowTotal = 0;
+				return weekTotal.substring( 0, weekTotal.lastIndexOf( ":00" ) );
 			})
-			.end()
-			.siblings( 'tfoot' )
-			.find( 'td' ).eq( elemIndex )
-			.text( function() {
-				var time = decimalToTime( colTotal );
-				return time;
-			});
-		
-		$( 'td.week-total' )
-			.text( function() {
-				var total = 0;
-				
-				$( this ).prevAll( '.total' )
-				.each( function() {
-					total += timeToDecimal( $( this ).text() );
-				})
-				var time = decimalToTime( total );
-				return time;
-			});	
-	}
+		})
+		.end()
+		.find( "tfoot td.day" )
+		.each( function( index, elem ){
+			$( elem ).text( function() {
+				var dayTotal = numeral( colTotals[index] ).format( "00:00" )
+				return dayTotal.substring( 0, dayTotal.lastIndexOf( ":00" ) );
+			})
+		})
+		.end()
+		.find( '.week-total' )
+		.text( function() {
+			var gTot = numeral( grandTotal ).format( "00:00" )
+			return gTot.substring( 0, gTot.lastIndexOf( ":00" ) );
+		});
 }
 
 function getWeekBookends( date ) {
