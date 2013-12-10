@@ -63,6 +63,7 @@ class Report_controller extends CI_Controller {
 			$myurl = $this->timetrackerurls->generate_project_url($projects['project_id'], $projects['project_name'], $this->data['controller'], $this->data['view']);
 			$this->data['sum_project_hours'] = $projects['timesheet_hours'];
 			$this->data['sum_project_billable_hours'] = $this->Report_model->projectBillableHours($this->todate, $this->fromdate, $projects['project_id']);
+			//$this->data['sum_project_billable_amount'] = money_format('%i', $this->data['sum_project_hours'] * $this->data['sum_project_billable_hours']);
 			
 			//get out the project data by project_id
 			$billable_hours_by_project = $this->Report_model->getHoursByProjectType($this->todate, $this->fromdate, $projects['project_id']);
@@ -111,6 +112,8 @@ class Report_controller extends CI_Controller {
 		$project_url[]['project_total_rate'] = "";
 		$project_url[]['project_billable_hours'] = "";
 		$project_url[]['project_total_hours'] = "";
+		//this is to display all of the project hours by rate rolled up.
+		$project_billable_sum = 0;
 		foreach ($projectquery as $projects) {			
 			$running_total_rate = 0;
 			$running_billable_time = 0;
@@ -129,10 +132,12 @@ class Report_controller extends CI_Controller {
 			$project_url[]['project_total_hours'] = $running_total_time;
 			$project_url[]['project_billable_hours'] = $running_billable_time;
 			$project_url[]['project_total_rate'] = $running_total_rate;
+			$project_billable_sum = $project_billable_sum + $running_total_rate;
 		}
 ////////////////////////
-		//}
-		$running_total_rate = "0.00";
+		//} 
+		
+		$this->data['project_billable_sum'] = $project_billable_sum;
 		$this->data['project_url'] = $project_url;
 		$this->data['client_name'] = $this->Report_model->getClientName($_GET["client_id"]);
 		//error_log($this->client_id);
