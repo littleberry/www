@@ -315,7 +315,15 @@ function addTimesheetRow( row ) {
 }
 
 function decimalToTime( dec ) {
-	var seconds = parseFloat( dec ) * 60 * 60;
+	if ( (typeof dec == "string" ) && ( dec.indexOf( ":" ) >= 0 ) ) {
+		console.log(typeof dec);
+		var seconds = numeral( dec ).value()
+	} else {
+		var seconds = parseFloat( dec ) * 60 * 60;
+	}
+	
+	
+	console.log( "seconds: " + seconds);
 	time = numeral( seconds ).format( "00:00" );
 	return time.substring( 0, time.lastIndexOf( ":" ) );
 }
