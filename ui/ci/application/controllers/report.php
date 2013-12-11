@@ -62,7 +62,6 @@ class Report extends CI_Controller {
 		//hours tracked
 		$all_data = $this->Report_model->getAllHours($this->todate, $this->fromdate);
 			$this->data['controller'] = "report_controller";
-			$this->data['view'] = "client_report";
 			foreach ($all_data as $data) {
 				$billable_time = "";
 				$total_time = "";
@@ -143,7 +142,9 @@ class Report extends CI_Controller {
 		
 		$this->input->get('page');
 		if ($this->input->get('page') == "clients") {
+		
 		//****CLIENT DATA*****//
+		$this->data['view'] = "client_report";
 		$client_url = array();
 		$client_url[]['client_billable_rate'] = array();
 		$client_url[]['client_billable_time'] = array();
@@ -174,6 +175,7 @@ class Report extends CI_Controller {
 			$this->load->view('client_view', $data);
 		} elseif ($this->input->get('page') == "projects") {
 			//****PROJECT DATA******/
+		$this->data['view'] = "project_report";
 		$project_url = array();
 		$project_url[]['project_billable_rate'] = array();
 		$project_url[]['project_billable_time'] = array();
@@ -205,13 +207,13 @@ class Report extends CI_Controller {
 			$this->load->view('project_view', $data);		
 		} elseif ($this->input->get('page') == "tasks") {
 			//****TASK DATA******/
+		$this->data['view'] = "task_report";
 		$task_url = array();
 		$task_url[]['task_billable_rate'] = array();
 		$task_url[]['task_billable_time'] = array();
 		$task_url[]['task_total_time'] = array();
 		$taskquery = $this->Report_model->getTaskHours($this->todate, $this->fromdate);
 		foreach ($taskquery as $tasks) {			
-			//THE ARRAY HAS BLANKS BECAUSE THESE VALUES ARE BEING INITIALIZED HERE.
 			$running_total_time = '';
 			$running_billable_time = '';
 			$running_billable_rate = '';
@@ -235,13 +237,13 @@ class Report extends CI_Controller {
 			$data = $this->data;
 			$this->load->view('task_view', $data);				
 		} elseif ($this->input->get('page') == "staff") {
+			$this->data['view'] = "person_report";
 			$person_url = array();
 		$person_url[]['person_billable_rate'] = array();
 		$person_url[]['person_billable_time'] = array();
 		$person_url[]['person_total_time'] = array();
 		$personquery = $this->Report_model->getPersonHours($this->todate, $this->fromdate);
 		foreach ($personquery as $persons) {			
-			//THE ARRAY HAS BLANKS BECAUSE THESE VALUES ARE BEING INITIALIZED HERE.
 			$running_total_time = '';
 			$running_billable_time = '';
 			$running_billable_rate = '';
