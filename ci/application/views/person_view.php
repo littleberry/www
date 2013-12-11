@@ -5,7 +5,7 @@
 	<?php 
 	//error_log(print_r($client_url,true));
 	$i = 0;
-	foreach ($task_url as $key=>$value) {
+	foreach ($person_url as $key=>$value) {
 		foreach ($value as $val) {
 			if ($val || $val == "0.00") {
 				echo "<td>$val</td>";

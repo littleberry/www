@@ -172,6 +172,63 @@ class Report_model extends CI_Model {
 		return $rows;	
 	}
 	
+	function getProjectHours($to, $from) {
+		$rows = array();
+		$projecthoursquery = $this->db->select('project.project_name');
+		$projecthoursquery = $this->db->select('project.project_id');
+		$projecthoursquery = $this->db->select_sum('timesheet_hours');
+		$projecthoursquery = $this->db->from('project');
+		$projecthoursquery = $this->db->join('timesheet_item', 'project.project_id = timesheet_item.project_id');
+		$projecthoursquery = $this->db->where('timesheet_date <=', $to);
+		$projecthoursquery = $this->db->where('timesheet_date >=', $from);
+		$projecthoursquery = $this->db->group_by('project.project_name');
+		$projecthoursquery = $this->db->having('count(*) > 0');
+		$projecthoursquery = $this->db->get();	
+		foreach($projecthoursquery->result_array() as $row)
+		{    
+        $rows[] = $row; //add the fetched result to the result array;
+		}
+		return $rows;
+	}
+	
+	function getTaskHours($to, $from) {
+		$rows = array();
+		$taskhoursquery = $this->db->select('task.task_name');
+		$taskhoursquery = $this->db->select('task.task_id');
+		$taskhoursquery = $this->db->select_sum('timesheet_hours');
+		$taskhoursquery = $this->db->from('task');
+		$taskhoursquery = $this->db->join('timesheet_item', 'task.task_id = timesheet_item.task_id');
+		$taskhoursquery = $this->db->where('timesheet_date <=', $to);
+		$taskhoursquery = $this->db->where('timesheet_date >=', $from);
+		$taskhoursquery = $this->db->group_by('task.task_name');
+		$taskhoursquery = $this->db->having('count(*) > 0');
+		$taskhoursquery = $this->db->get();	
+		foreach($taskhoursquery->result_array() as $row)
+		{    
+        $rows[] = $row; //add the fetched result to the result array;
+		}
+		return $rows;
+	}
+	
+	function getPersonHours($to, $from) {
+		$rows = array();
+		$personhoursquery = $this->db->select('person.person_first_name');
+		$personhoursquery = $this->db->select('person.person_id');
+		$personhoursquery = $this->db->select_sum('timesheet_hours');
+		$personhoursquery = $this->db->from('person');
+		$personhoursquery = $this->db->join('timesheet_item', 'person.person_id = timesheet_item.person_id');
+		$personhoursquery = $this->db->where('timesheet_date <=', $to);
+		$personhoursquery = $this->db->where('timesheet_date >=', $from);
+		$personhoursquery = $this->db->group_by('person.person_first_name');
+		$personhoursquery = $this->db->having('count(*) > 0');
+		$personhoursquery = $this->db->get();	
+		foreach($personhoursquery->result_array() as $row)
+		{    
+        $rows[] = $row; //add the fetched result to the result array;
+		}
+		return $rows;
+	}
+	
 	function getHoursByClientType($to, $from, $client_id) {
 		$rows = array(); //will hold all results
 		$clienthoursquery = $this->db->select('project.project_billable');
@@ -252,18 +309,7 @@ class Report_model extends CI_Model {
 	}
 	
 	//NOT SURE WE'RE GOING TO USE THIS
-	function getProjectHours($to, $from) {
-		$projecthoursquery = $this->db->select('project_name');
-		$projecthoursquery = $this->db->from('project');
-		$projecthoursquery = $this->db->select_sum('timesheet_hours');
-		$projecthoursquery = $this->db->join('timesheet_item', 'project.project_id = timesheet_item.project_id');
-		$projecthoursquery = $this->db->where('timesheet_date <=', $to);
-		$projecthoursquery = $this->db->where('timesheet_date >=', $from);
-		$projecthoursquery = $this->db->group_by('project_name');
-		$projecthoursquery = $this->db->having('count(*) > 0');
-		$projecthoursquery = $this->db->get();	
-		return $projecthoursquery->result();
-	}
+
 	
 	function getProjects($to, $from) {
 		$rows = array();
