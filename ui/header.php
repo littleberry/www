@@ -59,11 +59,11 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 	<h1 class="site-title">Time Tracker</h1>
 	<nav id="site-nav" class="site-nav">
 		<ul id="site-menu" class="site-menu">
-			<li class="site-menu-item"><a class="site-menu-link" href="timesheet.php">Timesheets</a></li>
+			<li class="site-menu-item"><a class="site-menu-link" href="../ui/timesheet.php">Timesheets</a></li>
 			<?php //if ($header_controller_vars->getValueEncoded("person_perm_id") != "Regular User") {?>
-			<li class="site-menu-item"><a class="site-menu-link" href="#">Reports</a></li>
+			<li class="site-menu-item"><a class="site-menu-link" href="../ci/index.php/report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))));?>&page=clients">Reports</a></li>
 			<li class="site-menu-item"><a class="site-menu-link" href="#">Invoices</a></li>
-			<li class="site-menu-item"><a class="site-menu-link" href="manage.php">Manage</a></li>
+			<li class="site-menu-item"><a class="site-menu-link" href="../ui/projects.php">Manage</a></li>
 		<?php //} ?>	
 		</ul>
 	</nav>
@@ -75,11 +75,22 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 	<nav id="section-nav" class="section-nav timesheets">
 		<h1 class="section-nav-title">Timesheets: </h1>
 		<ul class="section-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="timesheet.php">Time</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ui/timesheet.php">Time</a></li>
 			<!--li class="section-menu-item"><a class="section-menu-link" href="#">Expenses</a></li-->
-			<li class="section-menu-item"><a class="section-menu-link" href="timesheet_submitted.php">Pending Approval</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="timesheet_unsubmitted.php">Unsubmitted</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="timesheet_archived.php">Archive</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ui/timesheet_submitted.php">Pending Approval</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ui/timesheet_unsubmitted.php">Unsubmitted</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ui/timesheet_archived.php">Archive</a></li>
+
+		</ul>
+	</nav>
+	<nav id="section-nav" class="section-nav timesheets">
+		<h1 class="section-nav-title">Reports: </h1>
+		<ul class="section-menu">
+			<li class="section-menu-item"><a class="section-menu-link" href="../ci/index.php/report?fromdate=<?php echo date("Y-m-d", strtotime("last monday", strtotime(date("Y-m-d"))));?>&todate=<?php echo date("Y-m-d", strtotime("this sunday", strtotime(date("Y-m-d"))))?>&page=clients">Time</a></li>
+			<!--li class="section-menu-item"><a class="section-menu-link" href="#">Expenses</a></li-->
+			<li class="section-menu-item"><a class="section-menu-link" href="#">Detailed Time</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="#">Uninvoiced</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="#">Project Budget</a></li>
 
 		</ul>
 	</nav>
@@ -87,10 +98,10 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] != "") {
 	<nav id="section-nav" class="section-nav manage">
 		<h1 class="section-nav-title">Manage: </h1>
 		<ul class="section-menu">
-			<li class="section-menu-item"><a class="section-menu-link" href="projects.php">Projects</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="clients.php">Clients</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="people.php">People</a></li>
-			<li class="section-menu-item"><a class="section-menu-link" href="tasks.php">Tasks</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ui/projects.php">Projects</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ui/clients.php">Clients</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ui/people.php">People</a></li>
+			<li class="section-menu-item"><a class="section-menu-link" href="../ui/tasks.php">Tasks</a></li>
 		</ul>
 	</nav>
 	<?php //} ?>

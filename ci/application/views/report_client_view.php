@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-	require_once("/Applications/MAMP/htdocs/time_tracker/common/common.inc.php");
+	//require_once("/Applications/MAMP/htdocs/time_tracker/common/common.inc.php");
 	//probably shouldn't be in the view, but we'll leave it here for now
 	//take this out for now until I can figure out what's wrog
 	//checklogin();
-	include('header.php'); //add header.php to page moved to only be called when page is rendered so it's not sent back when page saved via JS/Ajax
+	//include('header.php'); //add header.php to page moved to only be called when page is rendered so it's not sent back when page saved via JS/Ajax
 ?>
 <style>
 #menucss
@@ -53,30 +53,30 @@ background-color: aqua;
 			<h1>This week:</h1>
 			<h3 class="page-title"><?php echo date_format(new DateTime($_GET['fromdate']), "F j, Y");?> to <?php echo date_format(new DateTime($_GET['todate']), "F j, Y");?></h3>
 		</header>
-	<table width="100%" style="border:1px solid;">
-	<tr><td><?php echo $picker ?>
-	</td></tr>
+	<table width="100%" border=1px solid>
+	<tr><td><?php echo $picker ?></td></tr>
 	<tr><td><?php echo $client_name[0]->client_name;?>
 	<tr><td>
 	<b><h3>Hours Tracked</h3></b><br>
 	<?php 
-	print_r($sum_project_hours);
+	print_r($project_hours_sum);
 	?>
 	</td><td><td><h5>Billable Hours</h5><h3><?php 
-	if (!$sum_project_billable_hours) {
-		echo 0;
-	} else {
-		echo $sum_project_billable_hours[0]->timesheet_hours;
-	}
+	//if (!$sum_project_billable_hours) {
+	//	echo 0;
+	//} else {
+	//	echo $sum_project_billable_hours[0]->timesheet_hours;
+	//}
+	print_r($project_billable_hours_sum);
 	?>
 	<br>
 	<h5>Unbillable Hours</h5><h3><?php 
-	if (!$sum_project_hours) {
+	if (!$project_hours_sum) {
 		echo "0";
-	} elseif (!$sum_project_billable_hours) {
-		echo intval($sum_project_hours) - 0;
+	} elseif (!$project_hours_sum) {
+		echo intval($project_hours_sum) - 0;
 	} else {
-		echo intval($sum_project_hours - intval($sum_project_billable_hours[0]->timesheet_hours) . ".00");
+		echo intval($project_hours_sum - intval($project_billable_hours_sum) . ".00");
 	}
 	?>
 	</h3></h3></td><td>
@@ -85,7 +85,8 @@ background-color: aqua;
 	//figure this out on Monday
 	//$billable_amount = $project_url['project_billable_hours'];
 	//$billable_amount = $project_url[6]['project_total_rate'];
-	print_r($project_billable_sum);
+	print_r($project_billable_sum) . ".00";
+	echo ".00";
 	//echo "$ " . $billable_amount?></h3></td></td></tr>
 
 	

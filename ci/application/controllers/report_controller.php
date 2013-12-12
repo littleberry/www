@@ -12,7 +12,16 @@ class Report_controller extends CI_Controller {
 		parent::__construct();
 		$this->fromdate = $this->input->get('fromdate');
 		$this->todate = $this->input->get('todate');
-		$this->client_id = $this->input->get('client_id');
+		//get the information for the page we're viewing.
+		if (isset($_GET['client_id'])) {
+			$this->client_id = $this->input->get('client_id');
+		} elseif (isset($_GET['project_id'])) {
+			$this->project_id = $this->input->get('project_id');
+		} elseif (isset($_GET['task_id'])) {
+			$this->task_id = $this->input->get('task_id');
+		} elseif (isset($_GET['person_id'])) {
+			$this->person_id = $this->input->get('person_id');
+		}
 		//date picker code
 		$this->load->library('DatePicker');   
 		$mypicker = $this->datepicker->show_picker();
@@ -45,32 +54,17 @@ class Report_controller extends CI_Controller {
 	
 	function client_report() {
 	    $this->load->model('Report_model', '', TRUE);
-		//all hours
-		//$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
-		//billable hours
 		$this->data['billablequery'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
-		//clients returned to page as URLs
-		//we'll try doing this here instead of in the view (which is probably right!!)
-		//build the anchors dynamically to return to the view.
 		$this->data['controller'] = "report_controller";
 		$this->data['view'] = "project_report";
 		$projectquery = $this->Report_model->getProjectsByClient($this->todate, $this->fromdate, $this->client_id);
 		$project_url = array();
-		$this->data['sum_project_hours'] = "0";
-		$this->data['sum_project_billable_hours'] = "0";
 		foreach ($projectquery as $projects) {
-			//print_r($clients);
 			$myurl = $this->timetrackerurls->generate_project_url($projects['project_id'], $projects['project_name'], $this->data['controller'], $this->data['view']);
-			$this->data['sum_project_hours'] = $projects['timesheet_hours'];
-			$this->data['sum_project_billable_hours'] = $this->Report_model->projectBillableHours($this->todate, $this->fromdate, $projects['project_id']);
-			//$this->data['sum_project_billable_amount'] = money_format('%i', $this->data['sum_project_hours'] * $this->data['sum_project_billable_hours']);
-			
-			//get out the project data by project_id
 			$billable_hours_by_project = $this->Report_model->getHoursByProjectType($this->todate, $this->fromdate, $projects['project_id']);
-			///////////////////
 			$i = 0;
 			$project_rate = "";
-				$project_billable_time = "";
+			$project_billable_time = "";
 				foreach ($billable_hours_by_project as $hours) {
 					if ($hours['project_billable'] == 1) {
 						if ($hours['project_invoice_by'] == "Project hourly rate") {
@@ -114,6 +108,10 @@ class Report_controller extends CI_Controller {
 		$project_url[]['project_total_hours'] = "";
 		//this is to display all of the project hours by rate rolled up.
 		$project_billable_sum = 0;
+		//this is to display all of the billable project hours rolled up.
+		$project_billable_hours_sum = 0;
+		//this is to display all of the project hours rolled up.
+		$project_hours_sum = 0;
 		foreach ($projectquery as $projects) {			
 			$running_total_rate = 0;
 			$running_billable_time = 0;
@@ -132,19 +130,23 @@ class Report_controller extends CI_Controller {
 			$project_url[]['project_total_hours'] = $running_total_time;
 			$project_url[]['project_billable_hours'] = $running_billable_time;
 			$project_url[]['project_total_rate'] = $running_total_rate;
-			//client sum at the project level
+			//client sum hours at the project level
+			$project_hours_sum = $project_hours_sum + $running_total_time;
+			//client sum billable hours at the project level
+			$project_billable_hours_sum = $project_billable_hours_sum + $running_billable_time; 
+			//client sum billable amount at the project level
 			$project_billable_sum = $project_billable_sum + $running_total_rate;
 		}
-////////////////////////
-		//} 
-		
+
+		$this->data['project_hours_sum'] = $project_hours_sum;
+		$this->data['project_billable_hours_sum'] = $project_billable_hours_sum;
 		$this->data['project_billable_sum'] = $project_billable_sum;
 		$this->data['project_url'] = $project_url;
 		$this->data['client_name'] = $this->Report_model->getClientName($_GET["client_id"]);
-		//error_log($this->client_id);
 		
 		
 		$data = $this->data;
+		$this->load->view('header_view');
 		$this->load->view('report_client_view', $data);
 	}
 	
@@ -152,15 +154,25 @@ class Report_controller extends CI_Controller {
 		
 		//these are all the queries
 		$this->load->model('Report_model', '', TRUE);
-		//all hours
-		$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
+		//all hours for projects
+		//NOT THIS THIS IS ALL HOURS, WE NEED TO AGGREGATE AT THE PROJECT LEVEL
+		//$this->data['sumquery'] = $this->Report_model->sumHours($this->todate, $this->fromdate);
 		//billable hours
-		$this->data['billablequery'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
+		//NOT THIS THIS IS ALL BILLABLE HOURS WE NEED TO AGGREGATE AT THE PROJECT LEVEL
+		//$this->data['billablequery'] = $this->Report_model->billableHours($this->todate, $this->fromdate);
 		//projects
-		$this->data['projectquery'] = $this->Report_model->getProjects($this->todate, $this->fromdate);
-		$this->data['projecthoursquery'] = $this->Report_model->getProjectHours($this->todate, $this->fromdate);
+		error_log($this->project_id);
+		$this->data['project_query'] = $this->Report_model->projectBillableHours($this->todate, $this->fromdate, $this->project_id);
+		$this->data['project_hours_query'] = $this->Report_model->getHoursByProjectType($this->todate, $this->fromdate, $this->project_id);
 		$data = $this->data;
+		$this->load->view('header_view');
 		$this->load->view('report_project_view', $data);
+	}
+	
+	function task_report() {
+		$data = array();
+		$this->load->view('header_view');
+		$this->load->view('report_task_view', $data);
 	}
 
 	

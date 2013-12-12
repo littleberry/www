@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-	require_once("/Applications/MAMP/htdocs/time_tracker/common/common.inc.php");
+	//require_once("/Applications/MAMP/htdocs/time_tracker/common/common.inc.php");
 	//probably shouldn't be in the view, but we'll leave it here for now
 	//take this out for now until I can figure out what's wrog
 	//checklogin();
-	include('header.php'); //add header.php to page moved to only be called when page is rendered so it's not sent back when page saved via JS/Ajax
+	//include('header.php'); //add header.php to page moved to only be called when page is rendered so it's not sent back when page saved via JS/Ajax
 ?>
 <style>
 #menucss
@@ -55,29 +55,21 @@ background-color: aqua;
 		</header>
 	<table width="100%" border=1px solid;>
 	<tr><td width=25%><h5>Hours Tracked</h5><h3><?php 
-	if (!$total_hours) {
-		echo 0;
-	} else {
-		echo $total_hours[0]->timesheet_hours;
-	}
+	print_r($total_time);
 	?></h3>
 	</td><td><td><h5>Billable Hours</h5><h3><?php 
-	if (!$billable_hours) {
-		echo 0;
-	} else {
-		echo $billable_hours[0]->timesheet_hours;
-	}
+	print_r($billable_time);
 	?>
 	<br>
 	<h5>Unbillable Hours</h5><h3><?php 
-	if (!$total_hours) {
+	if (!$total_time) {
 		echo "0";
-	} elseif (!$billable_hours) {
-		echo intval($total_hours[0]->timesheet_hours) - 0;
+	} elseif (!$billable_time) {
+		print_r($total_time);
 	} else {
-		echo intval($total_hours[0]->timesheet_hours) - intval($billable_hours[0]->timesheet_hours) . ".00";
+		echo intval($total_time - $billable_time);
 	}
 	?>
 	</h3></h3></td><td>
 	<h5>Billable Amount</h5><h3>
-	<?php echo "$ " . $billable_amount . ".00"?></h3></td></td></tr>
+	<?php echo "$ " . $billable_rate . ".00"?></h3></td></td></tr>
